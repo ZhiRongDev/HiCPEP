@@ -3,7 +3,6 @@ import os
 import argparse
 import numpy as np
 import pandas as pd
-from copy import deepcopy
 
 parser = argparse.ArgumentParser(
     prog='xxx.py',
@@ -37,7 +36,8 @@ def calc_approxPC1Pattern(**kwargs):
 
     del pearson_df
 
-    if len(pearson_np) != len(pearson_np[0]):
+    if len(pearson_np) != len(pearson_np[0]): 
+        print("Pearson matrix has a different number of rows and columns")
         return
 
     # According the steps in SVD, here we set the degree of freedom as n   
@@ -52,8 +52,9 @@ def calc_approxPC1Pattern(**kwargs):
     # The sign of the pearson with the largest absSum in cov_pearson_np_absSum should correspond with the patterns of EV1.
     cov_selected_np = cov_np[sorted_cov_absSum[0][0]]
 
-    print(cov_selected_np)
-
+    if kwargs["output"] == "None":
+        return
+    
     filename = kwargs["output"]
     os.makedirs(os.path.dirname(filename), exist_ok=True)
 
