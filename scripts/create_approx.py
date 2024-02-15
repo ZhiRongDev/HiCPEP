@@ -4,30 +4,9 @@ import argparse
 import numpy as np
 import pandas as pd
 
-parser = argparse.ArgumentParser(
-    prog='xxx.py',
-    allow_abbrev=False,
-    description='What the program does',
-    epilog='Text at the bottom of help'
-)
-parser.add_argument(
-    "--pearson",
-    type=str,
-    required=True,
-    help="Input blablabla"
-)
-parser.add_argument(
-    "--output",
-    type=str,
-    default="None",
-    help="Input int"
-)
-
-args = parser.parse_args()
-
-def calc_approxPC1Pattern(**kwargs):
+def create_approx(pearson, output, type):
     # Read in the Pearson correlatin matrix
-    pearson_df = pd.read_table(kwargs["pearson"], header=None, sep=" ")
+    pearson_df = pd.read_table(pearson, header=None, sep=" ")
     pearson_df.pop(pearson_df.columns[-1])
     pearson_df = pearson_df.dropna(axis=0, how="all").reset_index(drop=True)
     pearson_df = pearson_df.dropna(axis=1, how="all")
@@ -47,15 +26,20 @@ def calc_approxPC1Pattern(**kwargs):
     # Main idea, note that the covariance matrix is symmetric
     cov_absSum = [np.sum(np.abs(row)) for row in cov_np] 
     cov_absSum = list(enumerate(cov_absSum)) # Turn list into tuple with index, ex: (index, absSum)
-    sorted_cov_absSum = sorted(cov_absSum, key=lambda x: x[1], reverse=True) 
-    
-    # The sign of the pearson with the largest absSum in cov_pearson_np_absSum should correspond with the patterns of EV1.
-    cov_selected_np = cov_np[sorted_cov_absSum[0][0]]
+    sorted_cov_absSum = sorted(cov_absSum, key=lambda x: x[1], reverse=True) # Sorted from the maximum to the minimum 
 
-    if kwargs["output"] == "None":
+    # Decide to choose CxMax or CxMin
+    if type == "CxMax":
+        sorted_index = 0
+    elif type == "CxMin":
+        sorted_index = -1
+
+    cov_selected_np = cov_np[sorted_cov_absSum[sorted_index][0]]
+
+    if output == "None":
         return
     
-    filename = kwargs["output"]
+    filename = output
     os.makedirs(os.path.dirname(filename), exist_ok=True)
 
     with open(filename, 'w') as f:
@@ -67,4 +51,33 @@ def calc_approxPC1Pattern(**kwargs):
         
         f.write(tmp_str)
 
-calc_approxPC1Pattern(pearson=args.pearson, output=args.output)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        prog='xxx.py',
+        allow_abbrev=False,
+        description='What the program does', epilog='Text at the bottom of help'
+    )
+    parser.add_argument(
+        "--pearson",
+        type=str,
+        required=True,
+        help="Input blablabla"
+    )
+    parser.add_argument(
+        "--output",
+        type=str,
+        default="None",
+        help="Input int"
+    )
+    parser.add_argument(
+        "--type",
+        type=str,
+        default="CxMax",
+        help="Input int"
+    )
+
+    args = parser.parse_args()
+    kwargs = vars(args) # Turn into dict
+
+    create_approx(**kwargs)
