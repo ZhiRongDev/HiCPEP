@@ -50,7 +50,7 @@ def write_to_excel(output_file):
             cells = ["CH12-LX"]
             chroms = [str(i) for i in range(1, 20)]
     
-        chroms.extend(["Y", "X"])
+        chroms.extend(["X", "Y"])
         resolutions = ["1Mb", "100Kb"]
         types = ["CxMax", "CxMin"]
 
