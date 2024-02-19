@@ -3,31 +3,31 @@ import pandas as pd
 
 def summary_correctness(Juicer_PC1, approx):
     # Read in the Eigenvector 1
-    EV1_df = pd.read_table(Juicer_PC1, header=None)
-    EV1_df = EV1_df.dropna(axis=0, how="all").reset_index(drop=True)
-    EV1_np = EV1_df.values # Turn into numpy format
-    EV1_np = EV1_np.flatten() # Turn into 1D vector
+    PC1_df = pd.read_table(Juicer_PC1, header=None)
+    PC1_df = PC1_df.dropna(axis=0, how="all").reset_index(drop=True)
+    PC1_np = PC1_df.values # Turn into numpy format
+    PC1_np = PC1_np.flatten() # Turn into 1D vector
 
     approx_df = pd.read_table(approx, header=None)
     approx_np = approx_df.values # Turn into numpy format
     approx_np = approx_np.flatten() # Turn into 1D vector
 
-    del EV1_df, approx_df
+    del PC1_df, approx_df
 
-    if len(EV1_np) != len(approx_np): 
+    if len(PC1_np) != len(approx_np): 
         print("juicer_PC1 and approx has a different number of elements")
         return
     
-    entryNum = len(EV1_np)
+    entryNum = len(PC1_np)
 
-    if np.corrcoef(EV1_np, approx_np)[0][1] < 0:
+    if np.corrcoef(PC1_np, approx_np)[0][1] < 0:
         approx_np = -approx_np
 
-    EV1_pos_np = EV1_np > 0
+    PC1_pos_np = PC1_np > 0
     approx_pos_np = approx_np > 0
-    EV1_pos_VS_approx_pos_np = EV1_pos_np == approx_pos_np 
+    PC1_pos_VS_approx_pos_np = PC1_pos_np == approx_pos_np 
     
-    correctNum = list(EV1_pos_VS_approx_pos_np).count(True)
+    correctNum = list(PC1_pos_VS_approx_pos_np).count(True)
     correctRate = correctNum / entryNum
 
     return {
