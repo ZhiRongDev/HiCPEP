@@ -6,6 +6,10 @@ LIEBERMAN_DATA_PATH="/home/jordan990301/Projects/HiC-PC1_approx/data/Lieberman_A
 OUTPUT_PATH="/home/jordan990301/Projects/HiC-PC1_approx/outputs/approx_PC1_pattern"
 PY_FILE="/home/jordan990301/Projects/HiC-PC1_approx/code_for_paper/Lieberman2009/create_approx_2009.py"
 
+# cell_line_names=(\
+#     "K562"\
+# )
+
 for RESOLUTION in "1000000" "100000"
 do
     if [ $RESOLUTION = "1000000" ]

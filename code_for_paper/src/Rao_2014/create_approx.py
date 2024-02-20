@@ -37,6 +37,8 @@ def create_approx(pearson, output, type):
     cov_selected_np = cov_np[sorted_cov_absSum[sorted_index][0]]
 
     if output == "None":
+        for val in cov_selected_np:
+            print(val)
         return
     
     filename = output
@@ -44,13 +46,12 @@ def create_approx(pearson, output, type):
 
     with open(filename, 'w') as f:
         tmp_str = ''
+
         for i in cov_selected_np:
             tmp_str += f"{str(i)}\n"
 
         tmp_str = tmp_str[:-1]
-        
         f.write(tmp_str)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
