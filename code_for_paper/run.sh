@@ -24,15 +24,17 @@ then
 fi
 
 # Begin script in case all parameters are correct
-echo -e ">>> The docker volume path is set as ${DOCKER_VOLUME_PATH}"
-echo -e ">>> Start the process...... \n"
+echo "$(date '+%Y-%m-%d %H:%M:%S') The docker volume path is set as ${DOCKER_VOLUME_PATH}"
+echo "$(date '+%Y-%m-%d %H:%M:%S') Start the process......"
 sleep 3
 
-### Prepare for data required ###
-echo -e ">>> Start to download the required data. \n"
+### Prepare for the data required ###
+echo "$(date '+%Y-%m-%d %H:%M:%S') Start to download the required data."
 bash scripts/download_required_data.sh -p "${DOCKER_VOLUME_PATH}"
 
-echo -e ">>> Create the required juicer's pearsons and PC1 for Rao 2014 experiments \n"
+echo "$(date '+%Y-%m-%d %H:%M:%S') Create the required juicer's pearsons and PC1 for the Rao 2014 experiments"
 mkdir -p "${DOCKER_VOLUME_PATH}/data/Rao_2014/juicer_outputs"
-bash scripts/build_PearsonsAndPC1_humanCells.sh -p "${DOCKER_VOLUME_PATH}"
-bash scripts/build_PearsonsAndPC1_mouseCH12-LX.sh -p "${DOCKER_VOLUME_PATH}"
+bash scripts/build_PearsonsAndPC1_2014.sh -p "${DOCKER_VOLUME_PATH}"
+
+### Create the approximation ###
+echo "$(date '+%Y-%m-%d %H:%M:%S') Create the approximated PC1-pattern for the experiments of Rao 2014 and Lieberman 2009"
