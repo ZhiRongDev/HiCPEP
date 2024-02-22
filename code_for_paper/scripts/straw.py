@@ -6,8 +6,6 @@ def read_hic(hic_path):
     chrom_list= []
 
     for chrom in hic.getChromosomes():
-        # if (chrom.name != "All"):
-        #     chrom_list.append(chrom.name)
         if (chrom.name != "All" and chrom.name != "MT" and chrom.name != "chrM"):
             chrom_list.append(chrom.name)
 

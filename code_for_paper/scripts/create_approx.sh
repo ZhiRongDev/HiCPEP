@@ -1,6 +1,6 @@
 #!/bin/bash
 
-######## Rao 2014
+### Rao 2014
 DATA_PATH="${DOCKER_VOLUME_PATH}/data/Rao_2014/juicer_outputs"
 OUTPUT_PATH="${DOCKER_VOLUME_PATH}/outputs/approx_PC1_pattern/Rao_2014"
 PY_FILE="src/Rao_2014/create_approx_2014.py"
@@ -61,44 +61,44 @@ done
 
 echo "$(date '+%Y-%m-%d %H:%M:%S') Rao_2014 create_approx end"
 
-######## Lieberman 2009 
-# DATA_PATH="${DOCKER_VOLUME_PATH}/data/Lieberman_2009"
-# OUTPUT_PATH="${DOCKER_VOLUME_PATH}/outputs/approx_PC1_pattern/Lieberman_2009"
-# PY_FILE="src/Lieberman_2009/create_approx_2009.py"
-# mkdir -p "${OUTPUT_PATH}"
+### Lieberman 2009 
+DATA_PATH="${DOCKER_VOLUME_PATH}/data/Lieberman_2009"
+OUTPUT_PATH="${DOCKER_VOLUME_PATH}/outputs/approx_PC1_pattern/Lieberman_2009"
+PY_FILE="src/Lieberman_2009/create_approx_2009.py"
+mkdir -p "${OUTPUT_PATH}"
 
-# echo "$(date '+%Y-%m-%d %H:%M:%S') Lieberman_2009 create_approx start"
-# for RESOLUTION in "1000000" "100000" 
-# do
-#     CELL_LINE_NAMES=(\
-#         "gm06690"\
-#         "k562" \
-#     )
+echo "$(date '+%Y-%m-%d %H:%M:%S') Lieberman_2009 create_approx start"
+for RESOLUTION in "1000000" "100000" 
+do
+    CELL_LINE_NAMES=(\
+        "gm06690"\
+        "k562" \
+    )
 
-#     for TYPE in "CxMax" "CxMin"
-#     do
-#         for CELL_LINE in "${CELL_LINE_NAMES[@]}"
-#         do
-#             echo "$(date '+%Y-%m-%d %H:%M:%S') [${RESOLUTION}] [${TYPE}] [${CELL_LINE}] start"
+    for TYPE in "CxMax" "CxMin"
+    do
+        for CELL_LINE in "${CELL_LINE_NAMES[@]}"
+        do
+            echo "$(date '+%Y-%m-%d %H:%M:%S') [${RESOLUTION}] [${TYPE}] [${CELL_LINE}] start"
             
-#             # There are some missing chromosomes in Lieberman's dataset.
-#             if [[ "${CELL_LINE}" == "gm06690" ]]
-#             then
-#                 CHROM_LIST="X 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1"
-#             else
-#                 CHROM_LIST="22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1"
-#             fi
+            # There are some missing chromosomes in Lieberman's dataset.
+            if [[ "${CELL_LINE}" == "gm06690" ]]
+            then
+                CHROM_LIST="X 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1"
+            else
+                CHROM_LIST="22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1"
+            fi
 
-#             for CHROM_ID in $CHROM_LIST
-#             do
-#                 PEARSON_FILE="${DATA_PATH}/heatmaps/HIC_${CELL_LINE}_chr${CHROM_ID}_chr${CHROM_ID}_${RESOLUTION}_pearson.txt"
-#                 OUTPUT_FILE="${OUTPUT_PATH}/${CELL_LINE}/${RESOLUTION}/${TYPE}/approx_PC1_pattern_chr${CHROM_ID}.txt"
-#                 python "${PY_FILE}" --pearson "${PEARSON_FILE}" --output "${OUTPUT_FILE}" --type $TYPE
-#             done
+            for CHROM_ID in $CHROM_LIST
+            do
+                PEARSON_FILE="${DATA_PATH}/heatmaps/HIC_${CELL_LINE}_chr${CHROM_ID}_chr${CHROM_ID}_${RESOLUTION}_pearson.txt"
+                OUTPUT_FILE="${OUTPUT_PATH}/${CELL_LINE}/${RESOLUTION}/${TYPE}/approx_PC1_pattern_chr${CHROM_ID}.txt"
+                python "${PY_FILE}" --pearson "${PEARSON_FILE}" --output "${OUTPUT_FILE}" --type $TYPE
+            done
 
-#             echo "$(date '+%Y-%m-%d %H:%M:%S') [${RESOLUTION}] [${TYPE}] [${CELL_LINE}] end"
-#         done
-#     done
-# done
+            echo "$(date '+%Y-%m-%d %H:%M:%S') [${RESOLUTION}] [${TYPE}] [${CELL_LINE}] end"
+        done
+    done
+done
 
-# echo "$(date '+%Y-%m-%d %H:%M:%S') Lieberman_2009 create_approx end"
+echo "$(date '+%Y-%m-%d %H:%M:%S') Lieberman_2009 create_approx end"
