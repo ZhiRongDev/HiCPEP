@@ -1,5 +1,4 @@
 #!/bin/bash 
-
 JUICER_TOOLS="${DOCKER_VOLUME_PATH}/juicer_tools/juicer_tools.jar" # Customize your path for the juicer_tools
 OUTPUT_PATH="${DOCKER_VOLUME_PATH}/data/Rao_2014/juicer_outputs"
 

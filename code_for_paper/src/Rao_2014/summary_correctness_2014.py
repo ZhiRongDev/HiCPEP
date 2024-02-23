@@ -3,21 +3,27 @@ import pandas as pd
 import argparse
 import os
 
-def summary_correctness(Juicer_PC1, approx):
+def summary_correctness(PC1, approx):
     # Read in the Eigenvector 1
-    PC1_df = pd.read_table(Juicer_PC1, header=None)
-    PC1_df = PC1_df.dropna(axis=0, how="all").reset_index(drop=True)
+    PC1_df = pd.read_table(PC1, header=None)
+    PC1_df = PC1_df.fillna(0)
     PC1_np = PC1_df.values # Turn into numpy format
     PC1_np = PC1_np.flatten() # Turn into 1D vector
+    PC1_np = PC1_np[PC1_np != 0] # Remove 0
 
     approx_df = pd.read_table(approx, header=None)
     approx_np = approx_df.values # Turn into numpy format
     approx_np = approx_np.flatten() # Turn into 1D vector
+    approx_np = approx_np[approx_np != 0] # Remove 0
 
     del PC1_df, approx_df
 
     if len(PC1_np) != len(approx_np): 
-        print("juicer_PC1 and approx has a different number of elements")
+        print("PC1 and approx has a different number of elements")
+        print(PC1)
+        print(len(PC1_np))
+        print(approx)
+        print(len(approx_np))
         return
     
     entryNum = len(PC1_np)
@@ -41,7 +47,7 @@ def summary_correctness(Juicer_PC1, approx):
 def write_to_excel(docker_volume_path, output):
     CxMax_df = pd.DataFrame()
     CxMin_df = pd.DataFrame()
-    Juicer_PC1_path = f"{docker_volume_path}/data/Rao_2014/juicer_outputs"
+    PC1_path = f"{docker_volume_path}/data/Rao_2014/juicer_outputs"
     approx_path = f"{docker_volume_path}/outputs/approx_PC1_pattern/Rao_2014"
 
     for species in ["Human", "Mouse"]:
@@ -61,7 +67,7 @@ def write_to_excel(docker_volume_path, output):
                 for chrom in chroms:
                     for type in types:
                         kwargs = {
-                            "Juicer_PC1": f"{Juicer_PC1_path}/{cell}/{resolution}/eigenvector/pc1_chr{chrom}.txt",
+                            "PC1": f"{PC1_path}/{cell}/{resolution}/eigenvector/pc1_chr{chrom}.txt",
                             "approx": f"{approx_path}/{cell}/{resolution}/{type}/approx_PC1_pattern_chr{chrom}.txt",
                         }
 

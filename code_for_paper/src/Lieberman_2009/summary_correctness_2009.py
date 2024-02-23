@@ -3,9 +3,9 @@ import pandas as pd
 import argparse
 import os
 
-def summary_correctness(Lieberman_PC1, approx):
+def summary_correctness(PC1, approx):
     # Read in the Eigenvector 1
-    PC1_df = pd.read_table(Lieberman_PC1, header=None)
+    PC1_df = pd.read_table(PC1, header=None)
     PC1_df = PC1_df.iloc[:, [2]]
     PC1_np = PC1_df.values # Turn into numpy format
     PC1_np = PC1_np.flatten() # Turn into 1D vector
@@ -14,11 +14,12 @@ def summary_correctness(Lieberman_PC1, approx):
     approx_df = pd.read_table(approx, header=None)
     approx_np = approx_df.values # Turn into numpy format
     approx_np = approx_np.flatten() # Turn into 1D vector
+    approx_np = approx_np[approx_np != 0] # Remove 0
 
     del PC1_df, approx_df
 
     if len(PC1_np) != len(approx_np): 
-        print("Lieberman_PC1 and approx has a different number of elements")
+        print("PC1 and approx has a different number of elements")
         return
     
     entryNum = len(PC1_np)
@@ -42,7 +43,7 @@ def summary_correctness(Lieberman_PC1, approx):
 def write_to_excel(docker_volume_path, output):
     CxMax_df = pd.DataFrame()
     CxMin_df = pd.DataFrame()
-    Lieberman_PC1_path = f"{docker_volume_path}/data/Lieberman_2009/eigenvectors"
+    PC1_path = f"{docker_volume_path}/data/Lieberman_2009/eigenvectors"
     approx_path = f"{docker_volume_path}/outputs/approx_PC1_pattern/Lieberman_2009"
     
     cells = ["gm06690", "k562"]
@@ -72,27 +73,27 @@ def write_to_excel(docker_volume_path, output):
                     if cell == "gm06690":
                         if chrom == "23":
                             kwargs = {
-                                "Lieberman_PC1": f"{Lieberman_PC1_path}/GM-combined.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab",
+                                "PC1": f"{PC1_path}/GM-combined.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab",
                                 "approx": f"{approx_path}/{cell}/{resolution}/{type}/approx_PC1_pattern_chrX.txt",
                             }
                         else:
                             kwargs = {
-                                "Lieberman_PC1": f"{Lieberman_PC1_path}/GM-combined.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab",
+                                "PC1": f"{PC1_path}/GM-combined.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab",
                                 "approx": f"{approx_path}/{cell}/{resolution}/{type}/approx_PC1_pattern_chr{chrom}.txt",
                             }
                     elif cell == "k562":
                         kwargs = {
-                            "Lieberman_PC1": f"{Lieberman_PC1_path}/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab",
+                            "PC1": f"{PC1_path}/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab",
                             "approx": f"{approx_path}/{cell}/{resolution}/{type}/approx_PC1_pattern_chr{chrom}.txt",
                         }
                         # if chrom == "23":
                         #     kwargs = {
-                        #         "Lieberman_PC1": f"{Lieberman_PC1_path}/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab",
+                        #         "PC1": f"{PC1_path}/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab",
                         #         "approx": f"{approx_path}/{cell}/{resolution}/{type}/approx_PC1_pattern_chrX.txt",
                         #     }
                         # else:
                         #     kwargs = {
-                        #         "Lieberman_PC1": f"{Lieberman_PC1_path}/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab",
+                        #         "PC1": f"{PC1_path}/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab",
                         #         "approx": f"{approx_path}/{cell}/{resolution}/{type}/approx_PC1_pattern_chr{chrom}.txt",
                         #     }
 

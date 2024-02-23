@@ -1,9 +1,9 @@
 #!/bin/bash
+PY_FILE="src/common/create_approx.py"
 
 ### Rao 2014
 DATA_PATH="${DOCKER_VOLUME_PATH}/data/Rao_2014/juicer_outputs"
 OUTPUT_PATH="${DOCKER_VOLUME_PATH}/outputs/approx_PC1_pattern/Rao_2014"
-PY_FILE="src/Rao_2014/create_approx_2014.py"
 mkdir -p "${OUTPUT_PATH}"
 
 echo "$(date '+%Y-%m-%d %H:%M:%S') Rao_2014 create_approx start"
@@ -51,7 +51,7 @@ do
 
                 PEARSON_FILE="${DATA_PATH}/${CELL_LINE}/${RESOLUTION}/pearsons/pearson_chr${CHROM_ID}.txt"
                 OUTPUT_FILE="${OUTPUT_PATH}/${CELL_LINE}/${RESOLUTION}/${TYPE}/approx_PC1_pattern_chr${CHROM_ID}.txt"
-                python "${PY_FILE}" --pearson "${PEARSON_FILE}" --output "${OUTPUT_FILE}" --type $TYPE
+                python "${PY_FILE}" --pearson "${PEARSON_FILE}" --output "${OUTPUT_FILE}" --type $TYPE --source "Rao_2014"
             done
 
             echo "$(date '+%Y-%m-%d %H:%M:%S') [${RESOLUTION}] [${TYPE}] [${CELL_LINE}] end"
@@ -64,7 +64,6 @@ echo "$(date '+%Y-%m-%d %H:%M:%S') Rao_2014 create_approx end"
 ### Lieberman 2009 
 DATA_PATH="${DOCKER_VOLUME_PATH}/data/Lieberman_2009"
 OUTPUT_PATH="${DOCKER_VOLUME_PATH}/outputs/approx_PC1_pattern/Lieberman_2009"
-PY_FILE="src/Lieberman_2009/create_approx_2009.py"
 mkdir -p "${OUTPUT_PATH}"
 
 echo "$(date '+%Y-%m-%d %H:%M:%S') Lieberman_2009 create_approx start"
@@ -93,7 +92,7 @@ do
             do
                 PEARSON_FILE="${DATA_PATH}/heatmaps/HIC_${CELL_LINE}_chr${CHROM_ID}_chr${CHROM_ID}_${RESOLUTION}_pearson.txt"
                 OUTPUT_FILE="${OUTPUT_PATH}/${CELL_LINE}/${RESOLUTION}/${TYPE}/approx_PC1_pattern_chr${CHROM_ID}.txt"
-                python "${PY_FILE}" --pearson "${PEARSON_FILE}" --output "${OUTPUT_FILE}" --type $TYPE
+                python "${PY_FILE}" --pearson "${PEARSON_FILE}" --output "${OUTPUT_FILE}" --type $TYPE --source "Lieberman_2009"
             done
 
             echo "$(date '+%Y-%m-%d %H:%M:%S') [${RESOLUTION}] [${TYPE}] [${CELL_LINE}] end"

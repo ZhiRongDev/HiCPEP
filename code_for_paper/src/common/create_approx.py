@@ -4,12 +4,15 @@ import argparse
 import numpy as np
 import pandas as pd
 
-def create_approx(pearson, output, type):
+def create_approx(pearson, output, type, source):
     # Read in the Pearson correlatin matrix
-    pearson_df = pd.read_table(pearson, header=None, sep=" ")
+    if source == "Rao_2014":
+        pearson_df = pd.read_table(pearson, header=None, sep=" ")
+    elif source == "Lieberman_2009":
+        pearson_df = pd.read_table(pearson, index_col=0, header=1, sep="\t")
+
     pearson_df.pop(pearson_df.columns[-1])
-    pearson_df = pearson_df.dropna(axis=0, how="all").reset_index(drop=True)
-    pearson_df = pearson_df.dropna(axis=1, how="all")
+    pearson_df = pearson_df.fillna(0)
     pearson_np = pearson_df.values # Turn into numpy.ndarray
     pearson_np = pearson_np - pearson_np.mean(axis=1, keepdims=True) # Zero mean of Pearson correlaton matrix
 
@@ -28,13 +31,16 @@ def create_approx(pearson, output, type):
     cov_absSum = list(enumerate(cov_absSum)) # Turn list into tuple with index, ex: (index, absSum)
     sorted_cov_absSum = sorted(cov_absSum, key=lambda x: x[1], reverse=True) # Sorted from the maximum to the minimum 
 
-    # Decide to choose CxMax or CxMin
     if type == "CxMax":
         sorted_index = 0
+        cov_selected_np = cov_np[sorted_cov_absSum[sorted_index][0]]
     elif type == "CxMin":
         sorted_index = -1
-
-    cov_selected_np = cov_np[sorted_cov_absSum[sorted_index][0]]
+        cov_selected_np = cov_np[sorted_cov_absSum[sorted_index][0]]
+        # To avoid selecting the column with all 0 values. 
+        while cov_selected_np.sum() == 0:
+            sorted_index -= 1
+            cov_selected_np = cov_np[sorted_cov_absSum[sorted_index][0]]
 
     if output == "None":
         for val in cov_selected_np:
@@ -75,6 +81,12 @@ if __name__ == "__main__":
         "--type",
         type=str,
         default="CxMax",
+        help="Input int"
+    )
+    parser.add_argument(
+        "--source",
+        type=str,
+        default="Rao_2014",
         help="Input int"
     )
 

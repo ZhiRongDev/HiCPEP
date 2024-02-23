@@ -1,5 +1,4 @@
 #!/bin/bash
-
 DATA_PATH="${DOCKER_VOLUME_PATH}/data"
 OUTPUT_PATH="${DOCKER_VOLUME_PATH}/outputs"
 JUICER_TOOLS_PATH="${DOCKER_VOLUME_PATH}/juicer_tools"
