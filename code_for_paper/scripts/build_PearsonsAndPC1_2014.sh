@@ -4,7 +4,7 @@ OUTPUT_PATH="${DOCKER_VOLUME_PATH}/data/Rao_2014/juicer_outputs"
 
 for RESOLUTION in "1000000" "100000"
 do
-    CELL_LINE_NAMES=(\
+    CELL_LINES=(\
         "GM12878"\
         "IMR90" \
         "HMEC" \
@@ -30,7 +30,7 @@ do
         ["CH12-LX"]="https://hicfiles.s3.amazonaws.com/hiseq/ch12-lx-b-lymphoblasts/in-situ/combined.hic" \
     )
 
-    for CELL_LINE in "${CELL_LINE_NAMES[@]}"
+    for CELL_LINE in "${CELL_LINES[@]}"
     do
         LOG="${OUTPUT_PATH}/juicer_outputs.log"
         HIC_PATH="${CELL_LINE_LINKS[$CELL_LINE]}"

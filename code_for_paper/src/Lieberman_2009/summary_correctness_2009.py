@@ -46,6 +46,7 @@ def write_to_excel(docker_volume_path, output):
     PC1_path = f"{docker_volume_path}/data/Lieberman_2009/eigenvectors"
     approx_path = f"{docker_volume_path}/outputs/approx_PC1_pattern/Lieberman_2009"
     
+    resolutions = ["1000000", "100000"]
     cells = ["gm06690", "k562"]
     types = ["CxMax", "CxMin"]
 
@@ -56,18 +57,18 @@ def write_to_excel(docker_volume_path, output):
         23 X
         24 Y
 
-        Notes: There's no chromosome Y(24) in the datasets, and there's some missing data in k562
+        Notes: 
+        In Lieberman's dataset, there's no chromosome Y(24) in the datasets, and there's some missing data in k562.
+        Besides, the symbol used for the 23 chromosome are not the same in the `eigenvectors` and `heatmaps` diractory. (eigenvectors: 23, heatmaps: X)
     '''
     
-    for cell in cells:
-        if cell == "k562":
-            resolutions = ["1000000"]
-            chroms = [str(i) for i in range(1, 23)]
-        else:
-            resolutions = ["1000000", "100000"]
-            chroms = [str(i) for i in range(1, 24)]
+    for resolution in resolutions:
+        for cell in cells:
+            if cell == "k562" and resolution == "100000":
+                chroms = [str(i) for i in range(1, 23)]
+            else:
+                chroms = [str(i) for i in range(1, 24)]
 
-        for resolution in resolutions:
             for chrom in chroms:
                 for type in types:
                     if cell == "gm06690":
@@ -82,20 +83,16 @@ def write_to_excel(docker_volume_path, output):
                                 "approx": f"{approx_path}/{cell}/{resolution}/{type}/approx_PC1_pattern_chr{chrom}.txt",
                             }
                     elif cell == "k562":
-                        kwargs = {
-                            "PC1": f"{PC1_path}/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab",
-                            "approx": f"{approx_path}/{cell}/{resolution}/{type}/approx_PC1_pattern_chr{chrom}.txt",
-                        }
-                        # if chrom == "23":
-                        #     kwargs = {
-                        #         "PC1": f"{PC1_path}/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab",
-                        #         "approx": f"{approx_path}/{cell}/{resolution}/{type}/approx_PC1_pattern_chrX.txt",
-                        #     }
-                        # else:
-                        #     kwargs = {
-                        #         "PC1": f"{PC1_path}/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab",
-                        #         "approx": f"{approx_path}/{cell}/{resolution}/{type}/approx_PC1_pattern_chr{chrom}.txt",
-                        #     }
+                        if chrom == "23":
+                            kwargs = {
+                                "PC1": f"{PC1_path}/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab",
+                                "approx": f"{approx_path}/{cell}/{resolution}/{type}/approx_PC1_pattern_chrX.txt",
+                            }
+                        else:
+                            kwargs = {
+                                "PC1": f"{PC1_path}/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab",
+                                "approx": f"{approx_path}/{cell}/{resolution}/{type}/approx_PC1_pattern_chr{chrom}.txt",
+                            }
 
                     correctness_info = summary_correctness(**kwargs)
 

@@ -4,14 +4,12 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.colors import ListedColormap
 
-def plot_comparison(PC1, approx, resolution, scatter, relative_magnitude):
+def plot_comparison(PC1, approx, figsize, scatter, relative_magnitude):
     # Read in the Eigenvector 1
     PC1_df = pd.read_table(PC1, header=None)
-    PC1_df = PC1_df.dropna(axis=0, how="all").reset_index(drop=True)
+    PC1_df = PC1_df.fillna(0)
     PC1_np = PC1_df.values # Turn into numpy format
     PC1_np = PC1_np.flatten() # Turn into 1D vector
-
-    PC1_np = PC1_np[PC1_np != 0] # Remove 0 (For Lieberman 2009 eigenvector)
 
     approx_df = pd.read_table(approx, header=None)
     approx_np = approx_df.values # Turn into numpy format
@@ -36,11 +34,6 @@ def plot_comparison(PC1, approx, resolution, scatter, relative_magnitude):
     correctRate = correctNum / entryNum
 
     # Visualization
-    if resolution == "25Kb":
-        figsize = 50
-    else:
-        figsize = 30
-    
     if scatter != "None":
         plot_x_axis = [i + 1 for i in range(entryNum)]
         approx_Dots = [1 if i else -1 for i in approx_pos_np]
@@ -48,10 +41,10 @@ def plot_comparison(PC1, approx, resolution, scatter, relative_magnitude):
         PC1_colors = ListedColormap(['r', 'b'])
         scatter_labels = ["PC1 < 0", "PC1 > 0"]
 
-        plt.xticks(np.arange(0, entryNum, 50)) 
         plt.figure(figsize=(figsize, 6))
-        scatter =  plt.scatter(plot_x_axis, approx_Dots, c=PC1_colors_values, cmap=PC1_colors)
-        plt.legend(handles=scatter.legend_elements()[0], labels=scatter_labels, fontsize="20", loc="center left")
+        plt.xticks(np.arange(0, entryNum, 50)) 
+        scatter_config =  plt.scatter(plot_x_axis, approx_Dots, c=PC1_colors_values, cmap=PC1_colors)
+        plt.legend(handles=scatter_config.legend_elements()[0], labels=scatter_labels, fontsize="20", loc="center left")
         plt.title(f"entryNum: {entryNum}, correctNum = {correctNum}, correctRate={np.round(correctRate, 2)}", fontsize=20, loc="left")
         plt.savefig(scatter)
         plt.clf() 
@@ -60,19 +53,18 @@ def plot_comparison(PC1, approx, resolution, scatter, relative_magnitude):
         approx_np_Norm = (approx_np - np.mean(approx_np)) / np.std(approx_np)
         PC1_np_Norm = (PC1_np - np.mean(PC1_np)) / np.std(PC1_np)
         
-        plt.xticks(np.arange(0, entryNum, 50)) 
         plt.figure(figsize=(figsize, 6))
+        plt.xticks(np.arange(0, entryNum, 50)) 
         plt.plot(PC1_np_Norm, c='r')
         plt.plot(approx_np_Norm, c='b')
         plt.legend(["PC1", "approximated PC1-pattern"], fontsize="20", loc ="upper left")
         plt.title(f"entryNum: {entryNum}", fontsize=20, loc="left")
-        plt.savefig(relative_magnitude)
+        plt.savefig(relative_magnitude)        
         plt.clf()
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        prog='plot.py',
+        prog='plot_comparison.py',
         allow_abbrev=False,
         description='What the program does',
         epilog='Text at the bottom of help'
@@ -102,9 +94,9 @@ if __name__ == "__main__":
         help="Input int"
     )
     parser.add_argument(
-        "--resolution",
-        type=str,
-        default="1Mb",
+        "--figsize",
+        type=int,
+        default="30",
         help="Input int"
     )
 

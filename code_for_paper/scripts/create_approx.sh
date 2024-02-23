@@ -8,9 +8,9 @@ mkdir -p "${OUTPUT_PATH}"
 
 echo "$(date '+%Y-%m-%d %H:%M:%S') Rao_2014 create_approx start"
 
-for RESOLUTION in "1000000" "100000" 
+for RESOLUTION in "1000000" "100000"
 do
-    CELL_LINE_NAMES=(\
+    CELL_LINES=(\
         "GM12878"\
         "IMR90" \
         "HMEC" \
@@ -22,35 +22,24 @@ do
         "CH12-LX" \
     )
 
-    declare -A CELL_LINE_LINKS
-    CELL_LINE_LINKS=(\
-        ["GM12878"]="https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic" \
-        ["IMR90"]="https://hicfiles.s3.amazonaws.com/hiseq/imr90/in-situ/combined.hic" \
-        ["HMEC"]="https://hicfiles.s3.amazonaws.com/hiseq/hmec/in-situ/combined.hic" \
-        ["NHEK"]="https://hicfiles.s3.amazonaws.com/hiseq/nhek/in-situ/combined.hic" \
-        ["K562"]="https://hicfiles.s3.amazonaws.com/hiseq/k562/in-situ/combined.hic" \
-        ["KBM7"]="https://hicfiles.s3.amazonaws.com/hiseq/kbm7/in-situ/combined.hic" \
-        ["HUVEC"]="https://hicfiles.s3.amazonaws.com/hiseq/huvec/in-situ/combined.hic" \
-        ["HeLa"]="https://hicfiles.s3.amazonaws.com/hiseq/hela/in-situ/combined.hic" \
-        ["CH12-LX"]="https://hicfiles.s3.amazonaws.com/hiseq/ch12-lx-b-lymphoblasts/in-situ/combined.hic" \
-    )
-
     for TYPE in "CxMax" "CxMin"
     do
-        for CELL_LINE in "${CELL_LINE_NAMES[@]}"
+        for CELL_LINE in "${CELL_LINES[@]}"
         do
             echo "$(date '+%Y-%m-%d %H:%M:%S') [${RESOLUTION}] [${TYPE}] [${CELL_LINE}] start"
 
-            HIC_PATH="${CELL_LINE_LINKS[$CELL_LINE]}"
-            CHROM_LIST=$(python scripts/straw.py --hic_path "${HIC_PATH}")
+            # There are only 19 chromosome in CH12-LX, 
+            if [[ "${CELL_LINE}" == "CH12-LX" ]]
+            then
+                CHROM_LIST=(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 X Y)
+            else
+                CHROM_LIST=(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y)
+            fi
 
-            for CHROM in $CHROM_LIST
+            for CHROM in "${CHROM_LIST[@]}"
             do
-                CHROM_ID="${CHROM/chr/""}" 
-                CHROM_ID="${CHROM_ID/MT/"M"}" 
-
-                PEARSON_FILE="${DATA_PATH}/${CELL_LINE}/${RESOLUTION}/pearsons/pearson_chr${CHROM_ID}.txt"
-                OUTPUT_FILE="${OUTPUT_PATH}/${CELL_LINE}/${RESOLUTION}/${TYPE}/approx_PC1_pattern_chr${CHROM_ID}.txt"
+                PEARSON_FILE="${DATA_PATH}/${CELL_LINE}/${RESOLUTION}/pearsons/pearson_chr${CHROM}.txt"
+                OUTPUT_FILE="${OUTPUT_PATH}/${CELL_LINE}/${RESOLUTION}/${TYPE}/approx_PC1_pattern_chr${CHROM}.txt"
                 python "${PY_FILE}" --pearson "${PEARSON_FILE}" --output "${OUTPUT_FILE}" --type $TYPE --source "Rao_2014"
             done
 
@@ -69,26 +58,26 @@ mkdir -p "${OUTPUT_PATH}"
 echo "$(date '+%Y-%m-%d %H:%M:%S') Lieberman_2009 create_approx start"
 for RESOLUTION in "1000000" "100000" 
 do
-    CELL_LINE_NAMES=(\
+    CELL_LINES=(\
         "gm06690"\
         "k562" \
     )
 
     for TYPE in "CxMax" "CxMin"
     do
-        for CELL_LINE in "${CELL_LINE_NAMES[@]}"
+        for CELL_LINE in "${CELL_LINES[@]}"
         do
             echo "$(date '+%Y-%m-%d %H:%M:%S') [${RESOLUTION}] [${TYPE}] [${CELL_LINE}] start"
             
             # There are some missing chromosomes in Lieberman's dataset.
-            if [[ "${CELL_LINE}" == "gm06690" ]]
+            if [[ "${CELL_LINE}" == "k562" && "${RESOLUTION}" == "100000" ]]
             then
-                CHROM_LIST="X 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1"
+                CHROM_LIST=(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22)
             else
-                CHROM_LIST="22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1"
+                CHROM_LIST=(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X)
             fi
 
-            for CHROM_ID in $CHROM_LIST
+            for CHROM_ID in "${CHROM_LIST[@]}"
             do
                 PEARSON_FILE="${DATA_PATH}/heatmaps/HIC_${CELL_LINE}_chr${CHROM_ID}_chr${CHROM_ID}_${RESOLUTION}_pearson.txt"
                 OUTPUT_FILE="${OUTPUT_PATH}/${CELL_LINE}/${RESOLUTION}/${TYPE}/approx_PC1_pattern_chr${CHROM_ID}.txt"
