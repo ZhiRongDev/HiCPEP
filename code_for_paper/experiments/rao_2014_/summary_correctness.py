@@ -20,13 +20,9 @@ def summary_correctness(PC1, approx):
 
     if len(PC1_np) != len(approx_np): 
         print("PC1 and approx has a different number of elements")
-        print(PC1)
-        print(len(PC1_np))
-        print(approx)
-        print(len(approx_np))
         return
     
-    entryNum = len(PC1_np)
+    valid_entry_num = len(PC1_np)
 
     if np.corrcoef(PC1_np, approx_np)[0][1] < 0:
         approx_np = -approx_np
@@ -35,13 +31,13 @@ def summary_correctness(PC1, approx):
     approx_pos_np = approx_np > 0
     PC1_pos_VS_approx_pos_np = PC1_pos_np == approx_pos_np 
     
-    correctNum = list(PC1_pos_VS_approx_pos_np).count(True)
-    correctRate = correctNum / entryNum
+    correct_num = list(PC1_pos_VS_approx_pos_np).count(True)
+    correct_rate = correct_num / valid_entry_num
 
     return {
-        "entryNum": entryNum,
-        "correctNum": correctNum,
-        "correctRate": correctRate,
+        "valid_entry_num": valid_entry_num,
+        "correct_num": correct_num,
+        "correct_rate": correct_rate,
     }
 
 def write_to_excel(docker_volume_path, output):
@@ -66,35 +62,40 @@ def write_to_excel(docker_volume_path, output):
             for cell in cells:
                 for chrom in chroms:
                     for type in types:
-                        kwargs = {
-                            "PC1": f"{PC1_path}/{cell}/{resolution}/eigenvector/pc1_chr{chrom}.txt",
-                            "approx": f"{approx_path}/{cell}/{resolution}/{type}/approx_PC1_pattern_chr{chrom}.txt",
-                        }
+                        # kwargs = {
+                        #     "PC1": f"{PC1_path}/{cell}/{resolution}/eigenvector/pc1_chr{chrom}.txt",
+                        #     "approx": f"{approx_path}/{cell}/{resolution}/{type}/approx_PC1_pattern_chr{chrom}.txt",
+                        # }
 
-                        correctness_info = summary_correctness(**kwargs)
+                        PC1_df = pd.read_table(f"{PC1_path}/{cell}/{resolution}/eigenvector/pc1_chr{chrom}.txt", header=None)
+                        PC1_df = PC1_df.fillna(0)
+                        approx_df = pd.read_table(f"{approx_path}/{cell}/{resolution}/{type}/approx_PC1_pattern_chr{chrom}.txt", header=None)
+
+                        correctness_info = calc_correctness(PC1_df, approx_df)
+                        print(correctness_info)
 
                         if type == "CxMax":
                             if CxMax_df.empty:
                                 CxMax_df = pd.DataFrame(
-                                    [[cell, resolution, f"chr{chrom}", type, correctness_info["entryNum"], correctness_info["correctNum"], correctness_info["correctRate"]]],
-                                    columns=['cell', 'resolution', 'chromosome', "type", "entryNum", "correctNum", "correctRate"]
+                                    [[cell, resolution, f"chr{chrom}", type, correctness_info["valid_entry_num"], correctness_info["correct_num"], correctness_info["correct_rate"]]],
+                                    columns=['cell', 'resolution', 'chromosome', "type", "valid_entry_num", "correct_num", "correct_rate"]
                                 )
                             else:
                                 new_row_df = pd.DataFrame(
-                                    [[cell, resolution, f"chr{chrom}", type, correctness_info["entryNum"], correctness_info["correctNum"], correctness_info["correctRate"]]],
-                                    columns=['cell', 'resolution', 'chromosome', "type", "entryNum", "correctNum", "correctRate"]
+                                    [[cell, resolution, f"chr{chrom}", type, correctness_info["valid_entry_num"], correctness_info["correct_num"], correctness_info["correct_rate"]]],
+                                    columns=['cell', 'resolution', 'chromosome', "type", "valid_entry_num", "correct_num", "correct_rate"]
                                 )
                                 CxMax_df = pd.concat([CxMax_df, new_row_df], ignore_index=True)
                         elif type == "CxMin":
                             if CxMin_df.empty:
                                 CxMin_df = pd.DataFrame(
-                                    [[cell, resolution, f"chr{chrom}", type, correctness_info["entryNum"], correctness_info["correctNum"], correctness_info["correctRate"]]],
-                                    columns=['cell', 'resolution', 'chromosome', "type", "entryNum", "correctNum", "correctRate"]
+                                    [[cell, resolution, f"chr{chrom}", type, correctness_info["valid_entry_num"], correctness_info["correct_num"], correctness_info["correct_rate"]]],
+                                    columns=['cell', 'resolution', 'chromosome', "type", "valid_entry_num", "correct_num", "correct_rate"]
                                 )
                             else:
                                 new_row_df = pd.DataFrame(
-                                    [[cell, resolution, f"chr{chrom}", type, correctness_info["entryNum"], correctness_info["correctNum"], correctness_info["correctRate"]]],
-                                    columns=['cell', 'resolution', 'chromosome', "type", "entryNum", "correctNum", "correctRate"]
+                                    [[cell, resolution, f"chr{chrom}", type, correctness_info["valid_entry_num"], correctness_info["correct_num"], correctness_info["correct_rate"]]],
+                                    columns=['cell', 'resolution', 'chromosome', "type", "valid_entry_num", "correct_num", "correct_rate"]
                                 )
                                 CxMin_df = pd.concat([CxMin_df, new_row_df], ignore_index=True)
 

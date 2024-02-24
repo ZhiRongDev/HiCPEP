@@ -1,6 +1,5 @@
 # This code is for creating the approximated PC1-pattern. 
 import os
-import argparse
 import numpy as np
 import pandas as pd
 
@@ -58,39 +57,3 @@ def create_approx(pearson, output, type, source):
 
         tmp_str = tmp_str[:-1]
         f.write(tmp_str)
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        prog='xxx.py',
-        allow_abbrev=False,
-        description='What the program does', epilog='Text at the bottom of help'
-    )
-    parser.add_argument(
-        "--pearson",
-        type=str,
-        required=True,
-        help="Input blablabla"
-    )
-    parser.add_argument(
-        "--output",
-        type=str,
-        default="None",
-        help="Input int"
-    )
-    parser.add_argument(
-        "--type",
-        type=str,
-        default="CxMax",
-        help="Input int"
-    )
-    parser.add_argument(
-        "--source",
-        type=str,
-        default="Rao_2014",
-        help="Input int"
-    )
-
-    args = parser.parse_args()
-    kwargs = vars(args) # Turn into dict
-
-    create_approx(**kwargs)

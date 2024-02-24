@@ -32,22 +32,25 @@ echo "$(date '+%Y-%m-%d %H:%M:%S') Start the process......"
 
 ### Prepare for the data required.
 # echo "$(date '+%Y-%m-%d %H:%M:%S') Start to download the required data."
-# bash scripts/download_required_data.sh
+# bash download_required_data.sh
 
 # echo "$(date '+%Y-%m-%d %H:%M:%S') Create the required juicer's pearsons and PC1 for the Rao 2014 experiments"
-# mkdir -p "${DOCKER_VOLUME_PATH}/data/Rao_2014/juicer_outputs"
-# bash scripts/build_PearsonsAndPC1_2014.sh
+# mkdir -p "${DOCKER_VOLUME_PATH}/data/rao_2014/juicer_outputs"
+# bash build_pearsons_pc1_2014.sh
+
+### Start the program
+python main.py --docker_volume_path "${DOCKER_VOLUME_PATH}"
 
 ### Create the approximation. 
-echo "$(date '+%Y-%m-%d %H:%M:%S') Create the approximated PC1-pattern for the experiments of Rao 2014 and Lieberman 2009"
-bash scripts/create_approx.sh
+# echo "$(date '+%Y-%m-%d %H:%M:%S') Create the approximated PC1-pattern for the experiments of Rao 2014 and Lieberman 2009"
+# bash scripts/create_approx.sh
 
 ### Summary to the xlsx.
-echo "$(date '+%Y-%m-%d %H:%M:%S') Summarize for the experiments of Rao 2014"
-python src/Rao_2014/summary_correctness_2014.py --docker_volume_path "${DOCKER_VOLUME_PATH}" --output "${DOCKER_VOLUME_PATH}/outputs/summary/summary_2014.xlsx"
+# echo "$(date '+%Y-%m-%d %H:%M:%S') Summarize for the experiments of Rao 2014"
+# python src/rao_2014/summary_correctness_2014.py --docker_volume_path "${DOCKER_VOLUME_PATH}" --output "${DOCKER_VOLUME_PATH}/outputs/summary/summary_2014.xlsx"
 
-echo "$(date '+%Y-%m-%d %H:%M:%S') Summarize for the experiments of Lieberman 2009"
-python src/Lieberman_2009/summary_correctness_2009.py --docker_volume_path "${DOCKER_VOLUME_PATH}" --output "${DOCKER_VOLUME_PATH}/outputs/summary/summary_2009.xlsx"
+# echo "$(date '+%Y-%m-%d %H:%M:%S') Summarize for the experiments of Lieberman 2009"
+# python src/Lieberman_2009/summary_correctness_2009.py --docker_volume_path "${DOCKER_VOLUME_PATH}" --output "${DOCKER_VOLUME_PATH}/outputs/summary/summary_2009.xlsx"
 
 ### Plot the comparison with the bar and scatter charts.
 # echo "$(date '+%Y-%m-%d %H:%M:%S') Plotting for Lieberman 2009"

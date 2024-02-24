@@ -15,13 +15,17 @@ def plot_comparison(PC1, approx, figsize, scatter, relative_magnitude):
     approx_np = approx_df.values # Turn into numpy format
     approx_np = approx_np.flatten() # Turn into 1D vector
 
-    del PC1_df, approx_df
+    total_entry_num = len(PC1_np)
+
+    # Calculate the correct_rate
+    PC1_np = PC1_np[PC1_np != 0] # Remove 0
+    approx_np = approx_np[approx_np != 0] # Remove 0
 
     if len(PC1_np) != len(approx_np): 
         print("PC1 and approx has a different number of elements")
         return
     
-    entryNum = len(PC1_np)
+    valid_entry_num = len(PC1_np)
 
     if np.corrcoef(PC1_np, approx_np)[0][1] < 0:
         approx_np = -approx_np
@@ -30,22 +34,22 @@ def plot_comparison(PC1, approx, figsize, scatter, relative_magnitude):
     approx_pos_np = approx_np > 0
     PC1_pos_VS_approx_pos_np = PC1_pos_np == approx_pos_np 
     
-    correctNum = list(PC1_pos_VS_approx_pos_np).count(True)
-    correctRate = correctNum / entryNum
+    correct_num = list(PC1_pos_VS_approx_pos_np).count(True)
+    correct_rate = correct_num / valid_entry_num
+    
 
-    # Visualization
     if scatter != "None":
-        plot_x_axis = [i + 1 for i in range(entryNum)]
+        plot_x_axis = [i + 1 for i in range(valid_entry_num)]
         approx_Dots = [1 if i else -1 for i in approx_pos_np]
         PC1_colors_values = [1 if i else 0 for i in PC1_pos_np]
         PC1_colors = ListedColormap(['r', 'b'])
         scatter_labels = ["PC1 < 0", "PC1 > 0"]
 
         plt.figure(figsize=(figsize, 6))
-        plt.xticks(np.arange(0, entryNum, 50)) 
+        plt.xticks(np.arange(0, valid_entry_num, 50)) 
         scatter_config =  plt.scatter(plot_x_axis, approx_Dots, c=PC1_colors_values, cmap=PC1_colors)
         plt.legend(handles=scatter_config.legend_elements()[0], labels=scatter_labels, fontsize="20", loc="center left")
-        plt.title(f"entryNum: {entryNum}, correctNum = {correctNum}, correctRate={np.round(correctRate, 2)}", fontsize=20, loc="left")
+        plt.title(f"total_entry_num: {total_entry_num}, valid_entry_num: {valid_entry_num}, correct_num = {correct_num}, correct_rate={np.round(correct_rate, 2)}", fontsize=20, loc="left")
         plt.savefig(scatter)
         plt.clf() 
     
@@ -54,11 +58,11 @@ def plot_comparison(PC1, approx, figsize, scatter, relative_magnitude):
         PC1_np_Norm = (PC1_np - np.mean(PC1_np)) / np.std(PC1_np)
         
         plt.figure(figsize=(figsize, 6))
-        plt.xticks(np.arange(0, entryNum, 50)) 
+        plt.xticks(np.arange(0, valid_entry_num, 50)) 
         plt.plot(PC1_np_Norm, c='r')
         plt.plot(approx_np_Norm, c='b')
         plt.legend(["PC1", "approximated PC1-pattern"], fontsize="20", loc ="upper left")
-        plt.title(f"entryNum: {entryNum}", fontsize=20, loc="left")
+        plt.title(f"total_entry_num: {total_entry_num}, valid_entry_num: {valid_entry_num}", fontsize=20, loc="left")
         plt.savefig(relative_magnitude)        
         plt.clf()
 

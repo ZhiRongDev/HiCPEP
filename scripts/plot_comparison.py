@@ -21,7 +21,7 @@ def plot_comparison(Juicer_PC1, approx, resolution, scatter, relative_magnitude)
         print("juicer_PC1 and approx has a different number of elements")
         return
     
-    entryNum = len(PC1_np)
+    valid_entry_num = len(PC1_np)
 
     if np.corrcoef(PC1_np, approx_np)[0][1] < 0:
         approx_np = -approx_np
@@ -30,8 +30,8 @@ def plot_comparison(Juicer_PC1, approx, resolution, scatter, relative_magnitude)
     approx_pos_np = approx_np > 0
     PC1_pos_VS_approx_pos_np = PC1_pos_np == approx_pos_np 
     
-    correctNum = list(PC1_pos_VS_approx_pos_np).count(True)
-    correctRate = correctNum / entryNum
+    correct_num = list(PC1_pos_VS_approx_pos_np).count(True)
+    correct_rate = correct_num / valid_entry_num
 
     # Visualization
     if resolution == "25Kb":
@@ -40,17 +40,17 @@ def plot_comparison(Juicer_PC1, approx, resolution, scatter, relative_magnitude)
         figsize = 30
     
     if scatter != "None":
-        plot_x_axis = [i + 1 for i in range(entryNum)]
+        plot_x_axis = [i + 1 for i in range(valid_entry_num)]
         approx_Dots = [1 if i else -1 for i in approx_pos_np]
         PC1_colors_values = [1 if i else 0 for i in PC1_pos_np]
         PC1_colors = ListedColormap(['r', 'b'])
         scatter_labels = ["Juicer's PC1 < 0", "Juicer's PC1 > 0"]
 
-        plt.xticks(np.arange(0, entryNum, 50)) 
+        plt.xticks(np.arange(0, valid_entry_num, 50)) 
         plt.figure(figsize=(figsize, 6))
         scatter =  plt.scatter(plot_x_axis, approx_Dots, c=PC1_colors_values, cmap=PC1_colors)
         plt.legend(handles=scatter.legend_elements()[0], labels=scatter_labels, fontsize="20", loc="center left")
-        plt.title(f"entryNum: {entryNum}, correctNum = {correctNum}, correctRate={np.round(correctRate, 2)}", fontsize=20, loc="left")
+        plt.title(f"valid_entry_num: {valid_entry_num}, correct_num = {correct_num}, correct_rate={np.round(correct_rate, 2)}", fontsize=20, loc="left")
         plt.savefig(scatter)
         plt.clf() 
     
@@ -58,12 +58,12 @@ def plot_comparison(Juicer_PC1, approx, resolution, scatter, relative_magnitude)
         approx_np_Norm = (approx_np - np.mean(approx_np)) / np.std(approx_np)
         PC1_np_Norm = (PC1_np - np.mean(PC1_np)) / np.std(PC1_np)
         
-        plt.xticks(np.arange(0, entryNum, 50)) 
+        plt.xticks(np.arange(0, valid_entry_num, 50)) 
         plt.figure(figsize=(figsize, 6))
         plt.plot(PC1_np_Norm, c='r')
         plt.plot(approx_np_Norm, c='b')
         plt.legend(["Juicer's PC1", "approximated PC1-pattern"], fontsize="20", loc ="upper left")
-        plt.title(f"entryNum: {entryNum}", fontsize=20, loc="left")
+        plt.title(f"valid_entry_num: {valid_entry_num}", fontsize=20, loc="left")
         plt.savefig(relative_magnitude)
         plt.clf()
 
