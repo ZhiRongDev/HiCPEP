@@ -1,7 +1,7 @@
 import os
 import datetime
 import pandas as pd
-from experiments.process import create_approx, calc_correctness
+from experiments.process import create_approx, calc_correctness, plot_comparison
 
 def data_prepare(docker_volume_path):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 create_approx start")
@@ -97,6 +97,20 @@ def summary_correctness(docker_volume_path):
         output_df.to_excel(writer, sheet_name="summary_2014")
     return
 
+def plot_all_comparisons(docker_volume_path):
+    data_path = f"{docker_volume_path}/data"
+    output_path = f"{docker_volume_path}/outputs/plots/rao_2014"
+    os.makedirs(output_path, exist_ok=True)
+
+    pc1 = f"{data_path}/rao_2014/juicer_outputs/gm12878/1000000/eigenvector/pc1_chr1.txt"
+    approx=f"{docker_volume_path}/outputs/approx_pc1_pattern/rao_2014/gm12878/1000000/cxmax/approx_pc1_pattern_chr1.txt"
+
+    plot_comparison(pc1, approx, relative_magnitude=f"{output_path}/line.png", scatter=f"{output_path}/scatter.png", figsize=30)
+
+    return
+
+
 def run_all(docker_volume_path):
     # data_prepare(docker_volume_path)
-    summary_correctness(docker_volume_path)
+    # summary_correctness(docker_volume_path)
+    plot_all_comparisons(docker_volume_path)

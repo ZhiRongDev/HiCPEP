@@ -1,6 +1,8 @@
 import os
 import numpy as np
 import pandas as pd
+from matplotlib import pyplot as plt
+from matplotlib.colors import ListedColormap
 
 def create_approx(pearson, output, type, source="2014"):
     # Read in the Pearson correlatin matrix
@@ -56,7 +58,6 @@ def create_approx(pearson, output, type, source="2014"):
 
         tmp_str = tmp_str[:-1]
         f.write(tmp_str)
-
     return
 
 # Accept pandas Dataframe as the parameters.
@@ -72,24 +73,66 @@ def calc_correctness(pc1_df, approx_df):
     if len(pc1_np) != len(approx_np): 
         print("PC1 and approx has a different number of elements")
         return
-    
-    valid_entry_num = len(pc1_np)
 
     if np.corrcoef(pc1_np, approx_np)[0][1] < 0:
         approx_np = -approx_np
 
+    valid_entry_num = len(pc1_np)
     pc1_pos_np = pc1_np > 0
     approx_pos_np = approx_np > 0
     pc1_pos_vs_approx_pos_np = pc1_pos_np == approx_pos_np 
-    
     correct_num = list(pc1_pos_vs_approx_pos_np).count(True)
     correct_rate = correct_num / valid_entry_num
-
     return {
         "valid_entry_num": valid_entry_num,
         "correct_num": correct_num,
         "correct_rate": correct_rate,
     }
 
-def plot_comparison():
+def plot_comparison(pc1, approx, figsize, scatter, relative_magnitude):
+    # Read in the Eigenvector 1
+    pc1_df = pd.read_table(pc1, header=None)
+    pc1_df = pc1_df.fillna(0)
+    pc1_np = pc1_df.values # Turn into numpy format
+    pc1_np = pc1_np.flatten() # Turn into 1D vector
+
+    approx_df = pd.read_table(approx, header=None)
+    approx_np = approx_df.values # Turn into numpy format
+    approx_np = approx_np.flatten() # Turn into 1D vector
+
+    total_entry_num = len(pc1_np)
+    correctness_info = calc_correctness(pc1_df, approx_df)
+    valid_entry_num = correctness_info["valid_entry_num"]
+    correct_num = correctness_info["correct_num"]
+    correct_rate = correctness_info["correct_rate"]
+
+    if scatter != "None":
+        plot_x_axis = [i + 1 for i in range(total_entry_num)]
+        # approx_dots = [1 if i else -1 for i in approx_pos_np]
+        # pc1_colors_values = [1 if i else 0 for i in pc1_pos_np]
+        approx_dots = [1 if i > 0 else -1 if i < 0 else 0 for i in approx_np]
+        pc1_colors_values = [2 if i > 0 else 0 if i < 0 else 1 for i in pc1_np]
+        pc1_colors = ListedColormap(['r', 'g', 'b'])
+        scatter_labels = ["PC1 < 0", "PC1 == 0", "PC1 > 0"]
+
+        plt.figure(figsize=(figsize, 6))
+        plt.xticks(np.arange(0, valid_entry_num, 50)) 
+        scatter_config =  plt.scatter(plot_x_axis, approx_dots, c=pc1_colors_values, cmap=pc1_colors)
+        plt.legend(handles=scatter_config.legend_elements()[0], labels=scatter_labels, fontsize="20", loc="center left")
+        plt.title(f"total_entry_num: {total_entry_num}, valid_entry_num: {valid_entry_num}, correct_num = {correct_num}, correct_rate={np.round(correct_rate, 2)}", fontsize=20, loc="left")
+        plt.savefig(scatter)
+        plt.clf() 
+
+    if relative_magnitude != "None":
+        approx_np_norm = (approx_np - np.mean(approx_np)) / np.std(approx_np)
+        pc1_np_norm = (pc1_np - np.mean(pc1_np)) / np.std(pc1_np)
+        
+        plt.figure(figsize=(figsize, 6))
+        plt.xticks(np.arange(0, valid_entry_num, 50)) 
+        plt.plot(pc1_np_norm, c='r')
+        plt.plot(approx_np_norm, c='b')
+        plt.legend(["PC1", "approximated PC1-pattern"], fontsize="20", loc ="upper left")
+        plt.title(f"total_entry_num: {total_entry_num}, valid_entry_num: {valid_entry_num}", fontsize=20, loc="left")
+        plt.savefig(relative_magnitude)        
+        plt.clf()
     return
