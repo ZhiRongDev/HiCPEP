@@ -1,7 +1,7 @@
 import os
 import datetime
 import pandas as pd
-from experiments.process import create_approx, calc_correctness, plot_comparison
+from experiments.process import create_approx, calc_correctness, plot_comparison, calc_explained_variance
 
 def data_prepare(docker_volume_path):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 data_prepare start")
@@ -56,11 +56,9 @@ def summary_correctness(docker_volume_path):
             for cell_line in cell_lines:
                 for chrom in chroms:
                     for method in methods:
-                        pc1_df = pd.read_table(f"{pc1_path}/{cell_line}/{resolution}/eigenvector/pc1_chr{chrom}.txt", header=None)
-                        pc1_df = pc1_df.fillna(0)
-                        approx_df = pd.read_table(f"{approx_path}/{cell_line}/{resolution}/{method}/approx_pc1_pattern_chr{chrom}.txt", header=None)
-
-                        correctness_info = calc_correctness(pc1_df, approx_df)
+                        pc1 = f"{pc1_path}/{cell_line}/{resolution}/eigenvector/pc1_chr{chrom}.txt"
+                        approx = f"{approx_path}/{cell_line}/{resolution}/{method}/approx_pc1_pattern_chr{chrom}.txt"
+                        correctness_info = calc_correctness(pc1, approx, source="2014")
 
                         if method == "cxmax":
                             if cxmax_df.empty:
@@ -126,12 +124,20 @@ def plot_all_comparisons(docker_volume_path):
                     output_path = f"{docker_volume_path}/outputs/plots/rao_2014/{cell_line}/{resolution}/{method}"
                     os.makedirs(f"{output_path}/scatter", exist_ok=True)
                     os.makedirs(f"{output_path}/relative_magnitude", exist_ok=True)
-                    plot_comparison(pc1, approx, relative_magnitude=f"{output_path}/relative_magnitude/relative_magnitude_chr{chrom}.png", scatter=f"{output_path}/scatter/scatter_chr{chrom}.png", figsize=figsize)
+                    plot_comparison(pc1, approx, relative_magnitude=f"{output_path}/relative_magnitude/relative_magnitude_chr{chrom}.png", scatter=f"{output_path}/scatter/scatter_chr{chrom}.png", figsize=figsize, source="2014")
 
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 plot_comparison end")
     return
 
+def summary_all_explained_variance():
+    pearson = f"/home/jordan990301/Projects/HiCAPP/data/Rao_2014/juicer_outputs/GM12878/1000000/pearsons/pearson_chr1.txt"
+    calc_explained_variance(pearson, source="2014")
+
+    return
+
 def run_all(docker_volume_path):
-    data_prepare(docker_volume_path)
-    summary_correctness(docker_volume_path)
-    plot_all_comparisons(docker_volume_path)
+    # data_prepare(docker_volume_path)
+    # summary_correctness(docker_volume_path)
+    # plot_all_comparisons(docker_volume_path)
+    
+    summary_all_explained_variance()
