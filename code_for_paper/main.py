@@ -20,4 +20,4 @@ if __name__ == "__main__":
     docker_volume_path = args.docker_volume_path
 
     rao_2014.run_all(docker_volume_path)
-    # lieberman_2009.run_all(docker_volume_path)
+    lieberman_2009.run_all(docker_volume_path)

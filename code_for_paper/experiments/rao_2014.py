@@ -5,7 +5,6 @@ from experiments.process import create_approx, calc_correctness, plot_comparison
 
 def data_prepare(docker_volume_path):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 data_prepare start")
-
     data_path = f"{docker_volume_path}/data/rao_2014/juicer_outputs"
     output_path=f"{docker_volume_path}/outputs/approx_pc1_pattern/rao_2014"
     resolutions = [1000000, 100000]
@@ -35,7 +34,7 @@ def data_prepare(docker_volume_path):
 
 def summary_correctness(docker_volume_path):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_correctness start")
-    output = f"{docker_volume_path}/outputs/summary/summary_2014.xlsx"
+    output = f"{docker_volume_path}/outputs/summary/summary_correctness_2014.xlsx"
     cxmax_df = pd.DataFrame()
     cxmin_df = pd.DataFrame()
     pc1_path = f"{docker_volume_path}/data/rao_2014/juicer_outputs"
@@ -93,7 +92,7 @@ def summary_correctness(docker_volume_path):
     filename = output
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with pd.ExcelWriter(filename, mode="w") as writer:
-        output_df.to_excel(writer, sheet_name="summary_2014")
+        output_df.to_excel(writer, sheet_name="summary_correctness_2014")
 
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_correctness end")
     return

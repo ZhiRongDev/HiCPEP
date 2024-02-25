@@ -89,8 +89,13 @@ def calc_correctness(pc1_df, approx_df):
         "correct_rate": correct_rate,
     }
 
-def plot_comparison(pc1, approx, figsize, scatter, relative_magnitude):
-    pc1_df = pd.read_table(pc1, header=None)
+def plot_comparison(pc1, approx, figsize, scatter, relative_magnitude, source="2014"):
+    if source == "2014":
+        pc1_df = pd.read_table(pc1, header=None)
+    elif source == "2009":
+        pc1_df = pd.read_table(pc1, header=None, sep="\t")
+        pc1_df = pc1_df.iloc[:, [2]]
+    
     pc1_df = pc1_df.fillna(0)
     pc1_np = pc1_df.values # Turn into numpy format
     pc1_np = pc1_np.flatten() # Turn into 1D vector
