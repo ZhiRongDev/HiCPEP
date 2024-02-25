@@ -4,6 +4,9 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.colors import ListedColormap
 
+np.set_printoptions(suppress=True)
+np.set_printoptions(precision=2)
+
 def create_approx(pearson, output, method, source="2014"):
     # Read in the Pearson correlatin matrix
     if source == "2014":
@@ -60,15 +63,24 @@ def create_approx(pearson, output, method, source="2014"):
         f.write(tmp_str)
     return
 
-# Accept pandas Dataframe as the parameters.
-def calc_correctness(pc1_df, approx_df):
+def calc_correctness(pc1, approx, source="2014"):
+    if source == "2014":
+        pc1_df = pd.read_table(pc1, header=None)
+        pc1_df = pc1_df.fillna(0)
+    elif source == "2009":
+        pc1_df = pd.read_table(pc1, header=None, sep="\t")
+        pc1_df = pc1_df.iloc[:, [2]]
+
     pc1_np = pc1_df.values # Turn into numpy format
     pc1_np = pc1_np.flatten() # Turn into 1D vector
     pc1_np = pc1_np[pc1_np != 0] # Remove 0
 
+    approx_df = pd.read_table(approx, header=None)
     approx_np = approx_df.values # Turn into numpy format
     approx_np = approx_np.flatten() # Turn into 1D vector
     approx_np = approx_np[approx_np != 0] # Remove 0
+
+    del pc1_df, approx_df
 
     if len(pc1_np) != len(approx_np): 
         print("PC1 and approx has a different number of elements")
@@ -92,11 +104,11 @@ def calc_correctness(pc1_df, approx_df):
 def plot_comparison(pc1, approx, figsize, scatter, relative_magnitude, source="2014"):
     if source == "2014":
         pc1_df = pd.read_table(pc1, header=None)
+        pc1_df = pc1_df.fillna(0)
     elif source == "2009":
         pc1_df = pd.read_table(pc1, header=None, sep="\t")
         pc1_df = pc1_df.iloc[:, [2]]
     
-    pc1_df = pc1_df.fillna(0)
     pc1_np = pc1_df.values # Turn into numpy format
     pc1_np = pc1_np.flatten() # Turn into 1D vector
 
@@ -104,8 +116,10 @@ def plot_comparison(pc1, approx, figsize, scatter, relative_magnitude, source="2
     approx_np = approx_df.values # Turn into numpy format
     approx_np = approx_np.flatten() # Turn into 1D vector
 
+    del pc1_df, approx_df
+
     total_entry_num = len(pc1_np)
-    correctness_info = calc_correctness(pc1_df, approx_df)
+    correctness_info = calc_correctness(pc1, approx, source)
     valid_entry_num = correctness_info["valid_entry_num"]
     correct_num = correctness_info["correct_num"]
     correct_rate = correctness_info["correct_rate"]
@@ -144,5 +158,29 @@ def plot_comparison(pc1, approx, figsize, scatter, relative_magnitude, source="2
     plt.close('all')
     return
 
-def calc_explained_variance():
+def calc_explained_variance(pearson, source="2014"):
+    # Read in the Pearson correlatin matrix
+    if source == "2014":
+        pearson_df = pd.read_table(pearson, header=None, sep=" ")
+    elif source == "2009":
+        pearson_df = pd.read_table(pearson, index_col=0, header=1, sep="\t")
+
+    pearson_df.pop(pearson_df.columns[-1])
+    pearson_df = pearson_df.fillna(0)
+    pearson_np = pearson_df.values # Turn into numpy.ndarray
+    pearson_np = pearson_np - pearson_np.mean(axis=1, keepdims=True) # Zero mean of Pearson correlaton matrix
+
+    del pearson_df
+
+    # SVD
+    n = len(pearson_np)
+    y = pearson_np.T / np.sqrt(n)
+    U, S, Vh = np.linalg.svd(y, full_matrices=True)
+    eigenvalues = S * S
+    sum_eigenvalues = np.sum(eigenvalues)
+    explained_variances = eigenvalues / sum_eigenvalues
+
+    # print(np.sum(explained_variances))
+    # print(explained_variances)
+
     return

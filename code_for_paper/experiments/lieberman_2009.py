@@ -80,11 +80,7 @@ def summary_correctness(docker_volume_path):
                         pc1 = f"{pc1_path}/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
                         approx = f"{approx_path}/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chr{chrom}.txt"
 
-                    pc1_df = pd.read_table(pc1, header=None, sep="\t")
-                    pc1_df = pc1_df.iloc[:, [2]]
-                    approx_df = pd.read_table(approx, header=None)
-
-                    correctness_info = calc_correctness(pc1_df, approx_df)
+                    correctness_info = calc_correctness(pc1, approx, source="2009")
 
                     if method == "cxmax":
                         if cxmax_df.empty:
