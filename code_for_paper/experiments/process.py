@@ -4,7 +4,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.colors import ListedColormap
 
-def create_approx(pearson, output, type, source="2014"):
+def create_approx(pearson, output, method, source="2014"):
     # Read in the Pearson correlatin matrix
     if source == "2014":
         pearson_df = pd.read_table(pearson, header=None, sep=" ")
@@ -31,10 +31,10 @@ def create_approx(pearson, output, type, source="2014"):
     cov_abs_sum = list(enumerate(cov_abs_sum)) # Turn list into tuple with index, ex: (index, absSum)
     sorted_cov_abs_sum = sorted(cov_abs_sum, key=lambda x: x[1], reverse=True) # Sorted from the maximum to the minimum 
 
-    if type == "cxmax":
+    if method == "cxmax":
         sorted_index = 0
         cov_selected_np = cov_np[sorted_cov_abs_sum[sorted_index][0]]
-    elif type == "cxmin":
+    elif method == "cxmin":
         sorted_index = -1
         cov_selected_np = cov_np[sorted_cov_abs_sum[sorted_index][0]]
         # To avoid selecting the column with all 0 values. 
@@ -90,7 +90,6 @@ def calc_correctness(pc1_df, approx_df):
     }
 
 def plot_comparison(pc1, approx, figsize, scatter, relative_magnitude):
-    # Read in the Eigenvector 1
     pc1_df = pd.read_table(pc1, header=None)
     pc1_df = pc1_df.fillna(0)
     pc1_np = pc1_df.values # Turn into numpy format
@@ -106,10 +105,11 @@ def plot_comparison(pc1, approx, figsize, scatter, relative_magnitude):
     correct_num = correctness_info["correct_num"]
     correct_rate = correctness_info["correct_rate"]
 
+    if np.corrcoef(pc1_np, approx_np)[0][1] < 0:
+        approx_np = -approx_np
+
     if scatter != "None":
         plot_x_axis = [i + 1 for i in range(total_entry_num)]
-        # approx_dots = [1 if i else -1 for i in approx_pos_np]
-        # pc1_colors_values = [1 if i else 0 for i in pc1_pos_np]
         approx_dots = [1 if i > 0 else -1 if i < 0 else 0 for i in approx_np]
         pc1_colors_values = [2 if i > 0 else 0 if i < 0 else 1 for i in pc1_np]
         pc1_colors = ListedColormap(['r', 'g', 'b'])
@@ -135,4 +135,9 @@ def plot_comparison(pc1, approx, figsize, scatter, relative_magnitude):
         plt.title(f"total_entry_num: {total_entry_num}, valid_entry_num: {valid_entry_num}", fontsize=20, loc="left")
         plt.savefig(relative_magnitude)        
         plt.clf()
+    
+    plt.close('all')
+    return
+
+def calc_explained_variance():
     return

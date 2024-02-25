@@ -42,12 +42,12 @@ do
         # There are only 19 chromosome in ch12-lx, 
         if [[ "${CELL_LINE}" == "ch12-lx" ]]
         then
-            CHROM_LIST=(chr1 chr2 chr3 chr4 chr5 chr6 chr7 chr8 chr9 chr10 chr11 chr12 chr13 chr14 chr15 chr16 chr17 chr18 chr19 chrX chrY)
+            CHROMS=(chr1 chr2 chr3 chr4 chr5 chr6 chr7 chr8 chr9 chr10 chr11 chr12 chr13 chr14 chr15 chr16 chr17 chr18 chr19 chrX chrY)
         else
-            CHROM_LIST=(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y)
+            CHROMS=(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y)
         fi
 
-        for CHROM in "${CHROM_LIST[@]}"
+        for CHROM in "${CHROMS[@]}"
         do
             CHROM_ID="${CHROM/chr/""}" 
 
