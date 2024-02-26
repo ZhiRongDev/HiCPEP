@@ -1,6 +1,7 @@
 import os
 import datetime
 import pandas as pd
+import numpy as np
 from experiments.process import create_approx, calc_correctness, plot_comparison, calc_explained_variance
 
 def data_prepare(docker_volume_path):
@@ -34,9 +35,26 @@ def data_prepare(docker_volume_path):
 
 def summary_correctness(docker_volume_path):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_correctness start")
-    output = f"{docker_volume_path}/outputs/summary/summary_correctness_2014.xlsx"
-    cxmax_df = pd.DataFrame()
-    cxmin_df = pd.DataFrame()
+    cxmax_df = pd.DataFrame(columns = {
+        'cell_line': [], 
+        'resolution': [], 
+        'chrom':[], 
+        "method":[], 
+        "total_entry_num":[], 
+        "valid_entry_num":[], 
+        "correct_num":[], 
+        "correct_rate": []
+    })
+    cxmin_df = pd.DataFrame(columns = {
+        'cell_line': [], 
+        'resolution': [], 
+        'chrom':[], 
+        "method":[], 
+        "total_entry_num":[], 
+        "valid_entry_num":[], 
+        "correct_num":[], 
+        "correct_rate": []
+    })
     pc1_path = f"{docker_volume_path}/data/rao_2014/juicer_outputs"
     approx_path = f"{docker_volume_path}/outputs/approx_pc1_pattern/rao_2014"
 
@@ -61,33 +79,13 @@ def summary_correctness(docker_volume_path):
                         correctness_info = calc_correctness(pc1, approx, source="2014")
 
                         if method == "cxmax":
-                            if cxmax_df.empty:
-                                cxmax_df = pd.DataFrame(
-                                    [[cell_line, resolution, f"chr{chrom}", method, correctness_info["valid_entry_num"], correctness_info["correct_num"], correctness_info["correct_rate"]]],
-                                    columns=['cell', 'resolution', 'chromosome', "method", "valid_entry_num", "correct_num", "correct_rate"]
-                                )
-                            else:
-                                new_row_df = pd.DataFrame(
-                                    [[cell_line, resolution, f"chr{chrom}", method, correctness_info["valid_entry_num"], correctness_info["correct_num"], correctness_info["correct_rate"]]],
-                                    columns=['cell', 'resolution', 'chromosome', "method", "valid_entry_num", "correct_num", "correct_rate"]
-                                )
-                                cxmax_df = pd.concat([cxmax_df, new_row_df], ignore_index=True)
+                            cxmax_df.loc[len(cxmax_df)] = [cell_line, resolution, f"chr{chrom}", method, correctness_info["total_entry_num"], correctness_info["valid_entry_num"], correctness_info["correct_num"], correctness_info["correct_rate"]] 
                         elif method == "cxmin":
-                            if cxmin_df.empty:
-                                cxmin_df = pd.DataFrame(
-                                    [[cell_line, resolution, f"chr{chrom}", method, correctness_info["valid_entry_num"], correctness_info["correct_num"], correctness_info["correct_rate"]]],
-                                    columns=['cell', 'resolution', 'chromosome', "method", "valid_entry_num", "correct_num", "correct_rate"]
-                                )
-                            else:
-                                new_row_df = pd.DataFrame(
-                                    [[cell_line, resolution, f"chr{chrom}", method, correctness_info["valid_entry_num"], correctness_info["correct_num"], correctness_info["correct_rate"]]],
-                                    columns=['cell', 'resolution', 'chromosome', "method", "valid_entry_num", "correct_num", "correct_rate"]
-                                )
-                                cxmin_df = pd.concat([cxmin_df, new_row_df], ignore_index=True)
+                            cxmin_df.loc[len(cxmin_df)] = [cell_line, resolution, f"chr{chrom}", method, correctness_info["total_entry_num"], correctness_info["valid_entry_num"], correctness_info["correct_num"], correctness_info["correct_rate"]] 
 
     output_df = pd.concat([cxmax_df, cxmin_df], ignore_index=True)
 
-    filename = output
+    filename = f"{docker_volume_path}/outputs/summary/summary_correctness_2014.xlsx"
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with pd.ExcelWriter(filename, mode="w") as writer:
         output_df.to_excel(writer, sheet_name="summary_correctness_2014")
@@ -129,10 +127,79 @@ def plot_all_comparisons(docker_volume_path):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 plot_comparison end")
     return
 
-def summary_all_explained_variance():
-    pearson = f"/home/jordan990301/Projects/HiCAPP/data/Rao_2014/juicer_outputs/GM12878/1000000/pearsons/pearson_chr1.txt"
-    calc_explained_variance(pearson, source="2014")
+def summary_explained_variance(docker_volume_path):
+    print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_explained_variance_2014 start")
+    output_df = pd.DataFrame( columns = {
+        "cell_line": [],
+        "resolution": [],
+        "chrom": [],
+        "total_entry_num": [],
+        "valid_entry_num": [],
+        "exp_var_pc1": [],
+        "exp_var_pc2": [],
+        "exp_var_pc3": [],
+        "cos_sim_pc1": [],
+        "corr_pc1": []
+    })
 
+    data_path = f"{docker_volume_path}/data"
+    resolutions = [1000000]
+    cell_lines = ["gm12878", "hela", "hmec", "huvec", "imr90", "k562", "kbm7", "nhek", "ch12-lx"]
+    methods = ["cxmax", "cxmin"]
+
+    for resolution in resolutions:
+        for cell_line in cell_lines:
+            for method in methods:
+                if resolution == 1000000:
+                    figsize = 20
+                elif resolution == 100000:
+                    figsize = 40
+
+                if cell_line == "ch12-lx":
+                    chroms = [str(i) for i in range(1, 20)]
+                else:
+                    chroms = [str(i) for i in range(1, 23)]
+                chroms.extend(["X", "Y"])
+
+                print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_explained_variance_2014 {resolution} {cell_line} {method}")
+                for chrom in chroms:
+                    pearson = f"{docker_volume_path}/data/rao_2014/juicer_outputs/{cell_line}/{resolution}/pearsons/pearson_chr{chrom}.txt"
+                    pc1 = f"{docker_volume_path}/data/rao_2014/juicer_outputs/{cell_line}/{resolution}/eigenvector/pc1_chr{chrom}.txt"
+                    pc1_df = pd.read_table(pc1, header=None)
+                    pc1_df = pc1_df.fillna(0)
+                    pc1_np = pc1_df.values # Turn into numpy format
+                    pc1_np = pc1_np.flatten() # Turn into 1D vector
+                    pc1_np = pc1_np[pc1_np != 0] # Remove 0
+
+                    Vh, explained_variances, total_entry_num, valid_entry_num = calc_explained_variance(pearson, source="2014")
+
+                    if len(pc1_np) != len(Vh[0]):
+                        print("Juicer PC1 and self calculation PC1 has a different valid_entry_num")
+                        return
+
+                    # Compare the pc1 calculated by numpy with the Juicer's pc1. 
+                    cos_sim = np.dot(Vh[0], pc1_np) / (np.linalg.norm(Vh[0]) * np.linalg.norm(pc1_np))
+                    corr = np.corrcoef(Vh[0], pc1_np)[0][1]
+                    
+                    output_df.loc[len(output_df)] = [
+                        cell_line, 
+                        resolution, 
+                        chrom, 
+                        total_entry_num, 
+                        valid_entry_num,
+                        explained_variances[0],
+                        explained_variances[1],
+                        explained_variances[2],
+                        cos_sim,
+                        corr,
+                    ] 
+
+    filename = f"{docker_volume_path}/outputs/summary/summary_explained_variance_2014.xlsx"
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
+    with pd.ExcelWriter(filename, mode="w") as writer:
+        output_df.to_excel(writer, sheet_name="summary_explained_variance_2014")
+
+    print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_explained_variance_2014 end")
     return
 
 def run_all(docker_volume_path):
@@ -140,4 +207,5 @@ def run_all(docker_volume_path):
     # summary_correctness(docker_volume_path)
     # plot_all_comparisons(docker_volume_path)
     
-    summary_all_explained_variance()
+    summary_explained_variance(docker_volume_path)
+    return

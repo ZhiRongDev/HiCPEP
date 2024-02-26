@@ -34,9 +34,26 @@ def data_prepare(docker_volume_path):
 
 def summary_correctness(docker_volume_path):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_correctness start")
-    output = f"{docker_volume_path}/outputs/summary/summary_correctness_2009.xlsx"
-    cxmax_df = pd.DataFrame()
-    cxmin_df = pd.DataFrame()
+    cxmax_df = pd.DataFrame(columns = {
+        'cell_line': [], 
+        'resolution': [], 
+        'chrom':[], 
+        "method":[], 
+        "total_entry_num":[], 
+        "valid_entry_num":[], 
+        "correct_num":[], 
+        "correct_rate": []
+    })
+    cxmin_df = pd.DataFrame(columns = {
+        'cell_line': [], 
+        'resolution': [], 
+        'chrom':[], 
+        "method":[], 
+        "total_entry_num":[], 
+        "valid_entry_num":[], 
+        "correct_num":[], 
+        "correct_rate": []
+    })
     pc1_path = f"{docker_volume_path}/data/lieberman_2009/eigenvectors"
     approx_path = f"{docker_volume_path}/outputs/approx_pc1_pattern/lieberman_2009"
 
@@ -83,33 +100,13 @@ def summary_correctness(docker_volume_path):
                     correctness_info = calc_correctness(pc1, approx, source="2009")
 
                     if method == "cxmax":
-                        if cxmax_df.empty:
-                            cxmax_df = pd.DataFrame(
-                                [[cell_line, resolution, f"chr{chrom}", method, correctness_info["valid_entry_num"], correctness_info["correct_num"], correctness_info["correct_rate"]]],
-                                columns=['cell', 'resolution', 'chromosome', "method", "valid_entry_num", "correct_num", "correct_rate"]
-                            )
-                        else:
-                            new_row_df = pd.DataFrame(
-                                [[cell_line, resolution, f"chr{chrom}", method, correctness_info["valid_entry_num"], correctness_info["correct_num"], correctness_info["correct_rate"]]],
-                                columns=['cell', 'resolution', 'chromosome', "method", "valid_entry_num", "correct_num", "correct_rate"]
-                            )
-                            cxmax_df = pd.concat([cxmax_df, new_row_df], ignore_index=True)
+                        cxmax_df.loc[len(cxmax_df)] = [cell_line, resolution, f"chr{chrom}", method, correctness_info["total_entry_num"], correctness_info["valid_entry_num"], correctness_info["correct_num"], correctness_info["correct_rate"]] 
                     elif method == "cxmin":
-                        if cxmin_df.empty:
-                            cxmin_df = pd.DataFrame(
-                                [[cell_line, resolution, f"chr{chrom}", method, correctness_info["valid_entry_num"], correctness_info["correct_num"], correctness_info["correct_rate"]]],
-                                columns=['cell', 'resolution', 'chromosome', "method", "valid_entry_num", "correct_num", "correct_rate"]
-                            )
-                        else:
-                            new_row_df = pd.DataFrame(
-                                [[cell_line, resolution, f"chr{chrom}", method, correctness_info["valid_entry_num"], correctness_info["correct_num"], correctness_info["correct_rate"]]],
-                                columns=['cell', 'resolution', 'chromosome', "method", "valid_entry_num", "correct_num", "correct_rate"]
-                            )
-                            cxmin_df = pd.concat([cxmin_df, new_row_df], ignore_index=True)
+                        cxmin_df.loc[len(cxmin_df)] = [cell_line, resolution, f"chr{chrom}", method, correctness_info["total_entry_num"], correctness_info["valid_entry_num"], correctness_info["correct_num"], correctness_info["correct_rate"]] 
 
     output_df = pd.concat([cxmax_df, cxmin_df], ignore_index=True)
 
-    filename = output
+    filename = f"{docker_volume_path}/outputs/summary/summary_correctness_2009.xlsx"
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with pd.ExcelWriter(filename, mode="w") as writer:
         output_df.to_excel(writer, sheet_name="summary_correctness_2009")
@@ -162,6 +159,7 @@ def plot_all_comparisons(docker_volume_path):
     return
 
 def run_all(docker_volume_path):
-    data_prepare(docker_volume_path)
+    # data_prepare(docker_volume_path)
     summary_correctness(docker_volume_path)
-    plot_all_comparisons(docker_volume_path)
+    # plot_all_comparisons(docker_volume_path)
+    return

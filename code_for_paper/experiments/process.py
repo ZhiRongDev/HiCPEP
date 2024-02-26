@@ -25,9 +25,12 @@ def create_approx(pearson, output, method, source="2014"):
         print("Pearson matrix has a different number of rows and columns")
         return
 
-    # According the steps in SVD, here we set the degree of freedom as n   
-    n = len(pearson_np[0])
-    cov_np = np.matmul(pearson_np, pearson_np.T) / n
+    """_summary_
+        Calaulate the covariance matrix of the zero-means pearson matrix, according to the steps in PCA.
+        Note that we set the degree of freedom as n.
+    """
+    n = len(pearson_np[0]) # degree of freedom
+    cov_np = np.matmul(pearson_np, pearson_np.T) / n # covariance matrix
 
     # Main idea, note that the covariance matrix is symmetric
     cov_abs_sum = [np.sum(np.abs(row)) for row in cov_np] 
@@ -73,29 +76,34 @@ def calc_correctness(pc1, approx, source="2014"):
 
     pc1_np = pc1_df.values # Turn into numpy format
     pc1_np = pc1_np.flatten() # Turn into 1D vector
-    pc1_np = pc1_np[pc1_np != 0] # Remove 0
-
     approx_df = pd.read_table(approx, header=None)
     approx_np = approx_df.values # Turn into numpy format
     approx_np = approx_np.flatten() # Turn into 1D vector
+
+    total_entry_num = len(pc1_np)
+    if total_entry_num != len(approx_np): 
+        print("PC1 and approx has a different total_entry_num")
+        return
+    
+    pc1_np = pc1_np[pc1_np != 0] # Remove 0
     approx_np = approx_np[approx_np != 0] # Remove 0
+    valid_entry_num = len(pc1_np)
+    if valid_entry_num != len(approx_np): 
+        print("PC1 and approx has a different valid_entry_num")
+        return
 
     del pc1_df, approx_df
-
-    if len(pc1_np) != len(approx_np): 
-        print("PC1 and approx has a different number of elements")
-        return
 
     if np.corrcoef(pc1_np, approx_np)[0][1] < 0:
         approx_np = -approx_np
 
-    valid_entry_num = len(pc1_np)
     pc1_pos_np = pc1_np > 0
     approx_pos_np = approx_np > 0
     pc1_pos_vs_approx_pos_np = pc1_pos_np == approx_pos_np 
     correct_num = list(pc1_pos_vs_approx_pos_np).count(True)
     correct_rate = correct_num / valid_entry_num
     return {
+        "total_entry_num": total_entry_num,
         "valid_entry_num": valid_entry_num,
         "correct_num": correct_num,
         "correct_rate": correct_rate,
@@ -118,8 +126,8 @@ def plot_comparison(pc1, approx, figsize, scatter, relative_magnitude, source="2
 
     del pc1_df, approx_df
 
-    total_entry_num = len(pc1_np)
     correctness_info = calc_correctness(pc1, approx, source)
+    total_entry_num = correctness_info["total_entry_num"]
     valid_entry_num = correctness_info["valid_entry_num"]
     correct_num = correctness_info["correct_num"]
     correct_rate = correctness_info["correct_rate"]
@@ -170,17 +178,31 @@ def calc_explained_variance(pearson, source="2014"):
     pearson_np = pearson_df.values # Turn into numpy.ndarray
     pearson_np = pearson_np - pearson_np.mean(axis=1, keepdims=True) # Zero mean of Pearson correlaton matrix
 
+    total_entry_num = len(pearson_np)
+    """
+        Remove 0 rows and 0 columns.
+        https://stackoverflow.com/questions/11188364/remove-zero-lines-2-d-numpy-array
+    """
+    pearson_np = pearson_np[~np.all(pearson_np == 0, axis=1)]
+    pearson_np = pearson_np[:, ~np.all(pearson_np == 0, axis=0)]
+
     del pearson_df
 
-    # SVD
-    n = len(pearson_np)
+    valid_entry_num = len(pearson_np)
+    # Computing PCA through SVD
+    n = valid_entry_num
     y = pearson_np.T / np.sqrt(n)
+
+    """_summary_
+        These two lines of code will both calculate the covariance matrix of the pearson matrix, and is confirmed to have the same results.
+        # print(np.matmul(y.T, y), '\n')
+        # print(np.cov(pearson_np, bias=True)) # `bias=True` will set the degree of freedom as n.
+    """
+
     U, S, Vh = np.linalg.svd(y, full_matrices=True)
     eigenvalues = S * S
     sum_eigenvalues = np.sum(eigenvalues)
     explained_variances = eigenvalues / sum_eigenvalues
 
-    # print(np.sum(explained_variances))
-    # print(explained_variances)
-
-    return
+    # Return Principal components(Vector) and the explained variances of PC1(Vector).
+    return Vh, explained_variances, total_entry_num, valid_entry_num
