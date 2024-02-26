@@ -1,7 +1,8 @@
 import os
 import datetime
 import pandas as pd
-from experiments.process import create_approx, calc_correctness, plot_comparison
+import numpy as np
+from experiments.process import create_approx, calc_correctness, plot_comparison, calc_explained_variance
 
 def data_prepare(docker_volume_path):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 data_prepare start")
@@ -158,8 +159,88 @@ def plot_all_comparisons(docker_volume_path):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 plot_comparison end")
     return
 
+def summary_explained_variance(docker_volume_path):
+    print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_explained_variance start")
+    output_df = pd.DataFrame(columns = {
+        "cell_line": [],
+        "resolution": [],
+        "chrom": [],
+        "total_entry_num": [],
+        "valid_entry_num": [],
+        "exp_var_pc1": [],
+        "exp_var_pc2": [],
+        "exp_var_pc3": [],
+        "cos_sim_pc1": [],
+        "corr_pc1": []
+    })
+
+    resolutions = [1000000]
+    cell_lines = ["gm06690", "k562"]
+
+    for resolution in resolutions:
+        for cell_line in cell_lines:
+            # There are some missing chromosomes in Lieberman's dataset.
+            if cell_line == "k562" and resolution == 100000:
+                chroms = [str(i) for i in range(1, 23)]
+            else:
+                chroms = [str(i) for i in range(1, 23)]
+                chroms.extend(["X"])
+
+            print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_explained_variance_2009 {resolution} {cell_line}")
+            for chrom in chroms:
+                pearson = f"{docker_volume_path}/data/lieberman_2009/heatmaps/HIC_{cell_line}_chr{chrom}_chr{chrom}_{resolution}_pearson.txt"
+                
+                if cell_line == "gm06690":
+                    if chrom == "X":
+                        pc1 = f"{docker_volume_path}/data/lieberman_2009/eigenvectors/GM-combined.ctg23.ctg23.{resolution}bp.hm.eigenvector.tab"
+                    else:
+                        pc1 = f"{docker_volume_path}/data/lieberman_2009/eigenvectors/GM-combined.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
+                elif cell_line == "k562":
+                    if chrom == "X":
+                        pc1 = f"{docker_volume_path}/data/lieberman_2009/eigenvectors/K562-HindIII.ctg23.ctg23.{resolution}bp.hm.eigenvector.tab"
+                    else:
+                        pc1 = f"{docker_volume_path}/data/lieberman_2009/eigenvectors/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
+
+                pc1_df = pd.read_table(pc1, header=None, sep="\t")
+                pc1_df = pc1_df.iloc[:, [2]]
+                pc1_np = pc1_df.values # Turn into numpy format
+                pc1_np = pc1_np.flatten() # Turn into 1D vector
+                pc1_np = pc1_np[pc1_np != 0] # Remove 0
+
+                Vh, explained_variances, total_entry_num, valid_entry_num = calc_explained_variance(pearson, source="2009")
+
+                if len(pc1_np) != len(Vh[0]):
+                    print("Juicer PC1 and self calculation PC1 has a different valid_entry_num")
+                    return
+
+                # Compare the pc1 calculated by numpy with the Juicer's pc1. 
+                cos_sim = np.dot(Vh[0], pc1_np) / (np.linalg.norm(Vh[0]) * np.linalg.norm(pc1_np))
+                corr = np.corrcoef(Vh[0], pc1_np)[0][1]
+                
+                output_df.loc[len(output_df)] = [
+                    cell_line, 
+                    resolution, 
+                    chrom, 
+                    total_entry_num, 
+                    valid_entry_num,
+                    explained_variances[0],
+                    explained_variances[1],
+                    explained_variances[2],
+                    cos_sim,
+                    corr,
+                ] 
+
+    filename = f"{docker_volume_path}/outputs/summary/summary_explained_variance_2009.xlsx"
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
+    with pd.ExcelWriter(filename, mode="w") as writer:
+        output_df.to_excel(writer, sheet_name="summary_explained_variance_2009")
+
+    print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_explained_variance end")
+    return
+
 def run_all(docker_volume_path):
     # data_prepare(docker_volume_path)
-    summary_correctness(docker_volume_path)
+    # summary_correctness(docker_volume_path)
     # plot_all_comparisons(docker_volume_path)
+    summary_explained_variance(docker_volume_path)
     return
