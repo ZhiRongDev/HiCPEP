@@ -174,7 +174,7 @@ def summary_explained_variance(docker_volume_path):
         "corr_pc1": []
     })
 
-    resolutions = [1000000]
+    resolutions = [1000000, 100000] # 
     cell_lines = ["gm06690", "k562"]
 
     for resolution in resolutions:
@@ -239,8 +239,8 @@ def summary_explained_variance(docker_volume_path):
     return
 
 def run_all(docker_volume_path):
-    # data_prepare(docker_volume_path)
-    # summary_correctness(docker_volume_path)
-    # plot_all_comparisons(docker_volume_path)
+    data_prepare(docker_volume_path)
+    summary_correctness(docker_volume_path)
+    plot_all_comparisons(docker_volume_path)
     summary_explained_variance(docker_volume_path)
     return

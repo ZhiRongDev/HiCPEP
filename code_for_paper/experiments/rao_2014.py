@@ -142,9 +142,8 @@ def summary_explained_variance(docker_volume_path):
         "corr_pc1": []
     })
 
-    resolutions = [1000000]
+    resolutions = [1000000, 100000]
     cell_lines = ["gm12878", "hela", "hmec", "huvec", "imr90", "k562", "kbm7", "nhek", "ch12-lx"]
-    methods = ["cxmax", "cxmin"]
 
     for resolution in resolutions:
         for cell_line in cell_lines:
@@ -196,8 +195,8 @@ def summary_explained_variance(docker_volume_path):
     return
 
 def run_all(docker_volume_path):
-    # data_prepare(docker_volume_path)
-    # summary_correctness(docker_volume_path)
-    # plot_all_comparisons(docker_volume_path)
+    data_prepare(docker_volume_path)
+    summary_correctness(docker_volume_path)
+    plot_all_comparisons(docker_volume_path)
     summary_explained_variance(docker_volume_path)
     return
