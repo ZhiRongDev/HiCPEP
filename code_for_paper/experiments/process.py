@@ -4,8 +4,8 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.colors import ListedColormap
 
-np.set_printoptions(suppress=True)
-np.set_printoptions(precision=2)
+# np.set_printoptions(suppress=True)
+# np.set_printoptions(precision=2)
 
 def create_approx(pearson, output, method, source="2014"):
     # Read in the Pearson correlatin matrix
@@ -26,8 +26,8 @@ def create_approx(pearson, output, method, source="2014"):
         return
 
     """_summary_
-        Calaulate the covariance matrix of the zero-means pearson matrix, according to the steps in PCA.
-        Note that we set the degree of freedom as n.
+    Calaulate the covariance matrix of the zero-means pearson matrix, according to the steps in PCA.
+    Note that we set the degree of freedom as n.
     """
     n = len(pearson_np[0]) # degree of freedom
     cov_np = np.matmul(pearson_np, pearson_np.T) / n # covariance matrix
@@ -179,9 +179,9 @@ def calc_explained_variance(pearson, source="2014"):
     pearson_np = pearson_np - pearson_np.mean(axis=1, keepdims=True) # Zero mean of Pearson correlaton matrix
 
     total_entry_num = len(pearson_np)
-    """
-        Remove 0 rows and 0 columns.
-        https://stackoverflow.com/questions/11188364/remove-zero-lines-2-d-numpy-array
+    """_summary_
+    Remove 0 rows and 0 columns.
+    https://stackoverflow.com/questions/11188364/remove-zero-lines-2-d-numpy-array
     """
     pearson_np = pearson_np[~np.all(pearson_np == 0, axis=1)]
     pearson_np = pearson_np[:, ~np.all(pearson_np == 0, axis=0)]
@@ -194,9 +194,9 @@ def calc_explained_variance(pearson, source="2014"):
     y = pearson_np.T / np.sqrt(n)
 
     """_summary_
-        These two lines of code will both calculate the covariance matrix of the pearson matrix, and is confirmed to have the same results.
-        # print(np.matmul(y.T, y), '\n')
-        # print(np.cov(pearson_np, bias=True)) # `bias=True` will set the degree of freedom as n.
+    These two lines of code will both calculate the covariance matrix of the pearson matrix, and is confirmed to have the same results.
+    # print(np.matmul(y.T, y), '\n')
+    # print(np.cov(pearson_np, bias=True)) # `bias=True` will set the degree of freedom as n.
     """
 
     U, S, Vh = np.linalg.svd(y, full_matrices=True)
