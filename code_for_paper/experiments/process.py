@@ -17,7 +17,11 @@ def create_approx(pearson, output, method, source="2014"):
     pearson_df.pop(pearson_df.columns[-1])
     pearson_df = pearson_df.fillna(0)
     pearson_np = pearson_df.values # Turn into numpy.ndarray
-    pearson_np = pearson_np - pearson_np.mean(axis=1, keepdims=True) # Zero mean of Pearson correlaton matrix
+    
+    diag = np.diag(pearson_np)
+    diag_valid = diag != 0 
+    ixgrid = np.ix_(diag_valid, diag_valid) # Extract the submatrix.
+    pearson_np[ixgrid] -= pearson_np[ixgrid].mean(axis=1, keepdims=True) # Zero mean the Pearson correlaton matrix but still keep the all 0 rows/columns.
 
     del pearson_df
 
@@ -29,10 +33,11 @@ def create_approx(pearson, output, method, source="2014"):
     Calaulate the covariance matrix of the zero-means pearson matrix, according to the steps in PCA.
     Note that we set the degree of freedom as n.
     """
-    n = len(pearson_np[0]) # degree of freedom
-    cov_np = np.matmul(pearson_np, pearson_np.T) / n # covariance matrix
+    n = len(pearson_np[ixgrid])
+    cov_np = np.zeros((len(pearson_np), len(pearson_np))) 
+    cov_np[ixgrid] = np.matmul(pearson_np[ixgrid], pearson_np[ixgrid].T) / n # covariance matrix
 
-    # Main idea, note that the covariance matrix is symmetric
+    # Core idea, note that the covariance matrix is symmetric
     cov_abs_sum = [np.sum(np.abs(row)) for row in cov_np] 
     cov_abs_sum = list(enumerate(cov_abs_sum)) # Turn list into tuple with index, ex: (index, absSum)
     sorted_cov_abs_sum = sorted(cov_abs_sum, key=lambda x: x[1], reverse=True) # Sorted from the maximum to the minimum 
@@ -53,10 +58,9 @@ def create_approx(pearson, output, method, source="2014"):
             print(val)
         return
     
-    filename = output
-    os.makedirs(os.path.dirname(filename), exist_ok=True)
+    os.makedirs(os.path.dirname(output), exist_ok=True)
 
-    with open(filename, 'w') as f:
+    with open(output, 'w') as f:
         tmp_str = ''
 
         for i in cov_selected_np:
@@ -176,33 +180,30 @@ def calc_explained_variance(pearson, source="2014"):
     pearson_df.pop(pearson_df.columns[-1])
     pearson_df = pearson_df.fillna(0)
     pearson_np = pearson_df.values # Turn into numpy.ndarray
-    pearson_np = pearson_np - pearson_np.mean(axis=1, keepdims=True) # Zero mean of Pearson correlaton matrix
-
     total_entry_num = len(pearson_np)
-    """_summary_
-    Remove 0 rows and 0 columns.
-    https://stackoverflow.com/questions/11188364/remove-zero-lines-2-d-numpy-array
-    """
-    pearson_np = pearson_np[~np.all(pearson_np == 0, axis=1)]
-    pearson_np = pearson_np[:, ~np.all(pearson_np == 0, axis=0)]
+    
+    diag = np.diag(pearson_np)
+    diag_valid = diag != 0 
+    ixgrid = np.ix_(diag_valid, diag_valid) # Extract the submatrix.
+    pearson_np[ixgrid] -= pearson_np[ixgrid].mean(axis=1, keepdims=True) # Zero mean the Pearson correlaton matrix but still keep the all 0 rows/columns.
 
-    del pearson_df
-
-    valid_entry_num = len(pearson_np)
-    # Computing PCA through SVD
-    n = valid_entry_num
-    y = pearson_np.T / np.sqrt(n)
+    n = valid_entry_num = len(pearson_np[ixgrid])
+    y = pearson_np[ixgrid].T / np.sqrt(n)
 
     """_summary_
     These two lines of code will both calculate the covariance matrix of the pearson matrix, and is confirmed to have the same results.
-    # print(np.matmul(y.T, y), '\n')
-    # print(np.cov(pearson_np, bias=True)) # `bias=True` will set the degree of freedom as n.
+    print(np.matmul(y.T, y), '\n')
+    print(np.cov(pearson_np[ixgrid], bias=True)) # `bias=True` will set the degree of freedom as n.
     """
 
     U, S, Vh = np.linalg.svd(y, full_matrices=True)
     eigenvalues = S * S
     sum_eigenvalues = np.sum(eigenvalues)
     explained_variances = eigenvalues / sum_eigenvalues
+
+    tmp = np.zeros((len(pearson_np), len(pearson_np))) 
+    tmp[ixgrid] = Vh
+    Vh = tmp
 
     # Return Principal components(Vector) and the explained variances of PC1(Vector).
     return Vh, explained_variances, total_entry_num, valid_entry_num
