@@ -4,9 +4,6 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.colors import ListedColormap
 
-# np.set_printoptions(suppress=True)
-# np.set_printoptions(precision=2)
-
 def create_approx(pearson, output, method, source="2014"):
     # Read in the Pearson correlatin matrix
     if source == "2014":

@@ -1,4 +1,4 @@
-FROM jupyter/base-notebook:python-3.11.5
+FROM ubuntu:22.04
 
 USER root
 

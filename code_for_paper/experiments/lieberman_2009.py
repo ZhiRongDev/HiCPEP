@@ -174,7 +174,7 @@ def summary_explained_variance(docker_volume_path):
         "corr_pc1": []
     })
 
-    resolutions = [1000000, 100000] # 
+    resolutions = [1000000, 100000]
     cell_lines = ["gm06690", "k562"]
 
     for resolution in resolutions:
