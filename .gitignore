@@ -1,8 +1,2 @@
 __pycache__
 archive/
-code_for_paper/data/
-data/
-docker_volume/
-outputs/
-
-ref_for_dockerfile/

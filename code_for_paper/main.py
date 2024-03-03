@@ -6,18 +6,18 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog='main.py',
         allow_abbrev=False,
-        description='What the program does',
+        description='This program is used for producing the experiment results.',
         epilog='Text at the bottom of help'
     )
     parser.add_argument(
-        "--docker_volume_path",
+        "--data_store",
         type=str,
         required=True,
-        help="docker_volume_path"
+        help="data_store"
     )
 
     args = parser.parse_args()
-    docker_volume_path = args.docker_volume_path
+    data_store = args.data_store
 
-    rao_2014.run_all(docker_volume_path)
-    lieberman_2009.run_all(docker_volume_path)
+    rao_2014.run_all(data_store)
+    lieberman_2009.run_all(data_store)

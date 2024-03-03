@@ -1,7 +1,7 @@
 #!/bin/bash
-DATA_PATH="${DOCKER_VOLUME_PATH}/data"
-OUTPUT_PATH="${DOCKER_VOLUME_PATH}/outputs"
-JUICER_TOOLS_PATH="${DOCKER_VOLUME_PATH}/juicer_tools"
+DATA_PATH="${DATA_STORE}/data"
+OUTPUT_PATH="${DATA_STORE}/outputs"
+JUICER_TOOLS_PATH="${DATA_STORE}/juicer_tools"
 
 mkdir -p "${DATA_PATH}" "${OUTPUT_PATH}" "${JUICER_TOOLS_PATH}"
 
@@ -23,4 +23,5 @@ wget "https://ftp.ncbi.nlm.nih.gov/geo/series/GSE18nnn/GSE18199/suppl/GSE18199%5
 gzip -d "${DATA_PATH}/lieberman_2009/zip/GSE18199_eigenvector_files.zip.gz"
 unzip "${DATA_PATH}/lieberman_2009/zip/GSE18199_eigenvector_files.zip" -d "${DATA_PATH}/lieberman_2009/eigenvectors"
 
-rm -rf "${DATA_PATH}/lieberman_2009/zip" 
+### Optional
+# rm -rf "${DATA_PATH}/lieberman_2009/zip" 

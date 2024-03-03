@@ -4,10 +4,10 @@ import pandas as pd
 import numpy as np
 from experiments.process import create_approx, calc_correctness, plot_comparison, calc_explained_variance
 
-def data_prepare(docker_volume_path):
+def data_prepare(data_store):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 data_prepare start")
-    data_path = f"{docker_volume_path}/data/rao_2014/juicer_outputs"
-    output_path=f"{docker_volume_path}/outputs/approx_pc1_pattern/rao_2014"
+    data_path = f"{data_store}/data/rao_2014/juicer_outputs"
+    output_path=f"{data_store}/outputs/approx_pc1_pattern/rao_2014"
     resolutions = [1000000, 100000]
     cell_lines = ["gm12878", "imr90", "hmec", "nhek", "k562", "kbm7", "huvec", "hela", "ch12-lx"]
     methods = ["cxmax", "cxmin"]
@@ -33,7 +33,7 @@ def data_prepare(docker_volume_path):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 data_prepare end")
     return
 
-def summary_correctness(docker_volume_path):
+def summary_correctness(data_store):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_correctness start")
     cxmax_df = pd.DataFrame(columns = {
         'cell_line': [], 
@@ -55,8 +55,8 @@ def summary_correctness(docker_volume_path):
         "correct_num":[], 
         "correct_rate": []
     })
-    pc1_path = f"{docker_volume_path}/data/rao_2014/juicer_outputs"
-    approx_path = f"{docker_volume_path}/outputs/approx_pc1_pattern/rao_2014"
+    pc1_path = f"{data_store}/data/rao_2014/juicer_outputs"
+    approx_path = f"{data_store}/outputs/approx_pc1_pattern/rao_2014"
 
     for species in ["human", "mouse"]:
         if species == "human":
@@ -85,7 +85,7 @@ def summary_correctness(docker_volume_path):
 
     output_df = pd.concat([cxmax_df, cxmin_df], ignore_index=True)
 
-    filename = f"{docker_volume_path}/outputs/summary/summary_correctness_2014.xlsx"
+    filename = f"{data_store}/outputs/summary/summary_correctness_2014.xlsx"
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with pd.ExcelWriter(filename, mode="w") as writer:
         output_df.to_excel(writer, sheet_name="summary_correctness_2014")
@@ -93,9 +93,9 @@ def summary_correctness(docker_volume_path):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_correctness end")
     return
 
-def plot_all_comparisons(docker_volume_path):
+def plot_all_comparisons(data_store):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 plot_comparison start")
-    data_path = f"{docker_volume_path}/data"
+    data_path = f"{data_store}/data"
 
     resolutions = [1000000, 100000]
     cell_lines = ["gm12878", "hela", "hmec", "huvec", "imr90", "k562", "kbm7", "nhek", "ch12-lx"]
@@ -118,8 +118,8 @@ def plot_all_comparisons(docker_volume_path):
                 print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 plot_comparison {resolution} {cell_line} {method}")
                 for chrom in chroms:
                     pc1 = f"{data_path}/rao_2014/juicer_outputs/{cell_line}/{resolution}/eigenvector/pc1_chr{chrom}.txt"
-                    approx=f"{docker_volume_path}/outputs/approx_pc1_pattern/rao_2014/{cell_line}/{resolution}/{method}/approx_pc1_pattern_chr{chrom}.txt"
-                    output_path = f"{docker_volume_path}/outputs/plots/rao_2014/{cell_line}/{resolution}/{method}"
+                    approx=f"{data_store}/outputs/approx_pc1_pattern/rao_2014/{cell_line}/{resolution}/{method}/approx_pc1_pattern_chr{chrom}.txt"
+                    output_path = f"{data_store}/outputs/plots/rao_2014/{cell_line}/{resolution}/{method}"
                     os.makedirs(f"{output_path}/scatter", exist_ok=True)
                     os.makedirs(f"{output_path}/relative_magnitude", exist_ok=True)
                     plot_comparison(pc1, approx, relative_magnitude=f"{output_path}/relative_magnitude/relative_magnitude_chr{chrom}.png", scatter=f"{output_path}/scatter/scatter_chr{chrom}.png", figsize=figsize, source="2014")
@@ -127,7 +127,7 @@ def plot_all_comparisons(docker_volume_path):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 plot_comparison end")
     return
 
-def summary_explained_variance(docker_volume_path):
+def summary_explained_variance(data_store):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_explained_variance start")
     output_df = pd.DataFrame(columns = {
         "cell_line": [],
@@ -155,8 +155,8 @@ def summary_explained_variance(docker_volume_path):
 
             print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_explained_variance_2014 {resolution} {cell_line}")
             for chrom in chroms:
-                pearson = f"{docker_volume_path}/data/rao_2014/juicer_outputs/{cell_line}/{resolution}/pearsons/pearson_chr{chrom}.txt"
-                pc1 = f"{docker_volume_path}/data/rao_2014/juicer_outputs/{cell_line}/{resolution}/eigenvector/pc1_chr{chrom}.txt"
+                pearson = f"{data_store}/data/rao_2014/juicer_outputs/{cell_line}/{resolution}/pearsons/pearson_chr{chrom}.txt"
+                pc1 = f"{data_store}/data/rao_2014/juicer_outputs/{cell_line}/{resolution}/eigenvector/pc1_chr{chrom}.txt"
                 pc1_df = pd.read_table(pc1, header=None)
                 pc1_df = pc1_df.fillna(0)
                 pc1_np = pc1_df.values # Turn into numpy format
@@ -186,7 +186,7 @@ def summary_explained_variance(docker_volume_path):
                     corr,
                 ] 
 
-    filename = f"{docker_volume_path}/outputs/summary/summary_explained_variance_2014.xlsx"
+    filename = f"{data_store}/outputs/summary/summary_explained_variance_2014.xlsx"
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with pd.ExcelWriter(filename, mode="w") as writer:
         output_df.to_excel(writer, sheet_name="summary_explained_variance_2014")
@@ -194,9 +194,9 @@ def summary_explained_variance(docker_volume_path):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_explained_variance end")
     return
 
-def run_all(docker_volume_path):
-    data_prepare(docker_volume_path)
-    summary_correctness(docker_volume_path)
-    plot_all_comparisons(docker_volume_path)
-    summary_explained_variance(docker_volume_path)
+def run_all(data_store):
+    data_prepare(data_store)
+    summary_correctness(data_store)
+    plot_all_comparisons(data_store)
+    summary_explained_variance(data_store)
     return

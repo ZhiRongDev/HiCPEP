@@ -1,6 +1,6 @@
 #!/bin/bash 
-JUICER_TOOLS="${DOCKER_VOLUME_PATH}/juicer_tools/juicer_tools.jar" 
-OUTPUT_PATH="${DOCKER_VOLUME_PATH}/data/rao_2014/juicer_outputs"
+JUICER_TOOLS="${DATA_STORE}/juicer_tools/juicer_tools.jar" 
+OUTPUT_PATH="${DATA_STORE}/data/rao_2014/juicer_outputs"
 
 for RESOLUTION in "1000000" "100000"
 do

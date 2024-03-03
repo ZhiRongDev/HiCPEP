@@ -4,11 +4,11 @@ import pandas as pd
 import numpy as np
 from experiments.process import create_approx, calc_correctness, plot_comparison, calc_explained_variance
 
-def data_prepare(docker_volume_path):
+def data_prepare(data_store):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 data_prepare start")
 
-    data_path = f"{docker_volume_path}/data/lieberman_2009"
-    output_path=f"{docker_volume_path}/outputs/approx_pc1_pattern/lieberman_2009"
+    data_path = f"{data_store}/data/lieberman_2009"
+    output_path=f"{data_store}/outputs/approx_pc1_pattern/lieberman_2009"
     resolutions = [1000000, 100000]
     cell_lines = ["gm06690", "k562"]
     methods = ["cxmax", "cxmin"]
@@ -33,7 +33,7 @@ def data_prepare(docker_volume_path):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 data_prepare end")
     return
 
-def summary_correctness(docker_volume_path):
+def summary_correctness(data_store):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_correctness start")
     cxmax_df = pd.DataFrame(columns = {
         'cell_line': [], 
@@ -55,8 +55,8 @@ def summary_correctness(docker_volume_path):
         "correct_num":[], 
         "correct_rate": []
     })
-    pc1_path = f"{docker_volume_path}/data/lieberman_2009/eigenvectors"
-    approx_path = f"{docker_volume_path}/outputs/approx_pc1_pattern/lieberman_2009"
+    pc1_path = f"{data_store}/data/lieberman_2009/eigenvectors"
+    approx_path = f"{data_store}/outputs/approx_pc1_pattern/lieberman_2009"
 
     cell_lines = ["gm06690", "k562"]
     methods = ["cxmax", "cxmin"]
@@ -107,7 +107,7 @@ def summary_correctness(docker_volume_path):
 
     output_df = pd.concat([cxmax_df, cxmin_df], ignore_index=True)
 
-    filename = f"{docker_volume_path}/outputs/summary/summary_correctness_2009.xlsx"
+    filename = f"{data_store}/outputs/summary/summary_correctness_2009.xlsx"
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with pd.ExcelWriter(filename, mode="w") as writer:
         output_df.to_excel(writer, sheet_name="summary_correctness_2009")
@@ -115,9 +115,9 @@ def summary_correctness(docker_volume_path):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_correctness end")
     return
 
-def plot_all_comparisons(docker_volume_path):
+def plot_all_comparisons(data_store):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 plot_comparison start")
-    data_path = f"{docker_volume_path}/data"
+    data_path = f"{data_store}/data"
     cell_lines = ["gm06690", "k562"]
     methods = ["cxmax", "cxmin"]
 
@@ -142,16 +142,16 @@ def plot_all_comparisons(docker_volume_path):
                     if cell_line == "gm06690":
                         if chrom == "23":
                             pc1 = f"{data_path}/lieberman_2009/eigenvectors/GM-combined.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
-                            approx = f"{docker_volume_path}/outputs/approx_pc1_pattern/lieberman_2009/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chrX.txt"
+                            approx = f"{data_store}/outputs/approx_pc1_pattern/lieberman_2009/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chrX.txt"
                         else:
                             pc1 = f"{data_path}/lieberman_2009/eigenvectors/GM-combined.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
-                            approx = f"{docker_volume_path}/outputs/approx_pc1_pattern/lieberman_2009/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chr{chrom}.txt"
+                            approx = f"{data_store}/outputs/approx_pc1_pattern/lieberman_2009/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chr{chrom}.txt"
                     elif cell_line == "k562":
                         pc1 = f"{data_path}/lieberman_2009/eigenvectors/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
-                        approx = f"{docker_volume_path}/outputs/approx_pc1_pattern/lieberman_2009/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chr{chrom}.txt"
+                        approx = f"{data_store}/outputs/approx_pc1_pattern/lieberman_2009/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chr{chrom}.txt"
 
 
-                    output_path = f"{docker_volume_path}/outputs/plots/lieberman_2009/{cell_line}/{resolution}/{method}"
+                    output_path = f"{data_store}/outputs/plots/lieberman_2009/{cell_line}/{resolution}/{method}"
                     os.makedirs(f"{output_path}/scatter", exist_ok=True)
                     os.makedirs(f"{output_path}/relative_magnitude", exist_ok=True)
                     plot_comparison(pc1, approx, relative_magnitude=f"{output_path}/relative_magnitude/relative_magnitude_chr{chrom}.png", scatter=f"{output_path}/scatter/scatter_chr{chrom}.png", figsize=figsize, source="2009")
@@ -159,7 +159,7 @@ def plot_all_comparisons(docker_volume_path):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 plot_comparison end")
     return
 
-def summary_explained_variance(docker_volume_path):
+def summary_explained_variance(data_store):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_explained_variance start")
     output_df = pd.DataFrame(columns = {
         "cell_line": [],
@@ -188,18 +188,18 @@ def summary_explained_variance(docker_volume_path):
 
             print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_explained_variance_2009 {resolution} {cell_line}")
             for chrom in chroms:
-                pearson = f"{docker_volume_path}/data/lieberman_2009/heatmaps/HIC_{cell_line}_chr{chrom}_chr{chrom}_{resolution}_pearson.txt"
+                pearson = f"{data_store}/data/lieberman_2009/heatmaps/HIC_{cell_line}_chr{chrom}_chr{chrom}_{resolution}_pearson.txt"
                 
                 if cell_line == "gm06690":
                     if chrom == "X":
-                        pc1 = f"{docker_volume_path}/data/lieberman_2009/eigenvectors/GM-combined.ctg23.ctg23.{resolution}bp.hm.eigenvector.tab"
+                        pc1 = f"{data_store}/data/lieberman_2009/eigenvectors/GM-combined.ctg23.ctg23.{resolution}bp.hm.eigenvector.tab"
                     else:
-                        pc1 = f"{docker_volume_path}/data/lieberman_2009/eigenvectors/GM-combined.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
+                        pc1 = f"{data_store}/data/lieberman_2009/eigenvectors/GM-combined.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
                 elif cell_line == "k562":
                     if chrom == "X":
-                        pc1 = f"{docker_volume_path}/data/lieberman_2009/eigenvectors/K562-HindIII.ctg23.ctg23.{resolution}bp.hm.eigenvector.tab"
+                        pc1 = f"{data_store}/data/lieberman_2009/eigenvectors/K562-HindIII.ctg23.ctg23.{resolution}bp.hm.eigenvector.tab"
                     else:
-                        pc1 = f"{docker_volume_path}/data/lieberman_2009/eigenvectors/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
+                        pc1 = f"{data_store}/data/lieberman_2009/eigenvectors/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
 
                 pc1_df = pd.read_table(pc1, header=None, sep="\t")
                 pc1_df = pc1_df.iloc[:, [2]]
@@ -230,7 +230,7 @@ def summary_explained_variance(docker_volume_path):
                     corr,
                 ] 
 
-    filename = f"{docker_volume_path}/outputs/summary/summary_explained_variance_2009.xlsx"
+    filename = f"{data_store}/outputs/summary/summary_explained_variance_2009.xlsx"
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with pd.ExcelWriter(filename, mode="w") as writer:
         output_df.to_excel(writer, sheet_name="summary_explained_variance_2009")
@@ -238,9 +238,9 @@ def summary_explained_variance(docker_volume_path):
     print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_explained_variance end")
     return
 
-def run_all(docker_volume_path):
-    data_prepare(docker_volume_path)
-    summary_correctness(docker_volume_path)
-    plot_all_comparisons(docker_volume_path)
-    summary_explained_variance(docker_volume_path)
+def run_all(data_store):
+    data_prepare(data_store)
+    summary_correctness(data_store)
+    plot_all_comparisons(data_store)
+    summary_explained_variance(data_store)
     return
