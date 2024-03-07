@@ -1,6 +1,7 @@
 #!/bin/bash 
-JUICER_TOOLS="${DATA_STORE}/juicer_tools/juicer_tools.jar" 
+JUICER_TOOLS="${DATA_STORE}/juicer_tools/juicer_tools_1.22.01.jar" 
 OUTPUT_PATH="${DATA_STORE}/data/rao_2014/juicer_outputs"
+RAO_HIC_PATH="${DATA_STORE}/data/rao_2014/hic"
 
 for RESOLUTION in "1000000" "100000"
 do
@@ -12,22 +13,20 @@ do
         "k562" \
         "kbm7" \
         "huvec" \
-        "hela" \
         "ch12-lx" \
     )
 
     ### Note that `-A` should be set (Associative Array: key-value), not `-a` (Index Array)
     declare -A CELL_LINE_LINKS
     CELL_LINE_LINKS=(\
-        ["gm12878"]="https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic" \
-        ["imr90"]="https://hicfiles.s3.amazonaws.com/hiseq/imr90/in-situ/combined.hic" \
-        ["hmec"]="https://hicfiles.s3.amazonaws.com/hiseq/hmec/in-situ/combined.hic" \
-        ["nhek"]="https://hicfiles.s3.amazonaws.com/hiseq/nhek/in-situ/combined.hic" \
-        ["k562"]="https://hicfiles.s3.amazonaws.com/hiseq/k562/in-situ/combined.hic" \
-        ["kbm7"]="https://hicfiles.s3.amazonaws.com/hiseq/kbm7/in-situ/combined.hic" \
-        ["huvec"]="https://hicfiles.s3.amazonaws.com/hiseq/huvec/in-situ/combined.hic" \
-        ["hela"]="https://hicfiles.s3.amazonaws.com/hiseq/hela/in-situ/combined.hic" \
-        ["ch12-lx"]="https://hicfiles.s3.amazonaws.com/hiseq/ch12-lx-b-lymphoblasts/in-situ/combined.hic" \
+        ["gm12878"]="${RAO_HIC_PATH}/GSE63525_GM12878_insitu_primary_replicate_combined_30.hic" \
+        ["imr90"]="${RAO_HIC_PATH}/GSE63525_IMR90_combined_30.hic" \
+        ["hmec"]="${RAO_HIC_PATH}/GSE63525_HMEC_combined_30.hic" \
+        ["nhek"]="${RAO_HIC_PATH}/GSE63525_NHEK_combined_30.hic" \
+        ["k562"]="${RAO_HIC_PATH}/GSE63525_K562_combined_30.hic" \
+        ["kbm7"]="${RAO_HIC_PATH}/GSE63525_KBM7_combined_30.hic" \
+        ["huvec"]="${RAO_HIC_PATH}/GSE63525_HUVEC_combined_30.hic" \
+        ["ch12-lx"]="${RAO_HIC_PATH}/GSE63525_CH12_LX_combined_30.hic" \
     )
 
     for CELL_LINE in "${CELL_LINES[@]}"

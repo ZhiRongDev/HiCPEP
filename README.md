@@ -1,4 +1,4 @@
-# Hi-C Pearson matrix Approximated PC1 Pattern (HiC-PAPP)
+# Hi-C Pearson matrix Approximated PC1 pattern (HiCPAP)
 
 ## Requirements
 Create the requirements.txt with the support of `pip-tools`.

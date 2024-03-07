@@ -3,19 +3,21 @@ import datetime
 import pandas as pd
 import numpy as np
 from experiments.process import create_approx, calc_correctness, plot_comparison, calc_explained_variance
+import logging
+logging.basicConfig(format='%(message)s', level=logging.INFO)
 
 def data_prepare(data_store):
-    print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 data_prepare start")
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 data_prepare start")
     data_path = f"{data_store}/data/rao_2014/juicer_outputs"
     output_path=f"{data_store}/outputs/approx_pc1_pattern/rao_2014"
     resolutions = [1000000, 100000]
-    cell_lines = ["gm12878", "imr90", "hmec", "nhek", "k562", "kbm7", "huvec", "hela", "ch12-lx"]
+    cell_lines = ["gm12878", "imr90", "hmec", "nhek", "k562", "kbm7", "huvec", "ch12-lx"]
     methods = ["cxmax", "cxmin"]
 
     for resolution in resolutions:
         for cell_line in cell_lines:
             for method in methods:
-                print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} {resolution} {cell_line} {method} start")
+                logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} {resolution} {cell_line} {method} start")
                 
                 # There are only 19 chromosome in CH12-LX, 
                 if cell_line == "ch12-lx":
@@ -30,11 +32,11 @@ def data_prepare(data_store):
                     output=f"{output_path}/{cell_line}/{resolution}/{method}/approx_pc1_pattern_chr{chrom}.txt"
                     create_approx(pearson, output, method, source="2014")
 
-    print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 data_prepare end")
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 data_prepare end")
     return
 
 def summary_correctness(data_store):
-    print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_correctness start")
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_correctness start")
     cxmax_df = pd.DataFrame(columns = {
         'cell_line': [], 
         'resolution': [], 
@@ -60,7 +62,7 @@ def summary_correctness(data_store):
 
     for species in ["human", "mouse"]:
         if species == "human":
-            cell_lines = ["gm12878", "hela", "hmec", "huvec", "imr90", "k562", "kbm7", "nhek"]
+            cell_lines = ["gm12878", "imr90", "hmec", "nhek", "k562", "kbm7", "huvec"]
             chroms = [str(i) for i in range(1, 23)]
         elif species == "mouse":
             cell_lines = ["ch12-lx"]
@@ -90,15 +92,15 @@ def summary_correctness(data_store):
     with pd.ExcelWriter(filename, mode="w") as writer:
         output_df.to_excel(writer, sheet_name="summary_correctness_2014")
 
-    print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_correctness end")
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_correctness end")
     return
 
 def plot_all_comparisons(data_store):
-    print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 plot_comparison start")
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 plot_comparison start")
     data_path = f"{data_store}/data"
 
     resolutions = [1000000, 100000]
-    cell_lines = ["gm12878", "hela", "hmec", "huvec", "imr90", "k562", "kbm7", "nhek", "ch12-lx"]
+    cell_lines = ["gm12878", "imr90", "hmec", "nhek", "k562", "kbm7", "huvec", "ch12-lx"]
     methods = ["cxmax", "cxmin"]
 
     for resolution in resolutions:
@@ -115,7 +117,7 @@ def plot_all_comparisons(data_store):
                     chroms = [str(i) for i in range(1, 23)]
                 chroms.extend(["X", "Y"])
 
-                print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 plot_comparison {resolution} {cell_line} {method}")
+                logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 plot_comparison {resolution} {cell_line} {method}")
                 for chrom in chroms:
                     pc1 = f"{data_path}/rao_2014/juicer_outputs/{cell_line}/{resolution}/eigenvector/pc1_chr{chrom}.txt"
                     approx=f"{data_store}/outputs/approx_pc1_pattern/rao_2014/{cell_line}/{resolution}/{method}/approx_pc1_pattern_chr{chrom}.txt"
@@ -124,11 +126,11 @@ def plot_all_comparisons(data_store):
                     os.makedirs(f"{output_path}/relative_magnitude", exist_ok=True)
                     plot_comparison(pc1, approx, relative_magnitude=f"{output_path}/relative_magnitude/relative_magnitude_chr{chrom}.png", scatter=f"{output_path}/scatter/scatter_chr{chrom}.png", figsize=figsize, source="2014")
 
-    print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 plot_comparison end")
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 plot_comparison end")
     return
 
 def summary_explained_variance(data_store):
-    print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_explained_variance start")
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_explained_variance start")
     output_df = pd.DataFrame(columns = {
         "cell_line": [],
         "resolution": [],
@@ -143,7 +145,7 @@ def summary_explained_variance(data_store):
     })
 
     resolutions = [1000000, 100000]
-    cell_lines = ["gm12878", "hela", "hmec", "huvec", "imr90", "k562", "kbm7", "nhek", "ch12-lx"]
+    cell_lines = ["gm12878", "imr90", "hmec", "nhek", "k562", "kbm7", "huvec", "ch12-lx"]
 
     for resolution in resolutions:
         for cell_line in cell_lines:
@@ -153,7 +155,7 @@ def summary_explained_variance(data_store):
                 chroms = [str(i) for i in range(1, 23)]
             chroms.extend(["X", "Y"])
 
-            print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_explained_variance_2014 {resolution} {cell_line}")
+            logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_explained_variance_2014 {resolution} {cell_line}")
             for chrom in chroms:
                 pearson = f"{data_store}/data/rao_2014/juicer_outputs/{cell_line}/{resolution}/pearsons/pearson_chr{chrom}.txt"
                 pc1 = f"{data_store}/data/rao_2014/juicer_outputs/{cell_line}/{resolution}/eigenvector/pc1_chr{chrom}.txt"
@@ -164,14 +166,16 @@ def summary_explained_variance(data_store):
                 pc1_np = pc1_np[pc1_np != 0] # Remove 0
 
                 Vh, explained_variances, total_entry_num, valid_entry_num = calc_explained_variance(pearson, source="2014")
+                self_pc1_np = Vh[0]
+                self_pc1_np = self_pc1_np[self_pc1_np != 0] # Remove 0
 
-                if len(pc1_np) != len(Vh[0]):
-                    print("Juicer PC1 and self calculation PC1 has a different valid_entry_num")
+                if len(pc1_np) != len(self_pc1_np):
+                    logging.info("Juicer PC1 and self calculated PC1 has a different valid_entry_num")
                     return
 
                 # Compare the pc1 calculated by numpy with the Juicer's pc1. 
-                cos_sim = np.dot(Vh[0], pc1_np) / (np.linalg.norm(Vh[0]) * np.linalg.norm(pc1_np))
-                corr = np.corrcoef(Vh[0], pc1_np)[0][1]
+                cos_sim = np.dot(self_pc1_np, pc1_np) / (np.linalg.norm(self_pc1_np) * np.linalg.norm(pc1_np))
+                corr = np.corrcoef(self_pc1_np, pc1_np)[0][1]
                 
                 output_df.loc[len(output_df)] = [
                     cell_line, 
@@ -191,7 +195,7 @@ def summary_explained_variance(data_store):
     with pd.ExcelWriter(filename, mode="w") as writer:
         output_df.to_excel(writer, sheet_name="summary_explained_variance_2014")
 
-    print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_explained_variance end")
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_explained_variance end")
     return
 
 def run_all(data_store):

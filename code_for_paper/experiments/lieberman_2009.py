@@ -3,9 +3,11 @@ import datetime
 import pandas as pd
 import numpy as np
 from experiments.process import create_approx, calc_correctness, plot_comparison, calc_explained_variance
+import logging
+logging.basicConfig(format='%(message)s', level=logging.INFO)
 
 def data_prepare(data_store):
-    print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 data_prepare start")
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 data_prepare start")
 
     data_path = f"{data_store}/data/lieberman_2009"
     output_path=f"{data_store}/outputs/approx_pc1_pattern/lieberman_2009"
@@ -16,7 +18,7 @@ def data_prepare(data_store):
     for resolution in resolutions:
         for cell_line in cell_lines:
             for method in methods:
-                print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} {resolution} {cell_line} {method} start")
+                logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} {resolution} {cell_line} {method} start")
                 
                 # There are some missing chromosomes in Lieberman's dataset.
                 if cell_line == "k562" and resolution == 100000:
@@ -30,11 +32,11 @@ def data_prepare(data_store):
                     output=f"{output_path}/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chr{chrom}.txt"
                     create_approx(pearson, output, method, source="2009")
 
-    print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 data_prepare end")
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 data_prepare end")
     return
 
 def summary_correctness(data_store):
-    print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_correctness start")
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_correctness start")
     cxmax_df = pd.DataFrame(columns = {
         'cell_line': [], 
         'resolution': [], 
@@ -112,11 +114,11 @@ def summary_correctness(data_store):
     with pd.ExcelWriter(filename, mode="w") as writer:
         output_df.to_excel(writer, sheet_name="summary_correctness_2009")
 
-    print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_correctness end")
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_correctness end")
     return
 
 def plot_all_comparisons(data_store):
-    print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 plot_comparison start")
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 plot_comparison start")
     data_path = f"{data_store}/data"
     cell_lines = ["gm06690", "k562"]
     methods = ["cxmax", "cxmin"]
@@ -131,7 +133,7 @@ def plot_all_comparisons(data_store):
 
         for resolution in resolutions:
             for method in methods:
-                print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 plot_comparison {resolution} {cell_line} {method}")
+                logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 plot_comparison {resolution} {cell_line} {method}")
 
                 for chrom in chroms:
                     if resolution == 1000000:
@@ -156,11 +158,11 @@ def plot_all_comparisons(data_store):
                     os.makedirs(f"{output_path}/relative_magnitude", exist_ok=True)
                     plot_comparison(pc1, approx, relative_magnitude=f"{output_path}/relative_magnitude/relative_magnitude_chr{chrom}.png", scatter=f"{output_path}/scatter/scatter_chr{chrom}.png", figsize=figsize, source="2009")
 
-    print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 plot_comparison end")
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 plot_comparison end")
     return
 
 def summary_explained_variance(data_store):
-    print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_explained_variance start")
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_explained_variance start")
     output_df = pd.DataFrame(columns = {
         "cell_line": [],
         "resolution": [],
@@ -174,19 +176,19 @@ def summary_explained_variance(data_store):
         "corr_pc1": []
     })
 
-    resolutions = [1000000, 100000]
     cell_lines = ["gm06690", "k562"]
 
-    for resolution in resolutions:
-        for cell_line in cell_lines:
-            # There are some missing chromosomes in Lieberman's dataset.
-            if cell_line == "k562" and resolution == 100000:
-                chroms = [str(i) for i in range(1, 23)]
-            else:
-                chroms = [str(i) for i in range(1, 23)]
-                chroms.extend(["X"])
+    for cell_line in cell_lines:
+        if cell_line == "k562":
+            resolutions = [1000000]
+        else:
+            resolutions = [1000000, 100000]
 
-            print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_explained_variance_2009 {resolution} {cell_line}")
+        for resolution in resolutions:
+            chroms = [str(i) for i in range(1, 23)]
+            chroms.extend(["X"])
+
+            logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_explained_variance_2009 {resolution} {cell_line}")
             for chrom in chroms:
                 pearson = f"{data_store}/data/lieberman_2009/heatmaps/HIC_{cell_line}_chr{chrom}_chr{chrom}_{resolution}_pearson.txt"
                 
@@ -208,14 +210,16 @@ def summary_explained_variance(data_store):
                 pc1_np = pc1_np[pc1_np != 0] # Remove 0
 
                 Vh, explained_variances, total_entry_num, valid_entry_num = calc_explained_variance(pearson, source="2009")
+                self_pc1_np = Vh[0]
+                self_pc1_np = self_pc1_np[self_pc1_np != 0] # Remove 0
 
-                if len(pc1_np) != len(Vh[0]):
-                    print("Juicer PC1 and self calculation PC1 has a different valid_entry_num")
+                if len(pc1_np) != len(self_pc1_np):
+                    logging.info("Lieberman PC1 and self calculated PC1 has a different valid_entry_num")
                     return
 
                 # Compare the pc1 calculated by numpy with the Juicer's pc1. 
-                cos_sim = np.dot(Vh[0], pc1_np) / (np.linalg.norm(Vh[0]) * np.linalg.norm(pc1_np))
-                corr = np.corrcoef(Vh[0], pc1_np)[0][1]
+                cos_sim = np.dot(self_pc1_np, pc1_np) / (np.linalg.norm(self_pc1_np) * np.linalg.norm(pc1_np))
+                corr = np.corrcoef(self_pc1_np, pc1_np)[0][1]
                 
                 output_df.loc[len(output_df)] = [
                     cell_line, 
@@ -235,7 +239,7 @@ def summary_explained_variance(data_store):
     with pd.ExcelWriter(filename, mode="w") as writer:
         output_df.to_excel(writer, sheet_name="summary_explained_variance_2009")
 
-    print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_explained_variance end")
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_explained_variance end")
     return
 
 def run_all(data_store):

@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.colors import ListedColormap
+import logging
+logging.basicConfig(format='%(message)s', level=logging.INFO)
 
 def create_approx(pearson, output, method, source="2014"):
     # Read in the Pearson correlatin matrix
@@ -23,7 +25,7 @@ def create_approx(pearson, output, method, source="2014"):
     del pearson_df
 
     if len(pearson_np) != len(pearson_np[0]): 
-        print("Pearson matrix has a different number of rows and columns")
+        logging.info("Pearson matrix has a different number of rows and columns")
         return
 
     """_summary_
@@ -52,7 +54,7 @@ def create_approx(pearson, output, method, source="2014"):
 
     if output == "None":
         for val in cov_selected_np:
-            print(val)
+            logging.info(val)
         return
     
     os.makedirs(os.path.dirname(output), exist_ok=True)
@@ -83,14 +85,14 @@ def calc_correctness(pc1, approx, source="2014"):
 
     total_entry_num = len(pc1_np)
     if total_entry_num != len(approx_np): 
-        print("PC1 and approx has a different total_entry_num")
+        logging.info("PC1 and approx has a different total_entry_num")
         return
     
     pc1_np = pc1_np[pc1_np != 0] # Remove 0
     approx_np = approx_np[approx_np != 0] # Remove 0
     valid_entry_num = len(pc1_np)
     if valid_entry_num != len(approx_np): 
-        print("PC1 and approx has a different valid_entry_num")
+        logging.info("PC1 and approx has a different valid_entry_num")
         return
 
     del pc1_df, approx_df
@@ -189,8 +191,8 @@ def calc_explained_variance(pearson, source="2014"):
 
     """_summary_
     These two lines of code will both calculate the covariance matrix of the pearson matrix, and is confirmed to have the same results.
-    print(np.matmul(y.T, y), '\n')
-    print(np.cov(pearson_np[ixgrid], bias=True)) # `bias=True` will set the degree of freedom as n.
+    logging.info(np.matmul(y.T, y), '\n')
+    logging.info(np.cov(pearson_np[ixgrid], bias=True)) # `bias=True` will set the degree of freedom as n.
     """
 
     U, S, Vh = np.linalg.svd(y, full_matrices=True)
@@ -203,4 +205,4 @@ def calc_explained_variance(pearson, source="2014"):
     Vh = tmp
 
     # Return Principal components(Vector) and the explained variances of PC1(Vector).
-    return Vh, explained_variances, total_entry_num, valid_entry_num
+    return Vh[diag_valid], explained_variances, total_entry_num, valid_entry_num

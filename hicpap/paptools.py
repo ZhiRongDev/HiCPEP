@@ -5,10 +5,8 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.colors import ListedColormap
-
-np.set_printoptions(suppress=True)
-# np.set_printoptions(precision=2)
-# np.set_printoptions(threshold=np.inf)
+import logging
+logging.basicConfig(format='%(message)s', level=logging.INFO)
 
 def read_pearson(pearson: str, zero_mean: bool=True) -> np.ndarray:
     """_summary_
@@ -66,7 +64,7 @@ def straw_to_pearson(hic_path: str, chrom_x: str, chrom_y: str, resolution: int,
 
 def create_approx(pearson_np: np.ndarray, output: str="None", method: str="cxmax") -> np.ndarray:
     if len(pearson_np) != len(pearson_np[0]): 
-        print("Pearson matrix given has a different number of rows and columns")
+        logging.info("Pearson matrix given has a different number of rows and columns")
         return
 
     """_summary_
@@ -114,7 +112,7 @@ def create_approx(pearson_np: np.ndarray, output: str="None", method: str="cxmax
 
 def calc_explained_variance(pearson_np: np.ndarray):
     if len(pearson_np) != len(pearson_np[0]): 
-        print("Pearson matrix has a different number of rows and columns")
+        logging.info("Pearson matrix has a different number of rows and columns")
         return
     
     total_entry_num = len(pearson_np)
@@ -127,8 +125,8 @@ def calc_explained_variance(pearson_np: np.ndarray):
 
     """_summary_
     These two lines of code will both calculate the covariance matrix of the pearson matrix, and is confirmed to have the same results.
-    print(np.matmul(y.T, y), '\n')
-    print(np.cov(pearson_np[ixgrid], bias=True)) # `bias=True` will set the degree of freedom as n.
+    logging.info(np.matmul(y.T, y), '\n')
+    logging.info(np.cov(pearson_np[ixgrid], bias=True)) # `bias=True` will set the degree of freedom as n.
     """
     U, S, Vh = np.linalg.svd(y, full_matrices=True)
     eigenvalues = S * S
@@ -140,19 +138,19 @@ def calc_explained_variance(pearson_np: np.ndarray):
     Vh = tmp
 
     # Return Principal components(Vector) and the explained variances of PC1(Vector).
-    return Vh, explained_variances, total_entry_num, valid_entry_num
+    return Vh[diag_valid], explained_variances, total_entry_num, valid_entry_num
 
 def calc_correctness(pc1_np: np.ndarray, approx_np: np.ndarray):
     total_entry_num = len(pc1_np)
     if total_entry_num != len(approx_np): 
-        print("pc1_np and approx_np has a different total_entry_num")
+        logging.info("pc1_np and approx_np has a different total_entry_num")
         return
     
     pc1_np = pc1_np[pc1_np != 0] # Remove 0
     approx_np = approx_np[approx_np != 0] # Remove 0
     valid_entry_num = len(pc1_np)
     if valid_entry_num != len(approx_np): 
-        print("pc1_np and approx_np has a different valid_entry_num")
+        logging.info("pc1_np and approx_np has a different valid_entry_num")
         return
 
     if np.corrcoef(pc1_np, approx_np)[0][1] < 0:
