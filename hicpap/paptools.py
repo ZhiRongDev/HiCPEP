@@ -62,6 +62,7 @@ def straw_to_pearson(hic_path: str, chrom_x: str, chrom_y: str, resolution: int,
 
     return pearson_np
 
+# I should add an parameter which accepts the fasta file as an argument(to calc the GC content)
 def create_approx(pearson_np: np.ndarray, output: str="None", method: str="cxmax") -> np.ndarray:
     if len(pearson_np) != len(pearson_np[0]): 
         logging.info("Pearson matrix given has a different number of rows and columns")
@@ -110,7 +111,7 @@ def create_approx(pearson_np: np.ndarray, output: str="None", method: str="cxmax
 
     return cov_selected_np
 
-def calc_explained_variance(pearson_np: np.ndarray):
+def pca_on_pearson(pearson_np: np.ndarray):
     if len(pearson_np) != len(pearson_np[0]): 
         logging.info("Pearson matrix has a different number of rows and columns")
         return
@@ -208,3 +209,12 @@ def plot_comparison(pc1_np: np.ndarray, approx_np: np.ndarray, figsize: int=20, 
     
     plt.close('all')
     return
+
+def flip_track(track_np: np.ndarray, gc_df: pd.DataFrame, chrom: str) -> np.ndarray:
+    tmp_df = gc_df.loc[gc_df['chrom'] == chrom]
+    gc_np = tmp_df["GC"].fillna(0).values
+
+    if np.mean(gc_np[track_np > 0]) < np.mean(gc_np[track_np < 0]):
+        track_np = -track_np
+
+    return track_np

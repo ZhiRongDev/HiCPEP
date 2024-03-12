@@ -2,7 +2,7 @@ import os
 import datetime
 import pandas as pd
 import numpy as np
-from experiments.process import create_approx, calc_correctness, plot_comparison, calc_explained_variance
+from experiments.process import create_approx, calc_correctness, plot_comparison, pca_on_pearson
 import logging
 logging.basicConfig(format='%(message)s', level=logging.INFO)
 
@@ -209,7 +209,7 @@ def summary_explained_variance(data_store):
                 pc1_np = pc1_np.flatten() # Turn into 1D vector
                 pc1_np = pc1_np[pc1_np != 0] # Remove 0
 
-                Vh, explained_variances, total_entry_num, valid_entry_num = calc_explained_variance(pearson, source="2009")
+                Vh, explained_variances, total_entry_num, valid_entry_num = pca_on_pearson(pearson, source="2009")
                 self_pc1_np = Vh[0]
                 self_pc1_np = self_pc1_np[self_pc1_np != 0] # Remove 0
 

@@ -11,7 +11,7 @@ kwargs = {
 }
 pearson_np = paptools.read_pearson(**kwargs)
 approx_np = paptools.create_approx(pearson_np)
-Vh, explained_variances, total_entry_num, valid_entry_num = paptools.calc_explained_variance(pearson_np)
+Vh, explained_variances, total_entry_num, valid_entry_num = paptools.pca_on_pearson(pearson_np)
 
 print(paptools.calc_correctness(pc1_np=Vh[0], approx_np=approx_np))
 
@@ -36,7 +36,7 @@ kwargs = {
 }
 pearson_np = paptools.straw_to_pearson(**kwargs)
 approx_np = paptools.create_approx(pearson_np)
-Vh, explained_variances, total_entry_num, valid_entry_num = paptools.calc_explained_variance(pearson_np)
+Vh, explained_variances, total_entry_num, valid_entry_num = paptools.pca_on_pearson(pearson_np)
 
 
 ### Test

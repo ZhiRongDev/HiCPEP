@@ -169,7 +169,7 @@ def plot_comparison(pc1, approx, figsize, scatter, relative_magnitude, source="2
     plt.close('all')
     return
 
-def calc_explained_variance(pearson, source="2014"):
+def pca_on_pearson(pearson, source="2014"):
     # Read in the Pearson correlatin matrix
     if source == "2014":
         pearson_df = pd.read_table(pearson, header=None, sep=" ")
