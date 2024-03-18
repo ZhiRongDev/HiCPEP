@@ -184,8 +184,8 @@ def plot_all_comparisons(data_store):
     logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 plot_comparison end")
     return
 
-def summary_pca(data_store):
-    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_pca start")
+def summary_self_pca(data_store):
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_self_pca start")
     output_df = pd.DataFrame(columns = {
         "cell_line": [],
         "resolution": [],
@@ -195,8 +195,8 @@ def summary_pca(data_store):
         "exp_var_pc1": [],
         "exp_var_pc2": [],
         "exp_var_pc3": [],
-        "cos_sim_juicer_pc1": [],
-        "corr_juicer_pc1": []
+        "correct_rate_cxmax": [],
+        "correct_rate_cxmin": [],
     })
 
     cell_lines = ["gm06690", "k562"]
@@ -211,40 +211,25 @@ def summary_pca(data_store):
             chroms = [str(i) for i in range(1, 23)]
             chroms.extend(["X"])
 
-            logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_pca_2009 {resolution} {cell_line}")
+            logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_self_pca_2009 {resolution} {cell_line}")
             for chrom in chroms:
                 pearson = f"{data_store}/data/lieberman_2009/heatmaps/HIC_{cell_line}_chr{chrom}_chr{chrom}_{resolution}_pearson.txt"
-                
-                if cell_line == "gm06690":
-                    if chrom == "X":
-                        pc1 = f"{data_store}/data/lieberman_2009/eigenvectors/GM-combined.ctg23.ctg23.{resolution}bp.hm.eigenvector.tab"
-                    else:
-                        pc1 = f"{data_store}/data/lieberman_2009/eigenvectors/GM-combined.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
-                elif cell_line == "k562":
-                    if chrom == "X":
-                        pc1 = f"{data_store}/data/lieberman_2009/eigenvectors/K562-HindIII.ctg23.ctg23.{resolution}bp.hm.eigenvector.tab"
-                    else:
-                        pc1 = f"{data_store}/data/lieberman_2009/eigenvectors/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
-
-                pc1_df = pd.read_table(pc1, header=None, sep="\t")
-                pc1_df = pc1_df.iloc[:, [2]]
-                pc1_np = pc1_df.values # Turn into numpy format
-                pc1_np = pc1_np.flatten() # Turn into 1D vector
-                pc1_np = pc1_np[pc1_np != 0] # Remove 0
-
                 pearson_np = read_pearson(pearson=pearson, zero_mean=True, format="aiden_2009")
-
                 Vh, explained_variances, total_entry_num, valid_entry_num = pca_on_pearson(pearson_np=pearson_np)
-                self_pc1_np = Vh[0]
-                self_pc1_np = self_pc1_np[self_pc1_np != 0] # Remove 0
 
-                if len(pc1_np) != len(self_pc1_np):
-                    logging.info("Lieberman PC1 and self calculated PC1 has a different valid_entry_num")
-                    return
+                ## Compute correct_rate for cxmax
+                pc1_np = Vh[0].copy()
+                approx_np = create_approx(pearson_np=pearson_np, method="cxmax")
+                pc1_np, approx_np = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
+                correctness_info_cxmax = calc_correctness(pc1_np=pc1_np, approx_np=approx_np)
+                correct_rate_cxmax = correctness_info_cxmax["correct_rate"]
 
-                # Compare the pc1 calculated by numpy with the Juicer's pc1. 
-                cos_sim = np.dot(self_pc1_np, pc1_np) / (np.linalg.norm(self_pc1_np) * np.linalg.norm(pc1_np))
-                corr = np.corrcoef(self_pc1_np, pc1_np)[0][1]
+                ## Compute correct_rate for cxmax
+                pc1_np = Vh[0].copy()
+                approx_np = create_approx(pearson_np=pearson_np, method="cxmin")
+                pc1_np, approx_np = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
+                correctness_info_cxmin = calc_correctness(pc1_np=pc1_np, approx_np=approx_np)
+                correct_rate_cxmin = correctness_info_cxmin["correct_rate"]
                 
                 output_df.loc[len(output_df)] = [
                     cell_line, 
@@ -255,21 +240,21 @@ def summary_pca(data_store):
                     explained_variances[0],
                     explained_variances[1],
                     explained_variances[2],
-                    cos_sim,
-                    corr,
+                    correct_rate_cxmax,
+                    correct_rate_cxmin
                 ] 
 
-    filename = f"{data_store}/outputs/summary/summary_pca_2009.xlsx"
+    filename = f"{data_store}/outputs/summary/summary_self_pca_2009.xlsx"
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with pd.ExcelWriter(filename, mode="w") as writer:
-        output_df.to_excel(writer, sheet_name="summary_pca_2009")
+        output_df.to_excel(writer, sheet_name="summary_self_pca_2009")
 
-    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_pca end")
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_self_pca end")
     return
 
 def run_all(data_store):
     data_prepare(data_store)
     summary_correctness(data_store)
     plot_all_comparisons(data_store)
-    summary_pca(data_store)
+    summary_self_pca(data_store)
     return
