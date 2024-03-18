@@ -2,7 +2,7 @@ import os
 import datetime
 import pandas as pd
 import numpy as np
-from hicpap.paptools import create_approx, calc_correctness, plot_comparison, pca_on_pearson
+from hicpap.paptools import read_pearson, create_approx, calc_correctness, plot_comparison, pca_on_pearson, flip_tracks
 import logging
 logging.basicConfig(format='%(message)s', level=logging.INFO)
 
@@ -30,12 +30,7 @@ def data_prepare(data_store):
                 for chrom in chroms:
                     pearson=f"{data_path}/heatmaps/HIC_{cell_line}_chr{chrom}_chr{chrom}_{resolution}_pearson.txt"
                     output=f"{output_path}/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chr{chrom}.txt"
-                    pearson_df = pd.read_table(pearson, index_col=0, header=1, sep="\t")
-                    pearson_df.pop(pearson_df.columns[-1])
-                    pearson_df = pearson_df.fillna(0)
-                    pearson_np = pearson_df.values # Turn into numpy.ndarray
-                    del pearson_df
-
+                    pearson_np = read_pearson(pearson=pearson, zero_mean=True, format="aiden_2009")
                     create_approx(pearson_np=pearson_np, output=output, method=method)
 
     logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 data_prepare end")
@@ -115,6 +110,7 @@ def summary_correctness(data_store):
                     approx_np = approx_np.flatten() # Turn into 1D vector
                     del pc1_df, approx_df
 
+                    pc1_np, approx_np = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
                     correctness_info = calc_correctness(pc1_np=pc1_np, approx_np=approx_np)
 
                     if method == "cxmax":
@@ -182,6 +178,7 @@ def plot_all_comparisons(data_store):
                     relative_magnitude = f"{output_path}/relative_magnitude/relative_magnitude_chr{chrom}.png"
                     scatter=f"{output_path}/scatter/scatter_chr{chrom}.png"
 
+                    pc1_np, approx_np = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
                     plot_comparison(pc1_np=pc1_np, approx_np=approx_np, figsize=figsize, scatter=scatter, relative_magnitude=relative_magnitude)
 
     logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 plot_comparison end")
@@ -234,10 +231,8 @@ def summary_pca(data_store):
                 pc1_np = pc1_df.values # Turn into numpy format
                 pc1_np = pc1_np.flatten() # Turn into 1D vector
                 pc1_np = pc1_np[pc1_np != 0] # Remove 0
-                pearson_df = pd.read_table(pearson, index_col=0, header=1, sep="\t")
-                pearson_df.pop(pearson_df.columns[-1])
-                pearson_df = pearson_df.fillna(0)
-                pearson_np = pearson_df.values # Turn into numpy.ndarray
+
+                pearson_np = read_pearson(pearson=pearson, zero_mean=True, format="aiden_2009")
 
                 Vh, explained_variances, total_entry_num, valid_entry_num = pca_on_pearson(pearson_np=pearson_np)
                 self_pc1_np = Vh[0]

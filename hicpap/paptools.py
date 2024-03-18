@@ -7,14 +7,20 @@ from matplotlib.colors import ListedColormap
 import logging
 logging.basicConfig(format='%(message)s', level=logging.INFO)
 
-def read_pearson(pearson: str, zero_mean: bool=True) -> np.ndarray:
+def read_pearson(pearson: str, zero_mean: bool=True, format="rao_2014") -> np.ndarray:
     """_summary_
     Note that the return pearson matrix will be symmetric.
     """
-    pearson_df = pd.read_table(pearson, header=None, sep=" ")
-    pearson_df.pop(pearson_df.columns[-1])
-    pearson_df = pearson_df.fillna(0)
-    pearson_np = pearson_df.values # Turn into numpy.ndarray
+    if format == "rao_2014":
+        pearson_df = pd.read_table(pearson, header=None, sep=" ")
+        pearson_df.pop(pearson_df.columns[-1])
+        pearson_df = pearson_df.fillna(0)
+        pearson_np = pearson_df.values # Turn into numpy.ndarray
+    elif format == "aiden_2009":
+        pearson_df = pd.read_table(pearson, index_col=0, header=1, sep="\t")
+        pearson_df.pop(pearson_df.columns[-1])
+        pearson_df = pearson_df.fillna(0)
+        pearson_np = pearson_df.values # Turn into numpy.ndarray
 
     # Zero mean the Pearson correlaton matrix but still keep the all 0 rows/columns.
     if zero_mean:
@@ -61,8 +67,7 @@ def straw_to_pearson(hic_path: str, chrom_x: str, chrom_y: str, resolution: int,
 
     return pearson_np
 
-# I should add an parameter which accepts the fasta file as an argument(to calc the GC content)
-def create_approx(pearson_np: np.ndarray, output: str="None", method: str="cxmax") -> np.ndarray:
+def create_approx(pearson_np: np.ndarray, output: str | None = None, method: str="cxmax") -> np.ndarray:
     if len(pearson_np) != len(pearson_np[0]): 
         logging.info("Pearson matrix given has a different number of rows and columns")
         return
@@ -95,7 +100,7 @@ def create_approx(pearson_np: np.ndarray, output: str="None", method: str="cxmax
             sorted_index -= 1
             cov_selected_np = cov_np[sorted_cov_abs_sum[sorted_index][0]]
 
-    if output == "None":
+    if output == None:
         return cov_selected_np
     
     os.makedirs(os.path.dirname(output), exist_ok=True)
@@ -153,9 +158,6 @@ def calc_correctness(pc1_np: np.ndarray, approx_np: np.ndarray):
         logging.info("pc1_np and approx_np has a different valid_entry_num")
         return
 
-    if np.corrcoef(pc1_np, approx_np)[0][1] < 0:
-        approx_np = -approx_np
-
     pc1_pos_np = pc1_np > 0
     approx_pos_np = approx_np > 0
     pc1_pos_vs_approx_pos_np = pc1_pos_np == approx_pos_np 
@@ -169,17 +171,14 @@ def calc_correctness(pc1_np: np.ndarray, approx_np: np.ndarray):
         "correct_rate": correct_rate,
     }
 
-def plot_comparison(pc1_np: np.ndarray, approx_np: np.ndarray, figsize: int=20, scatter: str="None", relative_magnitude: str="None"):
+def plot_comparison(pc1_np: np.ndarray, approx_np: np.ndarray, figsize: int=20, scatter: str | None = None, relative_magnitude: str | None = None):
     correctness_info = calc_correctness(pc1_np, approx_np)
     total_entry_num = correctness_info["total_entry_num"]
     valid_entry_num = correctness_info["valid_entry_num"]
     correct_num = correctness_info["correct_num"]
     correct_rate = correctness_info["correct_rate"]
 
-    if np.corrcoef(pc1_np, approx_np)[0][1] < 0:
-        approx_np = -approx_np
-
-    if scatter != "None":
+    if scatter != None:
         plot_x_axis = [i + 1 for i in range(total_entry_num)]
         approx_dots = [1 if i > 0 else -1 if i < 0 else 0 for i in approx_np]
         pc1_colors_values = [2 if i > 0 else 0 if i < 0 else 1 for i in pc1_np]
@@ -194,7 +193,7 @@ def plot_comparison(pc1_np: np.ndarray, approx_np: np.ndarray, figsize: int=20, 
         plt.savefig(scatter)
         plt.clf() 
 
-    if relative_magnitude != "None":
+    if relative_magnitude != None:
         approx_np_norm = (approx_np - np.mean(approx_np)) / np.std(approx_np)
         pc1_np_norm = (pc1_np - np.mean(pc1_np)) / np.std(pc1_np)
         
@@ -210,7 +209,12 @@ def plot_comparison(pc1_np: np.ndarray, approx_np: np.ndarray, figsize: int=20, 
     plt.close('all')
     return
 
-def flip_track(track_np: np.ndarray, gc_df: pd.DataFrame, chrom: str) -> np.ndarray:
+def flip_tracks(track1_np: np.ndarray, track2_np: np.ndarray):
+    if np.corrcoef(track1_np, track2_np)[0][1] < 0:
+        track2_np = -track2_np
+    return track1_np, track2_np
+
+def flip_track_gc(track_np: np.ndarray, gc_df: pd.DataFrame, chrom: str) -> np.ndarray:
     tmp_df = gc_df.loc[gc_df['chrom'] == chrom]
     gc_np = tmp_df["GC"].fillna(0).values
 

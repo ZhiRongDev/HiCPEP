@@ -2,7 +2,7 @@ import os
 import datetime
 import pandas as pd
 import numpy as np
-from hicpap.paptools import create_approx, calc_correctness, plot_comparison, pca_on_pearson
+from hicpap.paptools import read_pearson, create_approx, calc_correctness, plot_comparison, pca_on_pearson, flip_tracks
 
 import logging
 logging.basicConfig(format='%(message)s', level=logging.INFO)
@@ -31,13 +31,7 @@ def data_prepare(data_store):
                 for chrom in chroms:
                     pearson=f"{data_path}/{cell_line}/{resolution}/pearsons/pearson_chr{chrom}.txt"
                     output=f"{output_path}/{cell_line}/{resolution}/{method}/approx_pc1_pattern_chr{chrom}.txt"
-
-                    pearson_df = pd.read_table(pearson, header=None, sep=" ")
-                    pearson_df.pop(pearson_df.columns[-1])
-                    pearson_df = pearson_df.fillna(0)
-                    pearson_np = pearson_df.values # Turn into numpy.ndarray
-
-                    del pearson_df
+                    pearson_np = read_pearson(pearson=pearson, zero_mean=True, format="rao_2014")
                     create_approx(pearson_np=pearson_np, output=output, method=method)
 
     logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 data_prepare end")
@@ -96,6 +90,7 @@ def summary_correctness(data_store):
                         approx_np = approx_np.flatten() # Turn into 1D vector
 
                         del pc1_df, approx_df
+                        pc1_np, approx_np = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
                         correctness_info = calc_correctness(pc1_np=pc1_np, approx_np=approx_np)
 
                         if method == "cxmax":
@@ -154,6 +149,7 @@ def plot_all_comparisons(data_store):
                     scatter = f"{output_path}/scatter/scatter_chr{chrom}.png"
 
                     del pc1_df, approx_df
+                    pc1_np, approx_np = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
                     plot_comparison(pc1_np=pc1_np, approx_np=approx_np, figsize=figsize, scatter=scatter, relative_magnitude=relative_magnitude)
 
     logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 plot_comparison end")
@@ -195,19 +191,18 @@ def summary_pca(data_store):
                 pc1_np = pc1_np.flatten() # Turn into 1D vector
 
                 pearson = f"{data_store}/data/rao_2014/juicer_outputs/{cell_line}/{resolution}/pearsons/pearson_chr{chrom}.txt"
-                pearson_df = pd.read_table(pearson, header=None, sep=" ")
-                pearson_df.pop(pearson_df.columns[-1])
-                pearson_df = pearson_df.fillna(0)
-                pearson_np = pearson_df.values # Turn into numpy.ndarray
+                pearson_np = read_pearson(pearson=pearson, zero_mean=True, format="rao_2014")
 
                 # Compart the pc1 calculated by numpy with approx_pc1
                 approx=f"{data_store}/outputs/approx_pc1_pattern/rao_2014/{cell_line}/{resolution}/cxmax/approx_pc1_pattern_chr{chrom}.txt"
                 approx_df = pd.read_table(approx, header=None)
                 approx_np = approx_df.values # Turn into numpy format
                 approx_np = approx_np.flatten() # Turn into 1D vector
+
+                pc1_np, approx_np = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
                 correctness_info = calc_correctness(pc1_np=pc1_np, approx_np=approx_np)
 
-                del pc1_df, pearson_df, approx_df 
+                del pc1_df, approx_df 
 
                 Vh, explained_variances, total_entry_num, valid_entry_num = pca_on_pearson(pearson_np=pearson_np)
                 self_pc1_np = Vh[0]
@@ -219,8 +214,8 @@ def summary_pca(data_store):
                     return
 
                 # Compare the pc1 calculated by numpy with the Juicer's pc1. 
-                cos_sim_juicer_pc1 = np.dot(self_pc1_np, pc1_np) / (np.linalg.norm(self_pc1_np) * np.linalg.norm(pc1_np))
-                corr_juicer_pc1 = np.corrcoef(self_pc1_np, pc1_np)[0][1]
+                cos_sim = np.dot(self_pc1_np, pc1_np) / (np.linalg.norm(self_pc1_np) * np.linalg.norm(pc1_np))
+                corr = np.corrcoef(self_pc1_np, pc1_np)[0][1]
                 
                 output_df.loc[len(output_df)] = [
                     cell_line, 
@@ -232,8 +227,8 @@ def summary_pca(data_store):
                     explained_variances[1],
                     explained_variances[2],
                     correctness_info["correct_rate"],
-                    cos_sim_juicer_pc1,
-                    corr_juicer_pc1,
+                    cos_sim,
+                    corr,
                 ] 
 
     filename = f"{data_store}/outputs/summary/summary_pca_2014.xlsx"
