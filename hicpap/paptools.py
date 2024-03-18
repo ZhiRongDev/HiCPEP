@@ -1,4 +1,3 @@
-### This module is adjusted from code_for_paper/experiments/process.py
 import os
 import hicstraw
 import numpy as np
@@ -162,6 +161,7 @@ def calc_correctness(pc1_np: np.ndarray, approx_np: np.ndarray):
     pc1_pos_vs_approx_pos_np = pc1_pos_np == approx_pos_np 
     correct_num = list(pc1_pos_vs_approx_pos_np).count(True)
     correct_rate = correct_num / valid_entry_num
+
     return {
         "total_entry_num": total_entry_num,
         "valid_entry_num": valid_entry_num,
