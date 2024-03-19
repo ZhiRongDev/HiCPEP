@@ -1,6 +1,7 @@
 # My own settings
 archive/
 examples/data/cool/
+test/data
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
