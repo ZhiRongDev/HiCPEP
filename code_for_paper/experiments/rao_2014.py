@@ -31,7 +31,7 @@ def data_prepare(data_store):
                 for chrom in chroms:
                     pearson=f"{data_path}/{cell_line}/{resolution}/pearsons/pearson_chr{chrom}.txt"
                     output=f"{output_path}/{cell_line}/{resolution}/{method}/approx_pc1_pattern_chr{chrom}.txt"
-                    pearson_np = read_pearson(pearson=pearson, zero_mean=True, format="rao_2014")
+                    pearson_np = read_pearson(pearson=pearson, zero_mean=True, format="juicer")
                     create_approx(pearson_np=pearson_np, output=output, method=method)
 
     logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 data_prepare end")
@@ -184,7 +184,7 @@ def summary_self_pca(data_store):
             logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_self_pca_2014 {resolution} {cell_line}")
             for chrom in chroms:
                 pearson = f"{data_store}/data/rao_2014/juicer_outputs/{cell_line}/{resolution}/pearsons/pearson_chr{chrom}.txt"
-                pearson_np = read_pearson(pearson=pearson, zero_mean=True, format="rao_2014")
+                pearson_np = read_pearson(pearson=pearson, zero_mean=True, format="juicer")
                 Vh, explained_variances, total_entry_num, valid_entry_num = pca_on_pearson(pearson_np=pearson_np)
 
                 ## Compute correct_rate for cxmax

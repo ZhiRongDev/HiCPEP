@@ -7,11 +7,11 @@ from matplotlib.colors import ListedColormap
 import logging
 logging.basicConfig(format='%(message)s', level=logging.INFO)
 
-def read_pearson(pearson: str, zero_mean: bool=True, format="rao_2014") -> np.ndarray:
+def read_pearson(pearson: str, zero_mean: bool=True, format="juicer") -> np.ndarray:
     """_summary_
     Note that the return pearson matrix will be symmetric.
     """
-    if format == "rao_2014":
+    if format == "juicer":
         pearson_df = pd.read_table(pearson, header=None, sep=" ")
         pearson_df.pop(pearson_df.columns[-1])
         pearson_df = pearson_df.fillna(0)
@@ -186,7 +186,7 @@ def plot_comparison(pc1_np: np.ndarray, approx_np: np.ndarray, figsize: int=20, 
         scatter_labels = ["PC1 < 0", "PC1 == 0", "PC1 > 0"]
 
         plt.figure(figsize=(figsize, 6))
-        plt.xticks(np.arange(0, valid_entry_num, 50)) 
+        plt.xticks(np.arange(0, total_entry_num, 50)) 
         scatter_config =  plt.scatter(plot_x_axis, approx_dots, c=pc1_colors_values, cmap=pc1_colors)
         plt.legend(handles=scatter_config.legend_elements()[0], labels=scatter_labels, fontsize="20", loc="center left")
         plt.title(f"total_entry_num: {total_entry_num}, valid_entry_num: {valid_entry_num}, correct_num = {correct_num}, correct_rate={np.round(correct_rate, 2)}", fontsize=20, loc="left")
@@ -198,7 +198,7 @@ def plot_comparison(pc1_np: np.ndarray, approx_np: np.ndarray, figsize: int=20, 
         pc1_np_norm = (pc1_np - np.mean(pc1_np)) / np.std(pc1_np)
         
         plt.figure(figsize=(figsize, 6))
-        plt.xticks(np.arange(0, valid_entry_num, 50)) 
+        plt.xticks(np.arange(0, total_entry_num, 50)) 
         plt.plot(pc1_np_norm, c='r')
         plt.plot(approx_np_norm, c='b')
         plt.legend(["PC1", "approximated PC1-pattern"], fontsize="20", loc ="upper left")
@@ -217,6 +217,9 @@ def flip_tracks(track1_np: np.ndarray, track2_np: np.ndarray):
 def flip_track_gc(track_np: np.ndarray, gc_df: pd.DataFrame, chrom: str) -> np.ndarray:
     tmp_df = gc_df.loc[gc_df['chrom'] == chrom]
     gc_np = tmp_df["GC"].fillna(0).values
+
+    print(f"np.mean(gc_np[track_np > 0]): {np.mean(gc_np[track_np > 0])}")
+    print(f"np.mean(gc_np[track_np < 0]): {np.mean(gc_np[track_np < 0])}")
 
     if np.mean(gc_np[track_np > 0]) < np.mean(gc_np[track_np < 0]):
         track_np = -track_np
