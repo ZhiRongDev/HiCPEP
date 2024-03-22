@@ -1,7 +1,7 @@
 # My own settings
 archive/
-examples/data/cool/
-test/data
+code_for_paper/notebooks/data
+examples/data/ucsc/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

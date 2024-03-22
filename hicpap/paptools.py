@@ -67,6 +67,20 @@ def straw_to_pearson(hic_path: str, chrom_x: str, chrom_y: str, resolution: int,
 
     return pearson_np
 
+def zero_means_pearson(pearson_np: np.ndarray) -> np.ndarray:
+    pearson_np = pearson_np.astype('float64')
+    pearson_df = pd.DataFrame(pearson_np)
+    pearson_df = pearson_df.fillna(0)
+    pearson_np = pearson_df.values
+
+    diag = np.diag(pearson_np)
+    diag_valid = diag != 0
+    ixgrid = np.ix_(diag_valid, diag_valid) # Extract the submatrix.
+    pearson_np[ixgrid] -= pearson_np[ixgrid].mean(axis=1, keepdims=True)
+
+    return pearson_np
+
+
 def create_approx(pearson_np: np.ndarray, output: str | None = None, method: str="cxmax") -> np.ndarray:
     if len(pearson_np) != len(pearson_np[0]): 
         logging.info("Pearson matrix given has a different number of rows and columns")
@@ -208,20 +222,3 @@ def plot_comparison(pc1_np: np.ndarray, approx_np: np.ndarray, figsize: int=20, 
     
     plt.close('all')
     return
-
-def flip_tracks(track1_np: np.ndarray, track2_np: np.ndarray):
-    if np.corrcoef(track1_np, track2_np)[0][1] < 0:
-        track2_np = -track2_np
-    return track1_np, track2_np
-
-def flip_track_gc(track_np: np.ndarray, gc_df: pd.DataFrame, chrom: str) -> np.ndarray:
-    tmp_df = gc_df.loc[gc_df['chrom'] == chrom]
-    gc_np = tmp_df["GC"].fillna(0).values
-
-    print(f"np.mean(gc_np[track_np > 0]): {np.mean(gc_np[track_np > 0])}")
-    print(f"np.mean(gc_np[track_np < 0]): {np.mean(gc_np[track_np < 0])}")
-
-    if np.mean(gc_np[track_np > 0]) < np.mean(gc_np[track_np < 0]):
-        track_np = -track_np
-
-    return track_np

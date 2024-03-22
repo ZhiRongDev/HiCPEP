@@ -2,7 +2,8 @@ import os
 import datetime
 import pandas as pd
 import numpy as np
-from hicpap.paptools import read_pearson, create_approx, calc_correctness, plot_comparison, pca_on_pearson, flip_tracks
+from hicpap.paptools import read_pearson, create_approx, calc_correctness, plot_comparison, pca_on_pearson
+from experiments.utils import flip_track_gc
 
 import logging
 logging.basicConfig(format='%(message)s', level=logging.INFO)
@@ -90,7 +91,21 @@ def summary_correctness(data_store):
                         approx_np = approx_np.flatten() # Turn into 1D vector
 
                         del pc1_df, approx_df
-                        pc1_np, approx_np = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
+
+                        # Flip according to the GC content.
+                        if cell_line == "ch12-lx":
+                            gc_df = pd.read_table(f"reference_gc/mm9/mm9_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
+                            gc_np = gc_df["GC"].values.flatten()
+                        else:
+                            gc_df = pd.read_table(f"reference_gc/hg19/hg19_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
+                            gc_np = gc_df["GC"].values.flatten()
+
+                        # Remove the last bin to make sure the total_entry_num of pc1_np and approx_np is same as gc_np.
+                        pc1_np = pc1_np[:-1]
+                        approx_np = approx_np[:-1]
+                        pc1_np = flip_track_gc(track_np=pc1_np, gc_np=gc_np)
+                        approx_np = flip_track_gc(track_np=approx_np, gc_np=gc_np)
+
                         correctness_info = calc_correctness(pc1_np=pc1_np, approx_np=approx_np)
 
                         if method == "cxmax":
@@ -149,7 +164,21 @@ def plot_all_comparisons(data_store):
                     scatter = f"{output_path}/scatter/scatter_chr{chrom}.png"
 
                     del pc1_df, approx_df
-                    pc1_np, approx_np = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
+
+                    # Flip according to the GC content.
+                    if cell_line == "ch12-lx":
+                        gc_df = pd.read_table(f"reference_gc/mm9/mm9_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
+                        gc_np = gc_df["GC"].values.flatten()
+                    else:
+                        gc_df = pd.read_table(f"reference_gc/hg19/hg19_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
+                        gc_np = gc_df["GC"].values.flatten()
+
+                    # Remove the last bin to make sure the total_entry_num of pc1_np and approx_np is same as gc_np.
+                    pc1_np = pc1_np[:-1]
+                    approx_np = approx_np[:-1]
+                    pc1_np = flip_track_gc(track_np=pc1_np, gc_np=gc_np)
+                    approx_np = flip_track_gc(track_np=approx_np, gc_np=gc_np)
+
                     plot_comparison(pc1_np=pc1_np, approx_np=approx_np, figsize=figsize, scatter=scatter, relative_magnitude=relative_magnitude)
 
     logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 plot_comparison end")
@@ -190,14 +219,42 @@ def summary_self_pca(data_store):
                 ## Compute correct_rate for cxmax
                 pc1_np = Vh[0].copy()
                 approx_np = create_approx(pearson_np=pearson_np, method="cxmax")
-                pc1_np, approx_np = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
+
+                # Flip according to the GC content.
+                if cell_line == "ch12-lx":
+                    gc_df = pd.read_table(f"reference_gc/mm9/mm9_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
+                    gc_np = gc_df["GC"].values.flatten()
+                else:
+                    gc_df = pd.read_table(f"reference_gc/hg19/hg19_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
+                    gc_np = gc_df["GC"].values.flatten()
+
+                # Remove the last bin to make sure the total_entry_num of pc1_np and approx_np is same as gc_np.
+                pc1_np = pc1_np[:-1]
+                approx_np = approx_np[:-1]
+                pc1_np = flip_track_gc(track_np=pc1_np, gc_np=gc_np)
+                approx_np = flip_track_gc(track_np=approx_np, gc_np=gc_np)
+
                 correctness_info = calc_correctness(pc1_np=pc1_np, approx_np=approx_np)
                 correct_rate_cxmax = correctness_info["correct_rate"]
 
-                ## Compute correct_rate for cxmax
+                ## Compute correct_rate for cxmin
                 pc1_np = Vh[0].copy()
                 approx_np = create_approx(pearson_np=pearson_np, method="cxmin")
-                pc1_np, approx_np = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
+
+                # Flip according to the GC content.
+                if cell_line == "ch12-lx":
+                    gc_df = pd.read_table(f"reference_gc/mm9/mm9_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
+                    gc_np = gc_df["GC"].values.flatten()
+                else:
+                    gc_df = pd.read_table(f"reference_gc/hg19/hg19_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
+                    gc_np = gc_df["GC"].values.flatten()
+
+                # Remove the last bin to make sure the total_entry_num of pc1_np and approx_np is same as gc_np.
+                pc1_np = pc1_np[:-1]
+                approx_np = approx_np[:-1]
+                pc1_np = flip_track_gc(track_np=pc1_np, gc_np=gc_np)
+                approx_np = flip_track_gc(track_np=approx_np, gc_np=gc_np)
+
                 correctness_info = calc_correctness(pc1_np=pc1_np, approx_np=approx_np)
                 correct_rate_cxmin = correctness_info["correct_rate"]
                 
