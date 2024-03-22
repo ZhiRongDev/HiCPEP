@@ -6,6 +6,11 @@ HiCPAP is a python package used for creating the Approximated-PC1-pattern, which
 
 ## Prerequisites
 
+To execute this example successfully, Please `cd` to the root directory:
+
+1. `python -m pip install -e .` (This will install hicpap and all the dependency packages through the setup.py).
+2. `pip install -r requirements.txt`.
+
 ## Installation
 
 ## Quick start

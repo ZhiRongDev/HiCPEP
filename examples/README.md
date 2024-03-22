@@ -1,5 +1,6 @@
 # Analyzing Hi-C Data with hicpap
 
+```
 examples
 ├── create_ref_gc.sh
 ├── data
@@ -18,3 +19,4 @@ examples
 │       └── mm9.2bit
 ├── example.ipynb
 └── README.md
+```

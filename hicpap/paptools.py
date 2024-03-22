@@ -159,7 +159,7 @@ def pca_on_pearson(pearson_np: np.ndarray):
     # Return Principal components(Vector) and the explained variances of PC1(Vector).
     return Vh[diag_valid], explained_variances, total_entry_num, valid_entry_num
 
-def calc_correctness(pc1_np: np.ndarray, approx_np: np.ndarray):
+def calc_similarity(pc1_np: np.ndarray, approx_np: np.ndarray):
     total_entry_num = len(pc1_np)
     if total_entry_num != len(approx_np): 
         logging.info("pc1_np and approx_np has a different total_entry_num")
@@ -175,22 +175,22 @@ def calc_correctness(pc1_np: np.ndarray, approx_np: np.ndarray):
     pc1_pos_np = pc1_np > 0
     approx_pos_np = approx_np > 0
     pc1_pos_vs_approx_pos_np = pc1_pos_np == approx_pos_np 
-    correct_num = list(pc1_pos_vs_approx_pos_np).count(True)
-    correct_rate = correct_num / valid_entry_num
+    similar_num = list(pc1_pos_vs_approx_pos_np).count(True)
+    similar_rate = similar_num / valid_entry_num
 
     return {
         "total_entry_num": total_entry_num,
         "valid_entry_num": valid_entry_num,
-        "correct_num": correct_num,
-        "correct_rate": correct_rate,
+        "similar_num": similar_num,
+        "similar_rate": similar_rate,
     }
 
 def plot_comparison(pc1_np: np.ndarray, approx_np: np.ndarray, figsize: int=20, scatter: str | None = None, relative_magnitude: str | None = None):
-    correctness_info = calc_correctness(pc1_np, approx_np)
-    total_entry_num = correctness_info["total_entry_num"]
-    valid_entry_num = correctness_info["valid_entry_num"]
-    correct_num = correctness_info["correct_num"]
-    correct_rate = correctness_info["correct_rate"]
+    similarity_info = calc_similarity(pc1_np, approx_np)
+    total_entry_num = similarity_info["total_entry_num"]
+    valid_entry_num = similarity_info["valid_entry_num"]
+    similar_num = similarity_info["similar_num"]
+    similar_rate = similarity_info["similar_rate"]
 
     if scatter != None:
         plot_x_axis = [i + 1 for i in range(total_entry_num)]
@@ -203,7 +203,7 @@ def plot_comparison(pc1_np: np.ndarray, approx_np: np.ndarray, figsize: int=20, 
         plt.xticks(np.arange(0, total_entry_num, 50)) 
         scatter_config =  plt.scatter(plot_x_axis, approx_dots, c=pc1_colors_values, cmap=pc1_colors)
         plt.legend(handles=scatter_config.legend_elements()[0], labels=scatter_labels, fontsize="20", loc="center left")
-        plt.title(f"total_entry_num: {total_entry_num}, valid_entry_num: {valid_entry_num}, correct_num = {correct_num}, correct_rate={np.round(correct_rate, 2)}", fontsize=20, loc="left")
+        plt.title(f"total_entry_num: {total_entry_num}, valid_entry_num: {valid_entry_num}, similar_num = {similar_num}, similar_rate={np.round(similar_rate, 2)}", fontsize=20, loc="left")
         plt.savefig(scatter)
         plt.clf() 
 

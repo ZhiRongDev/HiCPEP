@@ -2,7 +2,7 @@ import os
 import datetime
 import pandas as pd
 import numpy as np
-from hicpap.paptools import read_pearson, create_approx, calc_correctness, plot_comparison, pca_on_pearson
+from hicpap.paptools import read_pearson, create_approx, calc_similarity, plot_comparison, pca_on_pearson
 from experiments.utils import flip_track_gc
 
 import logging
@@ -38,8 +38,8 @@ def data_prepare(data_store):
     logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 data_prepare end")
     return
 
-def summary_correctness(data_store):
-    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_correctness start")
+def summary_similarity(data_store):
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_similarity start")
     cxmax_df = pd.DataFrame(columns = {
         'cell_line': [], 
         'resolution': [], 
@@ -47,8 +47,8 @@ def summary_correctness(data_store):
         "method":[], 
         "total_entry_num":[], 
         "valid_entry_num":[], 
-        "correct_num":[], 
-        "correct_rate": []
+        "similar_num":[], 
+        "similar_rate": []
     })
     cxmin_df = pd.DataFrame(columns = {
         'cell_line': [], 
@@ -57,8 +57,8 @@ def summary_correctness(data_store):
         "method":[], 
         "total_entry_num":[], 
         "valid_entry_num":[], 
-        "correct_num":[], 
-        "correct_rate": []
+        "similar_num":[], 
+        "similar_rate": []
     })
     pc1_path = f"{data_store}/data/rao_2014/juicer_outputs"
     approx_path = f"{data_store}/outputs/approx_pc1_pattern/rao_2014"
@@ -94,10 +94,10 @@ def summary_correctness(data_store):
 
                         # Flip according to the GC content.
                         if cell_line == "ch12-lx":
-                            gc_df = pd.read_table(f"reference_gc/mm9/mm9_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
+                            gc_df = pd.read_table(f"./reference_gc/mm9/mm9_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
                             gc_np = gc_df["GC"].values.flatten()
                         else:
-                            gc_df = pd.read_table(f"reference_gc/hg19/hg19_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
+                            gc_df = pd.read_table(f"./reference_gc/hg19/hg19_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
                             gc_np = gc_df["GC"].values.flatten()
 
                         # Remove the last bin to make sure the total_entry_num of pc1_np and approx_np is same as gc_np.
@@ -106,21 +106,21 @@ def summary_correctness(data_store):
                         pc1_np = flip_track_gc(track_np=pc1_np, gc_np=gc_np)
                         approx_np = flip_track_gc(track_np=approx_np, gc_np=gc_np)
 
-                        correctness_info = calc_correctness(pc1_np=pc1_np, approx_np=approx_np)
+                        similarity_info = calc_similarity(pc1_np=pc1_np, approx_np=approx_np)
 
                         if method == "cxmax":
-                            cxmax_df.loc[len(cxmax_df)] = [cell_line, resolution, f"chr{chrom}", method, correctness_info["total_entry_num"], correctness_info["valid_entry_num"], correctness_info["correct_num"], correctness_info["correct_rate"]] 
+                            cxmax_df.loc[len(cxmax_df)] = [cell_line, resolution, f"chr{chrom}", method, similarity_info["total_entry_num"], similarity_info["valid_entry_num"], similarity_info["similar_num"], similarity_info["similar_rate"]] 
                         elif method == "cxmin":
-                            cxmin_df.loc[len(cxmin_df)] = [cell_line, resolution, f"chr{chrom}", method, correctness_info["total_entry_num"], correctness_info["valid_entry_num"], correctness_info["correct_num"], correctness_info["correct_rate"]] 
+                            cxmin_df.loc[len(cxmin_df)] = [cell_line, resolution, f"chr{chrom}", method, similarity_info["total_entry_num"], similarity_info["valid_entry_num"], similarity_info["similar_num"], similarity_info["similar_rate"]] 
 
     output_df = pd.concat([cxmax_df, cxmin_df], ignore_index=True)
 
-    filename = f"{data_store}/outputs/summary/summary_correctness_2014.xlsx"
+    filename = f"{data_store}/outputs/summary/summary_similarity_2014.xlsx"
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with pd.ExcelWriter(filename, mode="w") as writer:
-        output_df.to_excel(writer, sheet_name="summary_correctness_2014")
+        output_df.to_excel(writer, sheet_name="summary_similarity_2014")
 
-    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_correctness end")
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_similarity end")
     return
 
 def plot_all_comparisons(data_store):
@@ -167,10 +167,10 @@ def plot_all_comparisons(data_store):
 
                     # Flip according to the GC content.
                     if cell_line == "ch12-lx":
-                        gc_df = pd.read_table(f"reference_gc/mm9/mm9_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
+                        gc_df = pd.read_table(f"./reference_gc/mm9/mm9_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
                         gc_np = gc_df["GC"].values.flatten()
                     else:
-                        gc_df = pd.read_table(f"reference_gc/hg19/hg19_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
+                        gc_df = pd.read_table(f"./reference_gc/hg19/hg19_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
                         gc_np = gc_df["GC"].values.flatten()
 
                     # Remove the last bin to make sure the total_entry_num of pc1_np and approx_np is same as gc_np.
@@ -195,8 +195,8 @@ def summary_self_pca(data_store):
         "exp_var_pc1": [],
         "exp_var_pc2": [],
         "exp_var_pc3": [],
-        "correct_rate_cxmax": [],
-        "correct_rate_cxmin": [],
+        "similar_rate_cxmax": [],
+        "similar_rate_cxmin": [],
     })
 
     resolutions = [1000000, 100000]
@@ -216,16 +216,16 @@ def summary_self_pca(data_store):
                 pearson_np = read_pearson(pearson=pearson, zero_mean=True, format="juicer")
                 Vh, explained_variances, total_entry_num, valid_entry_num = pca_on_pearson(pearson_np=pearson_np)
 
-                ## Compute correct_rate for cxmax
+                ## Compute similar_rate for cxmax
                 pc1_np = Vh[0].copy()
                 approx_np = create_approx(pearson_np=pearson_np, method="cxmax")
 
                 # Flip according to the GC content.
                 if cell_line == "ch12-lx":
-                    gc_df = pd.read_table(f"reference_gc/mm9/mm9_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
+                    gc_df = pd.read_table(f"./reference_gc/mm9/mm9_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
                     gc_np = gc_df["GC"].values.flatten()
                 else:
-                    gc_df = pd.read_table(f"reference_gc/hg19/hg19_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
+                    gc_df = pd.read_table(f"./reference_gc/hg19/hg19_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
                     gc_np = gc_df["GC"].values.flatten()
 
                 # Remove the last bin to make sure the total_entry_num of pc1_np and approx_np is same as gc_np.
@@ -234,19 +234,19 @@ def summary_self_pca(data_store):
                 pc1_np = flip_track_gc(track_np=pc1_np, gc_np=gc_np)
                 approx_np = flip_track_gc(track_np=approx_np, gc_np=gc_np)
 
-                correctness_info = calc_correctness(pc1_np=pc1_np, approx_np=approx_np)
-                correct_rate_cxmax = correctness_info["correct_rate"]
+                similarity_info = calc_similarity(pc1_np=pc1_np, approx_np=approx_np)
+                similar_rate_cxmax = similarity_info["similar_rate"]
 
-                ## Compute correct_rate for cxmin
+                ## Compute similar_rate for cxmin
                 pc1_np = Vh[0].copy()
                 approx_np = create_approx(pearson_np=pearson_np, method="cxmin")
 
                 # Flip according to the GC content.
                 if cell_line == "ch12-lx":
-                    gc_df = pd.read_table(f"reference_gc/mm9/mm9_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
+                    gc_df = pd.read_table(f"./reference_gc/mm9/mm9_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
                     gc_np = gc_df["GC"].values.flatten()
                 else:
-                    gc_df = pd.read_table(f"reference_gc/hg19/hg19_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
+                    gc_df = pd.read_table(f"./reference_gc/hg19/hg19_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
                     gc_np = gc_df["GC"].values.flatten()
 
                 # Remove the last bin to make sure the total_entry_num of pc1_np and approx_np is same as gc_np.
@@ -255,8 +255,8 @@ def summary_self_pca(data_store):
                 pc1_np = flip_track_gc(track_np=pc1_np, gc_np=gc_np)
                 approx_np = flip_track_gc(track_np=approx_np, gc_np=gc_np)
 
-                correctness_info = calc_correctness(pc1_np=pc1_np, approx_np=approx_np)
-                correct_rate_cxmin = correctness_info["correct_rate"]
+                similarity_info = calc_similarity(pc1_np=pc1_np, approx_np=approx_np)
+                similar_rate_cxmin = similarity_info["similar_rate"]
                 
                 output_df.loc[len(output_df)] = [
                     cell_line, 
@@ -267,8 +267,8 @@ def summary_self_pca(data_store):
                     explained_variances[0],
                     explained_variances[1],
                     explained_variances[2],
-                    correct_rate_cxmax,
-                    correct_rate_cxmin
+                    similar_rate_cxmax,
+                    similar_rate_cxmin
                 ] 
 
     filename = f"{data_store}/outputs/summary/summary_self_pca_2014.xlsx"
@@ -281,7 +281,7 @@ def summary_self_pca(data_store):
 
 def run_all(data_store):
     data_prepare(data_store)
-    summary_correctness(data_store)
+    summary_similarity(data_store)
     plot_all_comparisons(data_store)
     summary_self_pca(data_store)
     return

@@ -38,6 +38,10 @@ echo "$(date '+%Y-%m-%d %H:%M:%S') Create the required juicer's pearsons and PC1
 mkdir -p "${DATA_STORE}/data/rao_2014/juicer_outputs"
 bash build_pearsons_pc1_2014.sh
 
+### Optional, this is for creating the GC-content references (Already prepared in the `code_for_paper/reference_gc` directory).
+echo "$(date '+%Y-%m-%d %H:%M:%S') Start to creating reference_gc (GC-content files)."
+bash create_ref_gc.sh
+
 ### Start the program
 python main.py --data_store "${DATA_STORE}"
 echo "$(date '+%Y-%m-%d %H:%M:%S') Program end."
