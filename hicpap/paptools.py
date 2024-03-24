@@ -7,7 +7,17 @@ from matplotlib.colors import ListedColormap
 import logging
 logging.basicConfig(format='%(message)s', level=logging.INFO)
 
-def read_pearson(pearson: str, zero_mean: bool=True, format="juicer") -> np.ndarray:
+# Please make sure the pearson_np is already fillna with 0.
+def zero_means_pearson(pearson_np: np.ndarray) -> np.ndarray:
+    pearson_np = pearson_np.astype('float64')
+    diag = np.diag(pearson_np)
+    diag_valid = diag != 0
+    ixgrid = np.ix_(diag_valid, diag_valid) # Extract the submatrix.
+    pearson_np[ixgrid] -= pearson_np[ixgrid].mean(axis=1, keepdims=True)
+
+    return pearson_np
+
+def read_pearson(pearson: str, format="juicer") -> np.ndarray:
     """_summary_
     Note that the return pearson matrix will be symmetric.
     """
@@ -21,17 +31,11 @@ def read_pearson(pearson: str, zero_mean: bool=True, format="juicer") -> np.ndar
         pearson_df.pop(pearson_df.columns[-1])
         pearson_df = pearson_df.fillna(0)
         pearson_np = pearson_df.values # Turn into numpy.ndarray
-
-    # Zero mean the Pearson correlaton matrix but still keep the all 0 rows/columns.
-    if zero_mean:
-        diag = np.diag(pearson_np)
-        diag_valid = diag != 0 
-        ixgrid = np.ix_(diag_valid, diag_valid) # Extract the submatrix.
-        pearson_np[ixgrid] -= pearson_np[ixgrid].mean(axis=1, keepdims=True)
+    del pearson_df
 
     return pearson_np
 
-def straw_to_pearson(hic_path: str, chrom_x: str, chrom_y: str, resolution: int, norm: str="KR", method: str="oe", zero_mean: bool=True) -> np.ndarray:
+def straw_to_pearson(hic_path: str, chrom_x: str, chrom_y: str, resolution: int, norm: str="KR", method: str="oe") -> np.ndarray:
     """_summary_
 
             # # # #
@@ -58,33 +62,15 @@ def straw_to_pearson(hic_path: str, chrom_x: str, chrom_y: str, resolution: int,
     pearson_np = pearson_df.values # Turn into numpy.ndarray
     del pearson_df
 
-    # Zero mean the Pearson correlaton matrix but still keep the all 0 rows/columns.
-    if zero_mean:
-        diag = np.diag(pearson_np)
-        diag_valid = diag != 0
-        ixgrid = np.ix_(diag_valid, diag_valid) # Extract the submatrix.
-        pearson_np[ixgrid] -= pearson_np[ixgrid].mean(axis=1, keepdims=True)
-
     return pearson_np
-
-def zero_means_pearson(pearson_np: np.ndarray) -> np.ndarray:
-    pearson_np = pearson_np.astype('float64')
-    pearson_df = pd.DataFrame(pearson_np)
-    pearson_df = pearson_df.fillna(0)
-    pearson_np = pearson_df.values
-
-    diag = np.diag(pearson_np)
-    diag_valid = diag != 0
-    ixgrid = np.ix_(diag_valid, diag_valid) # Extract the submatrix.
-    pearson_np[ixgrid] -= pearson_np[ixgrid].mean(axis=1, keepdims=True)
-
-    return pearson_np
-
 
 def create_approx(pearson_np: np.ndarray, output: str | None = None, method: str="cxmax") -> np.ndarray:
     if len(pearson_np) != len(pearson_np[0]): 
         logging.info("Pearson matrix given has a different number of rows and columns")
         return
+
+    # Zero means pearson_np
+    pearson_np = zero_means_pearson(pearson_np=pearson_np)
 
     """_summary_
     Calaulate the covariance matrix of the zero-means pearson matrix, according to the steps in PCA.
@@ -133,6 +119,9 @@ def pca_on_pearson(pearson_np: np.ndarray):
     if len(pearson_np) != len(pearson_np[0]): 
         logging.info("Pearson matrix has a different number of rows and columns")
         return
+
+    # Zero means pearson_np
+    pearson_np = zero_means_pearson(pearson_np=pearson_np)
     
     total_entry_num = len(pearson_np)
     diag = np.diag(pearson_np)
