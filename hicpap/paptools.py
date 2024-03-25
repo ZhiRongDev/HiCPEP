@@ -24,12 +24,12 @@ def read_pearson(pearson: str, format="juicer") -> np.ndarray:
     if format == "juicer":
         pearson_df = pd.read_table(pearson, header=None, sep=" ")
         pearson_df.pop(pearson_df.columns[-1])
-        pearson_df = pearson_df.fillna(0)
+        pearson_df = pearson_df.fillna(float(0))
         pearson_np = pearson_df.values # Turn into numpy.ndarray
     elif format == "aiden_2009":
         pearson_df = pd.read_table(pearson, index_col=0, header=1, sep="\t")
         pearson_df.pop(pearson_df.columns[-1])
-        pearson_df = pearson_df.fillna(0)
+        pearson_df = pearson_df.fillna(float(0))
         pearson_np = pearson_df.values # Turn into numpy.ndarray
     del pearson_df
 
@@ -57,10 +57,7 @@ def straw_to_pearson(hic_path: str, chrom_x: str, chrom_y: str, resolution: int,
     matrix_np = matrix.getRecordsAsMatrix(0, chrom_y_size, 0, chrom_x_size)
 
     pearson_np = np.corrcoef(matrix_np)
-    pearson_df = pd.DataFrame(pearson_np)
-    pearson_df = pearson_df.fillna(0)
-    pearson_np = pearson_df.values # Turn into numpy.ndarray
-    del pearson_df
+    pearson_np = np.nan_to_num(x=pearson_np, nan=float(0))
 
     return pearson_np
 

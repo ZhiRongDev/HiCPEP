@@ -1,4 +1,10 @@
 #!/bin/bash
+
+# We created GC-content information files through the tool and datasets provided by UCSC Genome Browser.
+# Download the tool (hgGcPercent): https://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/
+# Command used to create the hg18 GC-content information: http://hgdownload.cse.ucsc.edu/goldenPath/hg18/gc5Base/
+# Command used to create the hg19 GC-content information: http://hgdownload.cse.ucsc.edu/goldenPath/hg19/gc5Base/
+
 ucsc_path="${DATA_STORE}/data/ucsc"
 store_path="./reference_gc"
 
