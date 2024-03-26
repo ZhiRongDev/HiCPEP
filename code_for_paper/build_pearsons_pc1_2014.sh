@@ -1,4 +1,8 @@
 #!/bin/bash 
+
+# This script is for creating the Pearson and PC1 ground truth files for the experiments of Rao, 2014.
+# Note that the logs will be stored in `juicer_outputs.log`.
+
 JUICER_TOOLS="${DATA_STORE}/juicer_tools/juicer_tools_1.22.01.jar" 
 OUTPUT_PATH="${DATA_STORE}/data/rao_2014/juicer_outputs"
 RAO_HIC_PATH="${DATA_STORE}/data/rao_2014/hic"
@@ -38,7 +42,7 @@ do
         mkdir -p "${OUTPUT_PATH}/${CELL_LINE}/${RESOLUTION}/eigenvector"
         touch "${LOG}"
 
-        # There are only 19 chromosome in ch12-lx, 
+        # There are only 19 chromosome in ch12-lx (Mouse), and the naming format is different with the other Human cell lines.
         if [[ "${CELL_LINE}" == "ch12-lx" ]]
         then
             CHROMS=(chr1 chr2 chr3 chr4 chr5 chr6 chr7 chr8 chr9 chr10 chr11 chr12 chr13 chr14 chr15 chr16 chr17 chr18 chr19 chrX chrY)

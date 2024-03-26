@@ -301,8 +301,8 @@ def summary_self_pca(data_store):
     return
 
 def run_all(data_store):
-    data_prepare(data_store)
-    summary_similarity(data_store)
-    plot_all_comparisons(data_store)
-    summary_self_pca(data_store)
+    data_prepare(data_store) # Create the Approximated PC1-pattern .txt files.
+    summary_similarity(data_store) # Compare the similarity difference with the PC1 and the Approximated PC1-pattern.
+    plot_all_comparisons(data_store) # Plot the scatter and relative-magnitude chart.
+    summary_self_pca(data_store) # Performing the PCA by self and get the information of the explained variances.
     return

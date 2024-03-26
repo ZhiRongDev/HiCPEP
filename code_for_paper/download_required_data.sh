@@ -1,4 +1,10 @@
 #!/bin/bash
+
+# This script is used for downloading the required data for the experiments of Lieberman, 2009 and Rao, 2014.
+# The data for the experiments of Lieberman, 2009 are downloaded from https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE18199.
+# The data for the experiments of Rao, 2014 are downloaded from https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE63525.
+# The juicer_tools_1.22.01.jar is downloaded from https://github.com/aidenlab/juicer/wiki/Download.
+
 DATA_PATH="${DATA_STORE}/data"
 OUTPUT_PATH="${DATA_STORE}/outputs"
 JUICER_TOOLS_PATH="${DATA_STORE}/juicer_tools"

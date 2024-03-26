@@ -22,5 +22,5 @@ Here we summarize the main usage of HiCPAP:
     approx_np = paptools.create_approx(pearson_np=pearson_np)
     print(f"approx_np: {approx_np}")
 
-For more details, please check the `examples <https://github.com/ZhiRongDev/HiCPAP/examples/>`_. 
-If you would like to check the program we used for the paper, please check the `code_for_paper <https://github.com/ZhiRongDev/HiCPAP/code_for_paper>`_.
+For more details, please check the `examples <https://github.com/ZhiRongDev/HiCPAP/blob/main/examples/>`_. 
+If you would like to check the program we used for the paper, please check the `code_for_paper <https://github.com/ZhiRongDev/HiCPAP/blob/main/code_for_paper>`_.

@@ -45,7 +45,7 @@ approx_np = paptools.create_approx(pearson_np=pearson_np)
 print(f"approx_np: {approx_np}")
 ```
 
-For more details, please check the [examples](https://github.com/ZhiRongDev/HiCPAP/examples/). If you are interested in the programs we used for the paper, please check the [code_for_paper](https://github.com/ZhiRongDev/HiCPAP/code_for_paper/).
+For more details, please check the [examples](https://github.com/ZhiRongDev/HiCPAP/blob/main/examples/). If you are interested in the programs we used for the paper, please check the [code_for_paper](https://github.com/ZhiRongDev/HiCPAP/blob/main/code_for_paper/).
 
 ## References
 

@@ -13,7 +13,7 @@ if __name__ == "__main__":
         "--data_store",
         type=str,
         required=True,
-        help="data_store"
+        help="This is the parameter specifying the path of the data_store directory."
     )
 
     args = parser.parse_args()
