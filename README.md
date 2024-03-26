@@ -1,28 +1,52 @@
-# Hi-C Pearson matrix's Approximated-PC1-pattern (HiCPAP)
+# Hi-C Pearson matrix's Approximated PC1-pattern (HiCPAP)
 
-HiCPAP is a python package used for creating the Approximated-PC1-pattern, which can be used to identify the A/B compartment.
+HiCPAP is a Python package for creating the Approximated PC1-pattern of the Hi-C Pearson matrix, which can be used for identifying the A/B compartments.
 
-## Features
+## Requirements and Installation
 
-## Prerequisites
+All the programs were tested in Ubuntu 22.04.4 LTS, HiCPAP requires `python3`, `pip` and `libcurl4-openssl-dev` installed on your system. 
 
-To execute this example successfully, Please `cd` to the root directory:
+For example (Paste these commands in Bash or Zsh):
 
-1. `python -m pip install -e .` (This will install hicpap and all the dependency packages through the setup.py).
-2. `pip install -r requirements.txt`.
+```shell
+sudo apt-get update
+sudo apt-get install -y libcurl4-openssl-dev
+sudo apt-get install -y python3
+sudo apt-get install -y pip
+sudo apt-get install -y git 
+git clone https://github.com/ZhiRongDev/HiCPAP.git
+cd HiCPAP
+python3 -m pip install -e .
+```
 
-## Installation
+If you have already installed the requirements, just paste these commands:
+
+```shell
+git clone https://github.com/ZhiRongDev/HiCPAP.git
+cd HiCPAP
+python3 -m pip install -e .
+```
 
 ## Quick start
 
-For instance:
->hicmaptools -in_map examples/fly_30k.binmap -in_bin examples/fly_30k.bins -bait examples/bait.bed -output temp.tsv
+```py
+from hicpap import paptools
+
+pearson_np = paptools.straw_to_pearson(
+    hic_path="https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic", # Path to the Juicer's `.hic` file.
+    chrom_x="1", 
+    chrom_y="1",
+    resolution=1000000,
+    normalization="KR",
+    data_type="oe", # Note that the Pearson matrix should be derived from the O/E matrix.
+)
+
+approx_np = paptools.create_approx(pearson_np=pearson_np)
+print(f"approx_np: {approx_np}")
+```
+
+For more details, please check the [examples](https://github.com/ZhiRongDev/HiCPAP/examples/). If you are interested in the programs we used for the paper, please check the [code_for_paper](https://github.com/ZhiRongDev/HiCPAP/code_for_paper/).
 
 ## References
 
-How the Juicer implemented there eigenvector-calculation:
-https://github.com/aidenlab/Juicebox/blob/12bc67454c460159c758606ff05eaecaf6601d1b/src/juicebox/data/MatrixZoomData.java#L708
-
-* Fill the matrix with 0 first, and remove rows/columns with all 0 entries.
-* Record the 0 (NaN) index position with numpy.diag, which should be 0.
-* Take advantage of numpy.ix_() to get the submatrix.
+* Zhi-Rong Cheng, Jia-Ming Chang. The exploration and optimization of the chromatin compartment analysis.

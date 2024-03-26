@@ -1,22 +1,21 @@
-hicmaptools
-===========
+Hi-C Pearson matrix's Approximated PC1-pattern (HiCPAP)
+=======================================================
 
-It is a commend line tool to access HiC maps. The complete program provides multi-query modes and analysis tools.
-
+HiCPAP is a Python package for creating the Approximated PC1-pattern of the Hi-C Pearson matrix, 
+which can be used for identifying the A/B compartments.
 
 .. toctree::
     :maxdepth: 2
 
     Requirements and Installation <install>
-    Usage <usage>
-    About file formats <format>
-    Permutation test <shuffle>
+    Quick start <quick_start>
+    API reference <api>
+    Code for paper <code_for_paper>
+    data_store directory structure <data_store>
 
 Citation & contact
 ,,,,,
 
-Jia-Ming Chang, Yi-Fu Weng, Wei-Ting Chang, Fu-An Lin, Giacomo Cavalli.
-`HiCmapTools: A tool to access HiC contact maps <https://doi.org/10.1186/s12859-022-04589-y>`_
-*BMC Bioinformatics* **23**, 64 (2022).
+Zhi-Rong Cheng, Jia-Ming Chang. The exploration and optimization of the chromatin compartment analysis.
 
-gmail: chang.jiaming
+gmail: jordan990301@gmail.com 

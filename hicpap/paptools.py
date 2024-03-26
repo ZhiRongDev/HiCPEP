@@ -35,7 +35,7 @@ def read_pearson(pearson: str, format="juicer") -> np.ndarray:
 
     return pearson_np
 
-def straw_to_pearson(hic_path: str, chrom_x: str, chrom_y: str, resolution: int, norm: str="KR", method: str="oe") -> np.ndarray:
+def straw_to_pearson(hic_path: str, chrom_x: str, chrom_y: str, resolution: int, normalization: str="KR", data_type: str="oe") -> np.ndarray:
     """_summary_
 
             # # # #
@@ -53,7 +53,7 @@ def straw_to_pearson(hic_path: str, chrom_x: str, chrom_y: str, resolution: int,
         if chrom.name == chrom_y:
             chrom_y_size = int(chrom.length)
 
-    matrix = hic.getMatrixZoomData(chrom_y, chrom_x, method, norm, "BP", resolution)
+    matrix = hic.getMatrixZoomData(chrom_y, chrom_x, data_type, normalization, "BP", resolution)
     matrix_np = matrix.getRecordsAsMatrix(0, chrom_y_size, 0, chrom_x_size)
 
     pearson_np = np.corrcoef(matrix_np)

@@ -1,30 +1,25 @@
 Requirements and Installation
 =============================
 
-Prerequisites
--------------
+All the programs were tested in Ubuntu 22.04.4 LTS, HiCPAP requires ``python3``, ``pip`` and ``libcurl4-openssl-dev`` installed on your system. 
 
-hicmaptools compilation requires the following tools installed on your system ``make``, ``gcc-c++`` and ``R``.
-
-Compile/Installation
---------------------
-
-Clone the git repository on your computer use below command:
+For example (Paste these commands in Bash or Zsh):
 
 ::
 
-    git clone git@github.com:changlabtw/hicmaptools.git hicmaptools
+    sudo apt-get update
+    sudo apt-get install -y libcurl4-openssl-dev
+    sudo apt-get install -y python3
+    sudo apt-get install -y pip
+    sudo apt-get install -y git 
+    git clone https://github.com/ZhiRongDev/HiCPAP.git
+    cd HiCPAP
+    python3 -m pip install -e .
 
-Move in the project root folder named ``hicmaptools`` and enter following commands. Then the binary will be automatically copied to the path ``./bin``
+If you have already installed the requirements, just paste these commands:
 
 ::
 
-    $ cd src
-    $ make
-
-The below command will copy the excutable binary file ``hicmaptools`` to the path specified by the environment variable ``$USER_BIN`` (check that it exists before run the
-make command)
-
-::
-
-    $ make install
+    git clone https://github.com/ZhiRongDev/HiCPAP.git
+    cd HiCPAP
+    python3 -m pip install -e .
