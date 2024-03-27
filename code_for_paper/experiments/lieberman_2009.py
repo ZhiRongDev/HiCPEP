@@ -1,8 +1,9 @@
 import os
 import datetime
+import numpy as np
 import pandas as pd
-from hicpap.paptools import read_pearson, create_approx, calc_similarity, plot_comparison, pca_on_pearson
-from experiments.utils import flip_track_gc
+from hicpap.paptools import create_approx, calc_similarity, plot_comparison, pca_on_pearson
+from experiments.utils import read_pearson, flip_track_gc
 
 import logging
 logging.basicConfig(format='%(message)s', level=logging.INFO)
@@ -106,6 +107,10 @@ def summary_similarity(data_store):
                     pc1_df = pc1_df.iloc[:, [2]]
                     pc1_np = pc1_df.values # Turn into numpy format
                     pc1_np = pc1_np.flatten() # Turn into 1D vector
+                    tmp = np.full(len(pc1_np), np.nan)
+                    tmp[pc1_np != 0] = pc1_np[pc1_np != 0]
+                    pc1_np = tmp
+
                     approx_df = pd.read_table(approx, header=None)
                     approx_np = approx_df.values # Turn into numpy format
                     approx_np = approx_np.flatten() # Turn into 1D vector
@@ -137,7 +142,10 @@ def summary_similarity(data_store):
     output_df = pd.concat([cxmax_df, cxmin_df], ignore_index=True)
 
     filename = f"{data_store}/outputs/summary/summary_similarity_2009.xlsx"
-    os.makedirs(os.path.dirname(filename), exist_ok=True)
+    
+    if os.path.dirname(filename):
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+
     with pd.ExcelWriter(filename, mode="w") as writer:
         output_df.to_excel(writer, sheet_name="summary_similarity_2009")
 
@@ -187,6 +195,10 @@ def plot_all_comparisons(data_store):
                     pc1_df = pc1_df.iloc[:, [2]]
                     pc1_np = pc1_df.values # Turn into numpy format
                     pc1_np = pc1_np.flatten() # Turn into 1D vector
+                    tmp = np.full(len(pc1_np), np.nan)
+                    tmp[pc1_np != 0] = pc1_np[pc1_np != 0]
+                    pc1_np = tmp
+
                     approx_df = pd.read_table(approx, header=None)
                     approx_np = approx_df.values # Turn into numpy format
                     approx_np = approx_np.flatten() # Turn into 1D vector
@@ -293,7 +305,10 @@ def summary_self_pca(data_store):
                 ] 
 
     filename = f"{data_store}/outputs/summary/summary_self_pca_2009.xlsx"
-    os.makedirs(os.path.dirname(filename), exist_ok=True)
+
+    if os.path.dirname(filename):
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+
     with pd.ExcelWriter(filename, mode="w") as writer:
         output_df.to_excel(writer, sheet_name="summary_self_pca_2009")
 

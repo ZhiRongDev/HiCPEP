@@ -15,7 +15,7 @@ Quick start
 First you have to specify the path for storing all the data required and experiment results, we highly recommand to created an empty directory for this purpose. 
 Here we assume the data will all be stored in the ``/tmp/data_store`` directory, all you need to do is to paste the commands below and wait for it finish (It will takes few hours).
 
-::
+.. code:: bash
 
     mkdir /tmp/data_store
     git clone https://github.com/ZhiRongDev/HiCPAP.git
@@ -29,7 +29,7 @@ Guidance
 
 The following is content of the ``code_for_paper`` directory:
 
-::
+.. code:: bash
 
     code_for_paper
     ├── experiments

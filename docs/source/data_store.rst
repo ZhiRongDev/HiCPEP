@@ -21,7 +21,7 @@ The ``outputs`` directory is used for storing the experiment results, including 
 Here we list the full directory structure, which might be informative after you execute the `run.sh <https://github.com/ZhiRongDev/HiCPAP/blob/main/code_for_paper/run.sh>`_ 
 (We only list the directories and skip the files):
 
-::
+.. code:: bash
 
     data_store
     ├── data

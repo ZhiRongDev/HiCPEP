@@ -6,7 +6,7 @@ Here we summarize the main usage of HiCPAP:
 1. Get the Pearson matrix through the ``paptools.read_pearson()`` or ``paptools.straw_to_pearson()``.
 2. Create the Approximated PC1-pattern with ``paptools.create_approx()``.
 
-::
+.. code::
 
     from hicpap import paptools
 

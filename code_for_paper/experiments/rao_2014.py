@@ -1,8 +1,8 @@
 import os
 import datetime
 import pandas as pd
-from hicpap.paptools import read_pearson, create_approx, calc_similarity, plot_comparison, pca_on_pearson
-from experiments.utils import flip_track_gc
+from hicpap.paptools import create_approx, calc_similarity, plot_comparison, pca_on_pearson
+from experiments.utils import read_pearson, flip_track_gc
 
 import logging
 logging.basicConfig(format='%(message)s', level=logging.INFO)
@@ -82,7 +82,6 @@ def summary_similarity(data_store):
                         approx = f"{approx_path}/{cell_line}/{resolution}/{method}/approx_pc1_pattern_chr{chrom}.txt"
 
                         pc1_df = pd.read_table(pc1, header=None)
-                        pc1_df = pc1_df.fillna(0)
                         pc1_np = pc1_df.values # Turn into numpy format
                         pc1_np = pc1_np.flatten() # Turn into 1D vector
                         approx_df = pd.read_table(approx, header=None)
@@ -115,7 +114,10 @@ def summary_similarity(data_store):
     output_df = pd.concat([cxmax_df, cxmin_df], ignore_index=True)
 
     filename = f"{data_store}/outputs/summary/summary_similarity_2014.xlsx"
-    os.makedirs(os.path.dirname(filename), exist_ok=True)
+
+    if os.path.dirname(filename):
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+
     with pd.ExcelWriter(filename, mode="w") as writer:
         output_df.to_excel(writer, sheet_name="summary_similarity_2014")
 
@@ -153,7 +155,6 @@ def plot_all_comparisons(data_store):
                     os.makedirs(f"{output_path}/relative_magnitude", exist_ok=True)
 
                     pc1_df = pd.read_table(pc1, header=None)
-                    pc1_df = pc1_df.fillna(0)
                     pc1_np = pc1_df.values # Turn into numpy format
                     pc1_np = pc1_np.flatten() # Turn into 1D vector
                     approx_df = pd.read_table(approx, header=None)
@@ -271,7 +272,10 @@ def summary_self_pca(data_store):
                 ] 
 
     filename = f"{data_store}/outputs/summary/summary_self_pca_2014.xlsx"
-    os.makedirs(os.path.dirname(filename), exist_ok=True)
+
+    if os.path.dirname(filename):
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+
     with pd.ExcelWriter(filename, mode="w") as writer:
         output_df.to_excel(writer, sheet_name="summary_self_pca_2014")
 

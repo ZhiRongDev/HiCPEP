@@ -14,7 +14,7 @@ sudo apt-get install -y libcurl4-openssl-dev
 sudo apt-get install -y python3
 sudo apt-get install -y pip
 sudo apt-get install -y git 
-git clone https://github.com/ZhiRongDev/HiCPAP.git
+git clone git@github.com:ZhiRongDev/HiCPAP.git
 cd HiCPAP
 python3 -m pip install -e .
 ```
@@ -22,7 +22,7 @@ python3 -m pip install -e .
 If you have already installed the requirements, just paste these commands:
 
 ```shell
-git clone https://github.com/ZhiRongDev/HiCPAP.git
+git clone git@github.com:ZhiRongDev/HiCPAP.git
 cd HiCPAP
 python3 -m pip install -e .
 ```
