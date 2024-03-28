@@ -12,11 +12,9 @@ Here we summarize the main usage of HiCPAP:
 
     pearson_np = paptools.straw_to_pearson(
         hic_path="https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic", # Path to the Juicer's `.hic` file.
-        chrom_x="1", 
-        chrom_y="1",
+        chrom="1", 
         resolution=1000000,
         normalization="KR",
-        data_type="oe", # Note that the Pearson matrix should be derived from the O/E matrix.
     )
 
     approx_np = paptools.create_approx(pearson_np=pearson_np)

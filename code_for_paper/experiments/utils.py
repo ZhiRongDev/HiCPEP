@@ -46,7 +46,7 @@ def flip_track_gc(track_np: np.ndarray, gc_np: np.ndarray) -> np.ndarray:
         logging.info(f"Length of track_np: {len(track_np)}")
         logging.info(f"Length of gc_np: {len(gc_np)}")
 
-    if np.mean(gc_np[track_np > 0]) < np.mean(gc_np[track_np < 0]):
+    if np.nanmean(gc_np[track_np > 0]) < np.nanmean(gc_np[track_np < 0]):
         track_np = -track_np
 
     return track_np

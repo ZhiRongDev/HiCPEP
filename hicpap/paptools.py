@@ -10,12 +10,13 @@ logging.basicConfig(format='%(message)s', level=logging.INFO)
 # Please make sure the pearson_np is already fillna with 0.
 def zero_means_pearson(pearson_np: np.ndarray) -> np.ndarray:
     """
-    This function will excludes the all-zero rows/columns of pearson_np and perform zero-means. 
-    The pearson_np returned will keep the origin all-zero rows/columns and retain the same shape. 
+    Perform zero means on the given Hi-C Pearson matrix. 
+    The calculation is only performed on the valid sub-matrix (rows/columns with all ``NaN`` will be excluded, however these all ``NaN`` rows/columns will not be removed in the Pearson matrix returned).
 
-    :param pearson_np: The Hi-C Pearson matrix (All the ``NaN`` values should be replaced with ``0`` in advance).
+    :param pearson_np: The origin Hi-C Pearson matrix, which typically includes some all ``NaN`` rows/columns.
     :type pearson_np: numpy.ndarray
-    :return: zero-means pearson_np. 
+
+    :return: Zero-means Hi-C Pearson matrix. 
     :rtype: numpy.ndarray
     """
     pearson_np = pearson_np.astype('float64')
@@ -28,9 +29,13 @@ def zero_means_pearson(pearson_np: np.ndarray) -> np.ndarray:
 
 def read_pearson(pearson: str) -> np.ndarray:
     """
-    :param pearson: The text file path of `juicer_tools <https://github.com/aidenlab/juicer/wiki/Pearsons>`_  created Pearson matrix.
+    Read a intra-chromosomal Hi-C Pearson matrix's ``.txt`` file created by `juicer_tools <https://github.com/aidenlab/juicer/wiki/Pearsons>`_ 
+    and return a Pearson matrix in NumPy format.
+
+    :param pearson: Path of the juicer_tools created intra-chromosomal Hi-C Pearson matrix ``.txt`` file.
     :type pearson: str
-    :return All `0` rows/columns removed pearson_np.
+
+    :return: Intra-chromosomal Hi-C Pearson matrix in NumPy format.
     :rtype: numpy.ndarray
     """
     pearson_df = pd.read_table(pearson, header=None, sep="\s+")
@@ -38,42 +43,54 @@ def read_pearson(pearson: str) -> np.ndarray:
 
     return pearson_np
 
-def straw_to_pearson(hic_path: str, chrom_x: str, chrom_y: str, resolution: int, normalization: str="KR", data_type: str="oe") -> np.ndarray:
+def straw_to_pearson(hic_path: str, chrom: str, resolution: int, normalization: str="KR") -> np.ndarray:
     """
-    This function will read the ``.hic`` created by `juicer <https://github.com/aidenlab/juicer>`_ and fill all the ``NaN`` values with ``0``.
+    Read a ``.hic`` file created by `Juicer <https://github.com/aidenlab/juicer>`_ and return the Pearson matrix in NumPy format. 
+    We only support creating the intra-chromosomal Hi-C Pearson matrix from O/E matrix, please check the `Straw API reference <https://pypi.org/project/hic-straw/>`_ if this function doesn't meet your needs.
 
-    :param hic_path:
+    :param hic_path: Path of the Juicer created ``.hic`` file.
     :type hic_path: str
 
-    :return
-    :rtype: numpy.ndarray 
+    :param chrom: chromosome name in string, from chromosome 1 to chromosome 22 and chromosome X, chromosome Y. (e.g. ``'1'``, ``'22'``, ``'X'``, ``'Y'``, etc.)
+    :type chrom: str
 
-    .. code:: bash
+    :param resolution: Typically ``2500000``, ``1000000``, ``500000``, ``100000``, ``50000``, ``25000``, ``10000``, ``5000``, etc. 
+    :type resolution: int
 
-                # # # #
-        chrom_y # # # #
-                # # # #
-                chrom_x
+    :param normalization: ``'NONE'``, ``'VC'``, ``'VC_SQRT'``, ``'KR'``, ``'SCALE'``, etc.
+    :type normalization: str
+
+    :return: Intra-chromosomal Pearson matrix in NumPy format.
+    :rtype: numpy.ndarray
     """
     hic = hicstraw.HiCFile(hic_path)
 
-    for chrom in hic.getChromosomes():
-        if chrom.name == chrom_x:
-            chrom_x_size = int(chrom.length)
-        if chrom.name == chrom_y:
-            chrom_y_size = int(chrom.length)
+    for chromosome in hic.getChromosomes():
+        if chromosome.name == chrom:
+            chrom_size = int(chromosome.length)
 
-    matrix = hic.getMatrixZoomData(chrom_y, chrom_x, data_type, normalization, "BP", resolution)
-    matrix_np = matrix.getRecordsAsMatrix(0, chrom_y_size, 0, chrom_x_size)
+    matrix = hic.getMatrixZoomData(chrom, chrom, "oe", normalization, "BP", resolution)
+    matrix_np = matrix.getRecordsAsMatrix(0, chrom_size, 0, chrom_size)
     pearson_np = np.corrcoef(matrix_np)
 
     return pearson_np
 
 def create_approx(pearson_np: np.ndarray, output: str | None = None, method: str="cxmax") -> np.ndarray:
     """
-    Calaulate the covariance matrix of the zero-means pearson matrix, according to the steps in PCA.
-    Note that we set the degree of freedom as n.
+    Create the Approximated PC1-pattern of the given Hi-C Pearson matrix. 
+    The calculation is only performed on the valid sub-matrix. (rows/columns with all ``NaN`` will be excluded, however these all ``NaN`` rows/columns will not be removed in the Approximated PC1-pattern returned)
 
+    :param pearson_np: Hi-C Pearson matrix in NumPy format.
+    :type pearson_np: numpy.ndarray
+    
+    :param output: (Optional) If the file path is specified, the Approximated PC1-pattern will be stored (e.g. ``output="./test/approx_pc1.txt"``).
+    :type output: str
+    
+    :param method: ``cxmax`` or ``cxmin``.
+    :type method: str
+
+    :return: Approximated PC1-pattern in NumPy format.
+    :rtype: numpy.ndarray.
     """
     if len(pearson_np) != len(pearson_np[0]): 
         logging.info("Pearson matrix given has a different number of rows and columns")
@@ -130,10 +147,24 @@ def create_approx(pearson_np: np.ndarray, output: str | None = None, method: str
 
 def pca_on_pearson(pearson_np: np.ndarray):
     """
-    These two lines of code will both calculate the covariance matrix of the pearson matrix, and is confirmed to have the same results.
-    logging.info(np.matmul(y.T, y), '\n')
-    logging.info(np.cov(pearson_np[ixgrid], bias=True)) # `bias=True` will set the degree of freedom as n.
+    Perform PCA on the given Hi-C Pearson matrix.
+    The calculation is only performed on the valid sub-matrix. (rows/columns with all ``NaN`` will be excluded, however these all ``NaN`` rows/columns will not be removed in the Principal component vectors returned)
 
+    Note that we set the degree of freedom as n (length of Pearson matrix's x-axis).
+
+    :param pearson_np: Hi-C Pearson matrix in NumPy format.
+    :type pearson_np: numpy.ndarray
+
+    :return:
+
+    .. code::
+        
+        Vh (numpy.ndarray) : Principal Component vectors of the valid sub-matrix, start from the PC1 in index 0, PC2 in index 1, PC3 in index 2, etc.
+        explained_variances (numpy.ndarray): A vector contains the explained variance of PC1, PC2, PC3 etc.
+        total_entry_num (int): Entry numbers including NaN.
+        valid_entry_num (int): Entry numbers excluding NaN.
+
+    :rtype: numpy.ndarray, numpy.ndarray, int, int
     """
     if len(pearson_np) != len(pearson_np[0]): 
         logging.info("Pearson matrix has a different number of rows and columns")
@@ -163,6 +194,29 @@ def pca_on_pearson(pearson_np: np.ndarray):
     return Vh[diag_valid], explained_variances, total_entry_num, valid_entry_num
 
 def calc_similarity(pc1_np: np.ndarray, approx_np: np.ndarray):
+    """
+    Compare the similarity information between the given PC1 and Approximated PC1-pattern.
+    (The ``NaN`` value entries will be excluded).
+
+    :param pc1_np: PC1 in NumPy format. 
+    :type pc1_np: numpy.ndarray.
+
+    :param approx_np: Approximated PC1-pattern in NumPy format. 
+    :type approx_np: numpy.ndarray.
+
+    :return:
+
+    .. code::
+
+        {
+            total_entry_num (int): Entry numbers including NaN.
+            valid_entry_num (int): Entry numbers excluding NaN.
+            similar_num (int): Number of entries that the PC1 and Approximated PC1-pattern have the some sign (positive/negative).
+            similar_rate (float): similar_num / valid_entry_num.
+        }
+
+    :rtype: dict
+    """
     total_entry_num = len(pc1_np)
     
     if total_entry_num != len(approx_np): 
@@ -192,13 +246,21 @@ def calc_similarity(pc1_np: np.ndarray, approx_np: np.ndarray):
 
 def plot_comparison(pc1_np: np.ndarray, approx_np: np.ndarray, figsize: int=20, scatter: str | None = None, relative_magnitude: str | None = None):
     """
-    Args:
-        pc1_np (np.ndarray): _description_
-        approx_np (np.ndarray): _description_
-        figsize (int, optional): _description_. Defaults to 20.
-        scatter (str | None, optional): _description_. Defaults to None.
-        relative_magnitude (str | None, optional): _description_. Defaults to None.
+    Plot the comparison figure between PC1 and Approximated PC1-pattern we used in our paper.
+    Note that for the plot of relative_magnitude, ``NaN`` value entries will be replaced with ``0`` in advance, 
+    and both the PC1 and Approximated PC1-pattern will be Z-score normalized.   
 
+    :param pc1_np: PC1 in NumPy format. 
+    :type pc1_np: numpy.ndarray.
+
+    :param approx_np: Approximated PC1-pattern in NumPy format. 
+    :type approx_np: numpy.ndarray.
+
+    :param scatter: (Optional) If the file path is specified, the scatter plot will be stored (e.g. ``scatter="./test/scatter.png"``).
+    :type scatter: str
+
+    :param relative_magnitude: (Optional) If the file path is specified, the relative_magnitude plot will be stored (e.g. ``relative_magnitude="./test/scatter.png"``).
+    :type relative_magnitude: str
     """
 
     if os.path.dirname(scatter):

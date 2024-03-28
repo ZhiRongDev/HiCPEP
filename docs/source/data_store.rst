@@ -18,7 +18,7 @@ and processed with `juicer_tools 1.22.01 <https://github.com/aidenlab/juicer/wik
 
 The ``outputs`` directory is used for storing the experiment results, including the Approximated PC1-pattern ``.txt`` files, scatter & relative_magnitude plots and the summary informations of all the experiments.
 
-Here we list the full directory structure, which might be informative after you execute the `run.sh <https://github.com/ZhiRongDev/HiCPAP/blob/main/code_for_paper/run.sh>`_ 
+Here we list the full directory structure, which might be informative before/after you execute the `run.sh <https://github.com/ZhiRongDev/HiCPAP/blob/main/code_for_paper/run.sh>`_ 
 (We only list the directories and skip the files):
 
 .. code:: bash

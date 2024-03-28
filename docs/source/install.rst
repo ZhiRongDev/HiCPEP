@@ -1,5 +1,5 @@
-Requirements and Installation
-=============================
+Installation
+=============
 
 All the programs were tested in Ubuntu 22.04.4 LTS, HiCPAP requires ``python3``, ``pip`` and ``libcurl4-openssl-dev`` installed on your system. 
 

@@ -7,6 +7,7 @@ We store all the programs in the `code_for_paper <https://github.com/ZhiRongDev/
 Prerequisites
 -------------
 * Make sure you have enough disk size for at least 120 GB, and the wifi connection is stable. 
+* Make sure you have at least 16 GB memory.
 * Make sure you have installed HiCPAP in your system.
 
 Quick start
@@ -18,7 +19,7 @@ Here we assume the data will all be stored in the ``/tmp/data_store`` directory,
 .. code:: bash
 
     mkdir /tmp/data_store
-    git clone https://github.com/ZhiRongDev/HiCPAP.git
+    git clone git@github.com:ZhiRongDev/HiCPAP.git
     cd HiCPAP/code_for_paper
     bash run.sh -p /tmp/data_store
 
@@ -56,5 +57,5 @@ The following is content of the ``code_for_paper`` directory:
 
 * The ``run.sh`` is the entry point to carry out all the experiments, please start the code tracing from this script if you're interested in how the entire programs work. 
 * The ``notebooks`` directory contains some of the examples we explained in our paper, all the details are written in these notebooks.
-* The ``experiments`` directory is a Python package used for the programs.
+* The ``experiments`` directory is a Python package used for the experiments.
 * The ``reference_gc`` directory contains the chromosome GC content references created by UCSC tools, please read `create_ref_gc.sh <https://github.com/ZhiRongDev/HiCPAP/blob/main/code_for_paper/create_ref_gc.sh>`_ for more information.
