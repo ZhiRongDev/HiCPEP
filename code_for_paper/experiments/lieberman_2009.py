@@ -2,8 +2,8 @@ import os
 import datetime
 import numpy as np
 import pandas as pd
-from hicpap.paptools import create_approx, calc_similarity, plot_comparison, pca_on_pearson
-from experiments.utils import read_pearson, flip_track_gc
+from hicpap.paptools import create_approx, calc_similarity, plot_comparison
+from experiments.utils import read_pearson, flip_track_gc, pca_on_pearson
 
 import logging
 logging.basicConfig(format='%(message)s', level=logging.INFO)
@@ -103,7 +103,7 @@ def summary_similarity(data_store):
                         pc1 = f"{pc1_path}/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
                         approx = f"{approx_path}/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chr{chrom}.txt"
                     
-                    pc1_df = pd.read_table(pc1, header=None, sep="\t")
+                    pc1_df = pd.read_table(pc1, header=None, sep="\s+")
                     pc1_df = pc1_df.iloc[:, [2]]
                     pc1_np = pc1_df.values # Turn into numpy format
                     pc1_np = pc1_np.flatten() # Turn into 1D vector
@@ -125,14 +125,10 @@ def summary_similarity(data_store):
 
                     gc_df = pd.read_table(f"./reference_gc/hg18/hg18_gc{resolution}_chr{chrom_name}.txt", skiprows=[0], names=["bin", "GC"])
                     gc_np = gc_df["GC"].values.flatten()
-
-                    # Remove the last bin to make sure the total_entry_num of pc1_np and approx_np is same as gc_np.
-                    pc1_np = pc1_np[:-1]
-                    approx_np = approx_np[:-1]
                     pc1_np = flip_track_gc(track_np=pc1_np, gc_np=gc_np)
                     approx_np = flip_track_gc(track_np=approx_np, gc_np=gc_np)
 
-                    similarity_info = calc_similarity(pc1_np=pc1_np, approx_np=approx_np)
+                    similarity_info = calc_similarity(track1_np=pc1_np, track2_np=approx_np)
 
                     if method == "cxmax":
                         cxmax_df.loc[len(cxmax_df)] = [cell_line, resolution, f"chr{chrom}", method, similarity_info["total_entry_num"], similarity_info["valid_entry_num"], similarity_info["similar_num"], similarity_info["similar_rate"]] 
@@ -191,7 +187,7 @@ def plot_all_comparisons(data_store):
                     os.makedirs(f"{output_path}/scatter", exist_ok=True)
                     os.makedirs(f"{output_path}/relative_magnitude", exist_ok=True)
 
-                    pc1_df = pd.read_table(pc1, header=None, sep="\t")
+                    pc1_df = pd.read_table(pc1, header=None, sep="\s+")
                     pc1_df = pc1_df.iloc[:, [2]]
                     pc1_np = pc1_df.values # Turn into numpy format
                     pc1_np = pc1_np.flatten() # Turn into 1D vector
@@ -215,9 +211,6 @@ def plot_all_comparisons(data_store):
                     gc_df = pd.read_table(f"./reference_gc/hg18/hg18_gc{resolution}_chr{chrom_name}.txt", skiprows=[0], names=["bin", "GC"])
                     gc_np = gc_df["GC"].values.flatten()
 
-                    # Remove the last bin to make sure the total_entry_num of pc1_np and approx_np is same as gc_np.
-                    pc1_np = pc1_np[:-1]
-                    approx_np = approx_np[:-1]
                     pc1_np = flip_track_gc(track_np=pc1_np, gc_np=gc_np)
                     approx_np = flip_track_gc(track_np=approx_np, gc_np=gc_np)
 
@@ -234,9 +227,9 @@ def summary_self_pca(data_store):
         "chrom": [],
         "total_entry_num": [],
         "valid_entry_num": [],
-        "exp_var_pc1": [],
-        "exp_var_pc2": [],
-        "exp_var_pc3": [],
+        "exp_var_ratio_pc1": [],
+        "exp_var_ratio_pc2": [],
+        "exp_var_ratio_pc3": [],
         "similar_rate_cxmax": [],
         "similar_rate_cxmin": [],
     })
@@ -257,7 +250,7 @@ def summary_self_pca(data_store):
             for chrom in chroms:
                 pearson = f"{data_store}/data/lieberman_2009/heatmaps/HIC_{cell_line}_chr{chrom}_chr{chrom}_{resolution}_pearson.txt"
                 pearson_np = read_pearson(pearson=pearson, format="aiden_2009")
-                Vh, explained_variances, total_entry_num, valid_entry_num = pca_on_pearson(pearson_np=pearson_np)
+                Vh, explained_variances_ratio, total_entry_num, valid_entry_num = pca_on_pearson(pearson_np=pearson_np)
 
                 ## Compute similar_rate for cxmax
                 pc1_np = Vh[0].copy()
@@ -267,12 +260,9 @@ def summary_self_pca(data_store):
                 gc_df = pd.read_table(f"./reference_gc/hg18/hg18_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
                 gc_np = gc_df["GC"].values.flatten()
 
-                # Remove the last bin to make sure the total_entry_num of pc1_np and approx_np is same as gc_np.
-                pc1_np = pc1_np[:-1]
-                approx_np = approx_np[:-1]
                 pc1_np = flip_track_gc(track_np=pc1_np, gc_np=gc_np)
 
-                similarity_info_cxmax = calc_similarity(pc1_np=pc1_np, approx_np=approx_np)
+                similarity_info_cxmax = calc_similarity(track1_np=pc1_np, track2_np=approx_np)
                 similar_rate_cxmax = similarity_info_cxmax["similar_rate"]
 
                 ## Compute similar_rate for cxmin
@@ -283,12 +273,9 @@ def summary_self_pca(data_store):
                 gc_df = pd.read_table(f"./reference_gc/hg18/hg18_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
                 gc_np = gc_df["GC"].values.flatten()
 
-                # Remove the last bin to make sure the total_entry_num of pc1_np and approx_np is same as gc_np.
-                pc1_np = pc1_np[:-1]
-                approx_np = approx_np[:-1]
                 pc1_np = flip_track_gc(track_np=pc1_np, gc_np=gc_np)
 
-                similarity_info_cxmin = calc_similarity(pc1_np=pc1_np, approx_np=approx_np)
+                similarity_info_cxmin = calc_similarity(track1_np=pc1_np, track2_np=approx_np)
                 similar_rate_cxmin = similarity_info_cxmin["similar_rate"]
                 
                 output_df.loc[len(output_df)] = [
@@ -297,9 +284,9 @@ def summary_self_pca(data_store):
                     chrom, 
                     total_entry_num, 
                     valid_entry_num,
-                    explained_variances[0],
-                    explained_variances[1],
-                    explained_variances[2],
+                    explained_variances_ratio[0],
+                    explained_variances_ratio[1],
+                    explained_variances_ratio[2],
                     similar_rate_cxmax,
                     similar_rate_cxmin
                 ] 

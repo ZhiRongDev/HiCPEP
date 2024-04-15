@@ -17,6 +17,7 @@ For the experiments of Rao, 2014, the ``.hic`` data are downloaded from `GSE6352
 and processed with `juicer_tools 1.22.01 <https://github.com/aidenlab/juicer/wiki/Download>`_ for creating the Pearsons and PC1s.
 
 The ``outputs`` directory is used for storing the experiment results, including the Approximated PC1-pattern ``.txt`` files, scatter & relative_magnitude plots and the summary informations of all the experiments.
+Note that we test the Approximated PC1-pattern created by ``cxmax`` or ``cxmin`` versus the ``juicer_tools`` created PC1, at the resolution of 1Mb and 100Kb.
 
 Here we list the full directory structure, which might be informative before/after you execute the `run.sh <https://github.com/ZhiRongDev/HiCPAP/blob/main/code_for_paper/run.sh>`_ 
 (We only list the directories and skip the files):
