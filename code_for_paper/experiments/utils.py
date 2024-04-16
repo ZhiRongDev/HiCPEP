@@ -98,7 +98,7 @@ def pca_on_pearson(pearson_np: np.ndarray):
     explained_variances_ratio = eigenvalues / sum_eigenvalues
 
     # Place back the valid entries to it's origin position in the chromosome.  
-    tmp = np.full((len(pearson_np), len(pearson_np)), np.nan) 
+    tmp = np.full((len(diag_valid), len(diag_valid)), np.nan) 
     tmp[ixgrid] = Vh
     Vh = tmp
 

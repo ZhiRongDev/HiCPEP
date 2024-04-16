@@ -12,8 +12,8 @@ logging.basicConfig(format='%(message)s', level=logging.INFO)
 
 def read_pearson(pearson: str) -> np.ndarray:
     """
-    Read a intra-chromosomal Hi-C Pearson matrix's ``.txt`` file created by `juicer_tools <https://github.com/aidenlab/juicer/wiki/Pearsons>`_ 
-    and return a Pearson matrix in NumPy format.
+    Read a ``.txt`` file of the intra-chromosomal Hi-C Pearson matrix created by `juicer_tools <https://github.com/aidenlab/juicer/wiki/Pearsons>`_ 
+    and return the Pearson matrix in NumPy format.
 
     :param pearson: Path of the juicer_tools created intra-chromosomal Hi-C Pearson matrix ``.txt`` file.
     :type pearson: ``str``
@@ -31,7 +31,7 @@ def read_pearson(pearson: str) -> np.ndarray:
 def straw_to_pearson(hic_path: str, chrom: str, resolution: int, normalization: str="KR") -> np.ndarray:
     """
     Read a ``.hic`` file created by `Juicer <https://github.com/aidenlab/juicer>`_ and return the Pearson matrix in NumPy format. 
-    This function is just a use case adjusted from the `Straw API reference <https://pypi.org/project/hic-straw/>`_, for creating the intra-chromosomal Hi-C Pearson matrix from the O/E matrix.
+    This function is just a use case adjusted from the `Straw API reference <https://pypi.org/project/hic-straw/>`_, which we use it for creating the intra-chromosomal Hi-C Pearson matrix from the O/E matrix.
 
     :param hic_path: Path of the Juicer created ``.hic`` file.
     :type hic_path: ``str``
@@ -64,7 +64,7 @@ def straw_to_pearson(hic_path: str, chrom: str, resolution: int, normalization: 
 def create_approx(pearson_np: np.ndarray, output: str | None = None, method: str="cxmax", sampling_proportion: float | None = None) -> np.ndarray:
     """
     Create the Approximated PC1-pattern of the given Hi-C Pearson matrix.
-    The calculation is only performed on the valid sub-matrix. (rows/columns with all ``NaN`` will be excluded, however these all ``NaN`` rows/columns will not be removed in the Approximated PC1-pattern returned)
+    The calculation is only performed on the valid sub-matrix. (rows and columns with all ``NaN`` will be excluded, however these all ``NaN`` rows/columns will not be removed in the Approximated PC1-pattern returned)
 
     :param pearson_np: Hi-C Pearson matrix in NumPy format.
     :type pearson_np: ``numpy.ndarray``
@@ -75,8 +75,12 @@ def create_approx(pearson_np: np.ndarray, output: str | None = None, method: str
     :param method: ``cxmax`` or ``cxmin``.
     :type method: ``str``
 
+    :param sampling_proportion: If this parameter is specified (e.g. 0.1), than the function will randomly sample the given percentage of rows in the Pearson matrix to create a partial covariance matrix, 
+                                and select the ``CxMax`` in this partial covariance matrix as the Approximated PC1-pattern.
+    :type sampling_proportion: ``float``
+
     :return: Approximated PC1-pattern in NumPy format.
-    :rtype: ``numpy.ndarray``.
+    :rtype: ``numpy.ndarray``
     """
 
     if len(pearson_np) != len(pearson_np[0]): 
@@ -150,13 +154,17 @@ def create_approx(pearson_np: np.ndarray, output: str | None = None, method: str
 
 def calc_similarity(track1_np: np.ndarray, track2_np: np.ndarray):
     """
-    Compare the similarity information between the given PC1 or Approximated PC1-pattern (The ``NaN`` value entries will be excluded).
+    Compare the similarity information between the given track1 and track2, 
+    The ``similar_rate`` is defined as the proportion of the entries in track1 (e.g. ``pc1_np``) 
+    that have a same positive/negative sign as the track2 (e.g. Approximated PC1-pattern) entries compared.
+
+    Note that the ``NaN`` value entries will be excluded in advance.
 
     :param track1_np: PC1 or Approximated PC1-pattern in ``numpy.ndarray`` format. 
-    :type track1_np: ``numpy.ndarray``.
+    :type track1_np: ``numpy.ndarray``
 
     :param track2_np: PC1 or Approximated PC1-pattern in ``numpy.ndarray`` format. 
-    :type track2_np: ``numpy.ndarray``.
+    :type track2_np: ``numpy.ndarray``
 
     :return:
 
@@ -165,12 +173,13 @@ def calc_similarity(track1_np: np.ndarray, track2_np: np.ndarray):
         {
             total_entry_num (int): Entry numbers including ``NaN``.
             valid_entry_num (int): Entry numbers excluding ``NaN``.
-            similar_num (int): Number of entries that the track1_np and track2_np have the same sign (positive or negative).
+            similar_num (int): Number of entries that the track1_np and track2_np have the same positive or negative sign.
             similar_rate (float): similar_num divide by valid_entry_num.
         }
 
     :rtype: ``dict``
     """
+
     track1_np = deepcopy(track1_np)
     track2_np = deepcopy(track2_np)
     total_entry_num = len(track1_np)
@@ -204,16 +213,19 @@ def calc_similarity(track1_np: np.ndarray, track2_np: np.ndarray):
 def plot_comparison(pc1_np: np.ndarray, approx_np: np.ndarray, figsize: int=20, scatter: str | None = None, relative_magnitude: str | None = None, xticks: int=50):
     """
     Plot the scatter or relative-magnitude comparison figure between the PC1 and Approximated PC1-pattern. 
-    Please specified at least one of the figure storing path among the scatter plot or relative_magnitude plot.
+    Please specified at least one of the figure storing path among the scatter plot or the relative_magnitude plot.
 
     Note that for the plot of relative_magnitude, all the ``NaN`` value entries will be replaced with ``0`` in advance, 
     and both the PC1 and Approximated PC1-pattern will be Z-score normalized.
 
     :param pc1_np: PC1 in ``numpy.ndarray`` format. 
-    :type pc1_np: ``numpy.ndarray``.
+    :type pc1_np: ``numpy.ndarray``
 
     :param approx_np: Approximated PC1-pattern in ``numpy.ndarray`` format. 
-    :type approx_np: ``numpy.ndarray``.
+    :type approx_np: ``numpy.ndarray``
+
+    :param figsize: Scaling the figure size. 
+    :type figsize: ``int``
 
     :param scatter: (Optional) If the file path is specified, the scatter plot will be stored (e.g. ``scatter="./test/scatter.png"``).
     :type scatter: ``str``
@@ -221,6 +233,7 @@ def plot_comparison(pc1_np: np.ndarray, approx_np: np.ndarray, figsize: int=20, 
     :param relative_magnitude: (Optional) If the file path is specified, the relative_magnitude plot will be stored (e.g. ``relative_magnitude="./test/scatter.png"``).
     :type relative_magnitude: ``str``
     """
+
     pc1_np = deepcopy(pc1_np)
     approx_np = deepcopy(approx_np)
 

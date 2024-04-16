@@ -4,8 +4,8 @@
     You can adapt this file completely to your liking, but it should at least
     contain the root `toctree` directive.
 
-Welcome to HiCPAP's documentation!
-==================================
+Welcome to the HiCPAP's documentation!
+======================================
 
 .. toctree::
     :maxdepth: 2
@@ -28,7 +28,7 @@ Indices and tables
 How to build this document
 ==========================
 
-The document is created with `Sphinx documentation <https://www.sphinx-doc.org/en/master/>`_. 
+The document is created with the `Sphinx documentation <https://www.sphinx-doc.org/en/master/>`_. 
 All the HTML pages will be placed in the ``build`` directory.
 
 .. code:: bash

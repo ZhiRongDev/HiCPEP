@@ -1,6 +1,7 @@
 # My own settings
 archive/
-code_for_paper/notebooks/data
+code_for_paper/notebooks/data/gm12878_pc1_25000_chr2.txt
+code_for_paper/notebooks/data/gm12878_pearson_25000_chr2.txt
 examples/data/ucsc/
 
 # Byte-compiled / optimized / DLL files

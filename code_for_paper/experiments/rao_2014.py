@@ -375,9 +375,9 @@ def summary_self_pca(data_store):
     return
 
 def run_all(data_store):
-    # data_prepare(data_store) # Create the Approximated PC1-pattern .txt files.
-    # summary_similarity(data_store) # Compare the similarity difference with the PC1 and the Approximated PC1-pattern.
-    # plot_all_comparisons(data_store) # Plot the scatter and relative-magnitude chart.
-    # summary_self_pca(data_store) # Performing the PCA by self and get the information of the explained variance ratios.
+    data_prepare(data_store) # Create the Approximated PC1-pattern .txt files.
+    summary_similarity(data_store) # Compare the similarity difference with the PC1 and the Approximated PC1-pattern.
+    plot_all_comparisons(data_store) # Plot the scatter and relative-magnitude chart.
+    summary_self_pca(data_store) # Performing the PCA by self and get the information of the explained variance ratios.
     summary_similar_rate_percentage(data_store) # Summarize the percentage of columns in the covariance matrix that has a similar_rate over 90%, 95% or 99%. 
     return

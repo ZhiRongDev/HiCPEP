@@ -20,4 +20,4 @@ if __name__ == "__main__":
     data_store = args.data_store
 
     rao_2014.run_all(data_store)
-    # lieberman_2009.run_all(data_store)
+    lieberman_2009.run_all(data_store)
