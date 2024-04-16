@@ -1,3 +1,7 @@
+"""
+The dataset used for this package can be downloaded from:
+https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE18199
+"""
 import os
 import datetime
 import numpy as np
@@ -74,17 +78,16 @@ def summary_similarity(data_store):
         24 Y
 
         Notes: 
-        In Lieberman's dataset, 
-        1. The symbol used for the 23 chromosome are not the same in the `eigenvectors` and `heatmaps` diractory. (eigenvectors: 23, heatmaps: X)
-        2. There's no chromosome Y(24) in the datasets, 
-        3. There's 100000 resolution pearson matrix for k562 (chr1 - chr22, "no" chrX), 
-        4. There's "no" 100000 resolution PC1 for k562.
+        In the dataset provided by Lieberman, 
+        1. The chromosome 23 are called the chromosome X in the`heatmaps` diractory.
+        2. There's no chromosome Y (24) in the datasets. 
+        3. There's no Pearson matrix nor PC1 for the K562 in chrX, resolution 100000 .
     '''
     
     for cell_line in cell_lines:
         if cell_line == "k562":
             resolutions = [1000000]
-            chroms = [str(i) for i in range(1, 23)]
+            chroms = [str(i) for i in range(1, 24)]
         else:
             resolutions = [1000000, 100000]
             chroms = [str(i) for i in range(1, 24)]
@@ -100,8 +103,12 @@ def summary_similarity(data_store):
                             pc1 = f"{pc1_path}/GM-combined.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
                             approx = f"{approx_path}/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chr{chrom}.txt"
                     elif cell_line == "k562":
-                        pc1 = f"{pc1_path}/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
-                        approx = f"{approx_path}/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chr{chrom}.txt"
+                        if chrom == "23":
+                            pc1 = f"{pc1_path}/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
+                            approx = f"{approx_path}/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chrX.txt"
+                        else:
+                            pc1 = f"{pc1_path}/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
+                            approx = f"{approx_path}/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chr{chrom}.txt"
                     
                     pc1_df = pd.read_table(pc1, header=None, sep="\s+")
                     pc1_df = pc1_df.iloc[:, [2]]
@@ -180,8 +187,12 @@ def plot_all_comparisons(data_store):
                             pc1 = f"{data_path}/lieberman_2009/eigenvectors/GM-combined.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
                             approx = f"{data_store}/outputs/approx_pc1_pattern/lieberman_2009/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chr{chrom}.txt"
                     elif cell_line == "k562":
-                        pc1 = f"{data_path}/lieberman_2009/eigenvectors/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
-                        approx = f"{data_store}/outputs/approx_pc1_pattern/lieberman_2009/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chr{chrom}.txt"
+                        if chrom == "23":
+                            pc1 = f"{data_path}/lieberman_2009/eigenvectors/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
+                            approx = f"{data_store}/outputs/approx_pc1_pattern/lieberman_2009/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chrX.txt"
+                        else:
+                            pc1 = f"{data_path}/lieberman_2009/eigenvectors/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
+                            approx = f"{data_store}/outputs/approx_pc1_pattern/lieberman_2009/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chr{chrom}.txt"
 
                     output_path = f"{data_store}/outputs/plots/lieberman_2009/{cell_line}/{resolution}/{method}"
                     os.makedirs(f"{output_path}/scatter", exist_ok=True)

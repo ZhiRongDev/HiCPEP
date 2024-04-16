@@ -1,3 +1,7 @@
+"""
+The dataset used for this package can be downloaded from:
+https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE63525
+"""
 import os
 import datetime
 import pandas as pd
@@ -9,6 +13,9 @@ import logging
 logging.basicConfig(format='%(message)s', level=logging.INFO)
 
 def data_prepare(data_store):
+    """
+    Note that GSE63525 doesn't provide the `.hic` files for HeLa, we skip this cell line.
+    """
     logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 data_prepare start")
     data_path = f"{data_store}/data/rao_2014/juicer_outputs"
     output_path=f"{data_store}/outputs/approx_pc1_pattern/rao_2014"

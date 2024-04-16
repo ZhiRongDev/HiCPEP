@@ -57,5 +57,5 @@ The following is the content of the ``code_for_paper`` directory:
 
 * The ``run.sh`` is the entry point to carry out all the experiments, please start the code tracing from this script if you're interested in how the entire programs work. 
 * The ``notebooks`` directory contains some of the examples we explained in our paper, all the details are written in the markdown of these notebooks.
-* The ``experiments`` directory is a Python package used for the experiments, including the experiment process for rao_2014 and lieberman_2009.
+* The ``experiments`` directory is a Python package used for the experiments, including the experiment process for rao_2014 (GSE63525) and lieberman_2009 (GSE18199).
 * The ``reference_gc`` directory contains the chromosome GC content references created by UCSC tools, please read `create_ref_gc.sh <https://github.com/ZhiRongDev/HiCPAP/blob/main/code_for_paper/create_ref_gc.sh>`_ for more information.
