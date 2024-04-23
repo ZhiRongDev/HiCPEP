@@ -7,7 +7,7 @@ import datetime
 import pandas as pd
 import numpy as np
 from hicpap.paptools import create_approx, calc_similarity, plot_comparison
-from experiments.utils import read_pearson, flip_track_gc, pca_on_pearson
+from experiments.utils import read_pearson, flip_tracks, pca_on_pearson
 
 import logging
 logging.basicConfig(format='%(message)s', level=logging.INFO)
@@ -98,16 +98,9 @@ def summary_similarity(data_store):
 
                         del pc1_df, approx_df
 
-                        # Flip according to the GC content.
-                        if cell_line == "ch12-lx":
-                            gc_df = pd.read_table(f"./reference_gc/mm9/mm9_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
-                            gc_np = gc_df["GC"].values.flatten()
-                        else:
-                            gc_df = pd.read_table(f"./reference_gc/hg19/hg19_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
-                            gc_np = gc_df["GC"].values.flatten()
+                        ### Flip tracks according to the similarity between track1 and track2
+                        pc1_np, approx_np  = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
 
-                        pc1_np = flip_track_gc(track_np=pc1_np, gc_np=gc_np)
-                        approx_np = flip_track_gc(track_np=approx_np, gc_np=gc_np)
                         similarity_info = calc_similarity(track1_np=pc1_np, track2_np=approx_np)
 
                         if method == "cxmax":
@@ -158,21 +151,10 @@ def summary_similar_rate_percentage(data_store):
             for cell_line in cell_lines:
                 for chrom in chroms:
 
-                    # Flip according to the GC content.
-                    if cell_line == "ch12-lx":
-                        gc_df = pd.read_table(f"./reference_gc/mm9/mm9_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
-                        gc_np = gc_df["GC"].values.flatten()
-                    else:
-                        gc_df = pd.read_table(f"./reference_gc/hg19/hg19_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
-                        gc_np = gc_df["GC"].values.flatten()
-                    
-                    del gc_df
-
                     pc1 = f"{juicer_outputs_path}/{cell_line}/{resolution}/eigenvector/pc1_chr{chrom}.txt"
                     pc1_df = pd.read_table(pc1, header=None)
                     pc1_np = pc1_df.values # Turn into numpy format
                     pc1_np = pc1_np.flatten() # Turn into 1D vector
-                    pc1_np = flip_track_gc(track_np=pc1_np, gc_np=gc_np)
 
                     del pc1_df
 
@@ -198,7 +180,10 @@ def summary_similar_rate_percentage(data_store):
                         # Place back the valid entries to it's origin position in the chromosome.  
                         approx_np = np.full(len(diag_valid), np.nan)
                         approx_np[diag_valid] = cov_np[i]
-                        approx_np = flip_track_gc(track_np=approx_np, gc_np=gc_np)
+
+                        ### Flip tracks according to the similarity between track1 and track2
+                        pc1_np, approx_np  = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
+
                         similar_info = calc_similarity(track1_np=pc1_np, track2_np=approx_np)
 
                         if similar_info["similar_rate"] >= 0.9:
@@ -267,16 +252,8 @@ def plot_all_comparisons(data_store):
 
                     del pc1_df, approx_df
 
-                    # Flip according to the GC content.
-                    if cell_line == "ch12-lx":
-                        gc_df = pd.read_table(f"./reference_gc/mm9/mm9_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
-                        gc_np = gc_df["GC"].values.flatten()
-                    else:
-                        gc_df = pd.read_table(f"./reference_gc/hg19/hg19_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
-                        gc_np = gc_df["GC"].values.flatten()
-
-                    pc1_np = flip_track_gc(track_np=pc1_np, gc_np=gc_np)
-                    approx_np = flip_track_gc(track_np=approx_np, gc_np=gc_np)
+                    ### Flip tracks according to the similarity between track1 and track2
+                    pc1_np, approx_np  = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
 
                     plot_comparison(pc1_np=pc1_np, approx_np=approx_np, figsize=figsize, scatter=scatter, relative_magnitude=relative_magnitude)
 
@@ -322,16 +299,8 @@ def summary_self_pca(data_store):
                 approx_np = approx_df.values # Turn into numpy format
                 approx_np = approx_np.flatten() # Turn into 1D vector
 
-                # Flip according to the GC content.
-                if cell_line == "ch12-lx":
-                    gc_df = pd.read_table(f"./reference_gc/mm9/mm9_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
-                    gc_np = gc_df["GC"].values.flatten()
-                else:
-                    gc_df = pd.read_table(f"./reference_gc/hg19/hg19_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
-                    gc_np = gc_df["GC"].values.flatten()
-
-                pc1_np = flip_track_gc(track_np=pc1_np, gc_np=gc_np)
-                approx_np = flip_track_gc(track_np=approx_np, gc_np=gc_np)
+                ### Flip tracks according to the similarity between track1 and track2
+                pc1_np, approx_np  = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
 
                 similarity_info = calc_similarity(track1_np=pc1_np, track2_np=approx_np)
                 similar_rate_cxmax = similarity_info["similar_rate"]
@@ -343,16 +312,8 @@ def summary_self_pca(data_store):
                 approx_np = approx_df.values # Turn into numpy format
                 approx_np = approx_np.flatten() # Turn into 1D vector
 
-                # Flip according to the GC content.
-                if cell_line == "ch12-lx":
-                    gc_df = pd.read_table(f"./reference_gc/mm9/mm9_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
-                    gc_np = gc_df["GC"].values.flatten()
-                else:
-                    gc_df = pd.read_table(f"./reference_gc/hg19/hg19_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
-                    gc_np = gc_df["GC"].values.flatten()
-
-                pc1_np = flip_track_gc(track_np=pc1_np, gc_np=gc_np)
-                approx_np = flip_track_gc(track_np=approx_np, gc_np=gc_np)
+                ### Flip tracks according to the similarity between track1 and track2
+                pc1_np, approx_np  = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
 
                 similarity_info = calc_similarity(track1_np=pc1_np, track2_np=approx_np)
                 similar_rate_cxmin = similarity_info["similar_rate"]
@@ -382,7 +343,7 @@ def summary_self_pca(data_store):
     return
 
 def run_all(data_store):
-    data_prepare(data_store) # Create the Approximated PC1-pattern .txt files.
+    # data_prepare(data_store) # Create the Approximated PC1-pattern .txt files.
     summary_similarity(data_store) # Compare the similarity difference with the PC1 and the Approximated PC1-pattern.
     plot_all_comparisons(data_store) # Plot the scatter and relative-magnitude chart.
     summary_self_pca(data_store) # Performing the PCA by self and get the information of the explained variance ratios.

@@ -7,7 +7,7 @@ import datetime
 import numpy as np
 import pandas as pd
 from hicpap.paptools import create_approx, calc_similarity, plot_comparison
-from experiments.utils import read_pearson, flip_track_gc, pca_on_pearson
+from experiments.utils import read_pearson, flip_tracks, pca_on_pearson
 
 import logging
 logging.basicConfig(format='%(message)s', level=logging.INFO)
@@ -124,16 +124,8 @@ def summary_similarity(data_store):
                     
                     del pc1_df, approx_df
 
-                    # Flip according to the GC content.
-                    if chrom == "23":
-                        chrom_name = "X"
-                    else:
-                        chrom_name = chrom
-
-                    gc_df = pd.read_table(f"./reference_gc/hg18/hg18_gc{resolution}_chr{chrom_name}.txt", skiprows=[0], names=["bin", "GC"])
-                    gc_np = gc_df["GC"].values.flatten()
-                    pc1_np = flip_track_gc(track_np=pc1_np, gc_np=gc_np)
-                    approx_np = flip_track_gc(track_np=approx_np, gc_np=gc_np)
+                    ### Flip tracks according to the similarity between track1 and track2
+                    pc1_np, approx_np  = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
 
                     similarity_info = calc_similarity(track1_np=pc1_np, track2_np=approx_np)
 
@@ -213,17 +205,8 @@ def plot_all_comparisons(data_store):
                     relative_magnitude = f"{output_path}/relative_magnitude/relative_magnitude_chr{chrom}.png"
                     scatter=f"{output_path}/scatter/scatter_chr{chrom}.png"
 
-                    # Flip according to the GC content.
-                    if chrom == "23":
-                        chrom_name = "X"
-                    else:
-                        chrom_name = chrom
-
-                    gc_df = pd.read_table(f"./reference_gc/hg18/hg18_gc{resolution}_chr{chrom_name}.txt", skiprows=[0], names=["bin", "GC"])
-                    gc_np = gc_df["GC"].values.flatten()
-
-                    pc1_np = flip_track_gc(track_np=pc1_np, gc_np=gc_np)
-                    approx_np = flip_track_gc(track_np=approx_np, gc_np=gc_np)
+                    ### Flip tracks according to the similarity between track1 and track2
+                    pc1_np, approx_np  = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
 
                     plot_comparison(pc1_np=pc1_np, approx_np=approx_np, figsize=figsize, scatter=scatter, relative_magnitude=relative_magnitude)
 
@@ -267,11 +250,8 @@ def summary_self_pca(data_store):
                 pc1_np = Vh[0].copy()
                 approx_np = create_approx(pearson_np=pearson_np, method="cxmax")
 
-                # Flip according to the GC content.
-                gc_df = pd.read_table(f"./reference_gc/hg18/hg18_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
-                gc_np = gc_df["GC"].values.flatten()
-
-                pc1_np = flip_track_gc(track_np=pc1_np, gc_np=gc_np)
+                ### Flip tracks according to the similarity between track1 and track2
+                pc1_np, approx_np  = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
 
                 similarity_info_cxmax = calc_similarity(track1_np=pc1_np, track2_np=approx_np)
                 similar_rate_cxmax = similarity_info_cxmax["similar_rate"]
@@ -280,11 +260,8 @@ def summary_self_pca(data_store):
                 pc1_np = Vh[0].copy()
                 approx_np = create_approx(pearson_np=pearson_np, method="cxmin")
 
-                # Flip according to the GC content.
-                gc_df = pd.read_table(f"./reference_gc/hg18/hg18_gc{resolution}_chr{chrom}.txt", skiprows=[0], names=["bin", "GC"])
-                gc_np = gc_df["GC"].values.flatten()
-
-                pc1_np = flip_track_gc(track_np=pc1_np, gc_np=gc_np)
+                ### Flip tracks according to the similarity between track1 and track2
+                pc1_np, approx_np  = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
 
                 similarity_info_cxmin = calc_similarity(track1_np=pc1_np, track2_np=approx_np)
                 similar_rate_cxmin = similarity_info_cxmin["similar_rate"]
@@ -314,7 +291,7 @@ def summary_self_pca(data_store):
     return
 
 def run_all(data_store):
-    data_prepare(data_store) # Create the Approximated PC1-pattern .txt files.
+    # data_prepare(data_store) # Create the Approximated PC1-pattern .txt files.
     summary_similarity(data_store) # Compare the similarity difference with the PC1 and the Approximated PC1-pattern.
     plot_all_comparisons(data_store) # Plot the scatter and relative-magnitude chart.
     summary_self_pca(data_store) # Performing the PCA by self and get the information of the explained variances.
