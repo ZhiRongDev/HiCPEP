@@ -2,13 +2,13 @@ Code for paper
 ==============
 
 This page explains how to reproduce the experiment results of our research. 
-We store all the programs in the `code_for_paper <https://github.com/ZhiRongDev/HiCPAP/blob/main/code_for_paper>`_ directory.
+We store all the programs in the `code_for_paper <https://github.com/ZhiRongDev/HiCPEP/blob/main/code_for_paper>`_ directory.
 
 Prerequisites
 -------------
 * Make sure you have enough disk size for at least 120 GB, and the wifi connection is stable. 
 * Make sure you have at least 16 GB memory.
-* Make sure you have installed HiCPAP in your system.
+* Make sure you have installed HiCPEP in your system.
 
 Quick start
 -----------
@@ -19,11 +19,11 @@ Here we assume the data will all be stored in the ``/tmp/data_store`` directory,
 .. code:: bash
 
     mkdir /tmp/data_store
-    git clone git@github.com:ZhiRongDev/HiCPAP.git
-    cd HiCPAP/code_for_paper
+    git clone git@github.com:ZhiRongDev/HiCPEP.git
+    cd HiCPEP/code_for_paper
     bash run.sh -p /tmp/data_store
 
-We explain the directory structure in the `data_store.rst <https://github.com/ZhiRongDev/HiCPAP/blob/main/docs/source/data_store.rst>`_.
+We explain the directory structure in the `data_store.rst <https://github.com/ZhiRongDev/HiCPEP/blob/main/docs/source/data_store.rst>`_.
 
 Guidance
 --------
@@ -58,4 +58,4 @@ The following is the content of the ``code_for_paper`` directory:
 * The ``run.sh`` is the entry point to carry out all the experiments, please start the code tracing from this script if you're interested in how the entire programs work. 
 * The ``notebooks`` directory contains some of the examples we explained in our paper, all the details are written in the markdown of these notebooks.
 * The ``experiments`` directory is a Python package used for the experiments, including the experiment process for rao_2014 (GSE63525) and lieberman_2009 (GSE18199).
-* The ``reference_gc`` directory contains the chromosome GC content references created by UCSC tools, please read `create_ref_gc.sh <https://github.com/ZhiRongDev/HiCPAP/blob/main/code_for_paper/create_ref_gc.sh>`_ for more information.
+* The ``reference_gc`` directory contains the chromosome GC content references created by UCSC tools, please read `create_ref_gc.sh <https://github.com/ZhiRongDev/HiCPEP/blob/main/code_for_paper/create_ref_gc.sh>`_ for more information.

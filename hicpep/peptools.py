@@ -23,9 +23,8 @@ def read_pearson(pearson: str) -> np.ndarray:
     """
 
     pearson_df = pd.read_table(pearson, header=None, sep="\s+")
-    pearson_np = pearson_df.values # Turn into numpy.ndarray
+    pearson_np = pearson_df.values # Turn into numpy.ndarray.
     pearson_np = pearson_np.astype('float64')
-
     return pearson_np
 
 def straw_to_pearson(hic_path: str, chrom: str, resolution: int, normalization: str="KR") -> np.ndarray:
@@ -36,7 +35,7 @@ def straw_to_pearson(hic_path: str, chrom: str, resolution: int, normalization: 
     :param hic_path: Path of the Juicer created ``.hic`` file.
     :type hic_path: ``str``
 
-    :param chrom: chromosome name in string (e.g. ``'1'``, ``'22'``, ``'X'`` or ``'chr1'``, ``'chr22'``, ``'chrX'`` etc. according to the cell line).
+    :param chrom: Chromosome name in string (e.g. ``'1'``, ``'22'``, ``'X'`` or ``'chr1'``, ``'chr22'``, ``'chrX'`` etc. according to the cell line).
     :type chrom: ``str``
 
     :param resolution: Typically ``2500000``, ``1000000``, ``500000``, ``100000``, ``50000``, ``25000``, ``10000``, ``5000``, etc. 
@@ -58,28 +57,27 @@ def straw_to_pearson(hic_path: str, chrom: str, resolution: int, normalization: 
     matrix = hic.getMatrixZoomData(chrom, chrom, "oe", normalization, "BP", resolution)
     matrix_np = matrix.getRecordsAsMatrix(0, chrom_size, 0, chrom_size)
     pearson_np = np.corrcoef(matrix_np)
-
     return pearson_np
 
-def create_approx(pearson_np: np.ndarray, output: str | None = None, method: str="cxmax", sampling_proportion: float | None = None) -> np.ndarray:
+def create_est(pearson_np: np.ndarray, output: str | None = None, method: str="cxmax", sampling_proportion: float | None = None) -> np.ndarray:
     """
-    Create the Approximated PC1-pattern of the given Hi-C Pearson matrix.
-    The calculation is only performed on the valid sub-matrix. (rows and columns with all ``NaN`` will be excluded, however these all ``NaN`` rows/columns will not be removed in the Approximated PC1-pattern returned)
+    Create the Estimated PC1-pattern of the given Hi-C Pearson matrix.
+    The calculation is only performed on the valid sub-matrix. (rows and columns with all ``NaN`` will be excluded, however these all ``NaN`` rows/columns will not be removed in the Estimated PC1-pattern returned)
 
     :param pearson_np: Hi-C Pearson matrix in NumPy format.
     :type pearson_np: ``numpy.ndarray``
     
-    :param output: (Optional) If the file path is specified, the Approximated PC1-pattern will be stored (e.g. ``output="./test/approx_pc1.txt"``).
+    :param output: (Optional) If the file path is specified, the Estimated PC1-pattern will be stored (e.g. ``output="./test/est_pc1.txt"``).
     :type output: ``str``
     
     :param method: ``cxmax`` or ``cxmin``.
     :type method: ``str``
 
     :param sampling_proportion: If this parameter is specified (e.g. 0.1), than the function will randomly sample the given percentage of rows in the Pearson matrix to create a partial covariance matrix, 
-                                and select the ``CxMax`` in this partial covariance matrix as the Approximated PC1-pattern.
+                                and select the ``cxmax`` in this partial covariance matrix as the Estimated PC1-pattern.
     :type sampling_proportion: ``float``
 
-    :return: Approximated PC1-pattern in NumPy format.
+    :return: Estimated PC1-pattern in NumPy format.
     :rtype: ``numpy.ndarray``
     """
 
@@ -111,10 +109,10 @@ def create_approx(pearson_np: np.ndarray, output: str | None = None, method: str
 
         if method == "cxmax":
             sorted_index = 0
-            approx_np = cov_np[sorted_cov_abs_sum[sorted_index][0]]
+            est_np = cov_np[sorted_cov_abs_sum[sorted_index][0]]
         elif method == "cxmin":
             sorted_index = -1
-            approx_np = cov_np[sorted_cov_abs_sum[sorted_index][0]]
+            est_np = cov_np[sorted_cov_abs_sum[sorted_index][0]]
 
     elif isinstance(sampling_proportion, float) and sampling_proportion > 0 and sampling_proportion <= 1:
         n = len(pearson_np)
@@ -125,18 +123,18 @@ def create_approx(pearson_np: np.ndarray, output: str | None = None, method: str
 
         if method == "cxmax":
             sorted_index = 0
-            approx_np = partial_cov_np.T[sorted_partial_cov_abs_sum[sorted_index][0]]
+            est_np = partial_cov_np.T[sorted_partial_cov_abs_sum[sorted_index][0]]
         elif method == "cxmin":
             sorted_index = -1
-            approx_np = partial_cov_np.T[sorted_partial_cov_abs_sum[sorted_index][0]]
+            est_np = partial_cov_np.T[sorted_partial_cov_abs_sum[sorted_index][0]]
 
     # Place back the valid entries to it's origin position in the chromosome.
     tmp = np.full(len(diag_valid), np.nan)
-    tmp[diag_valid] = approx_np
-    approx_np = tmp
+    tmp[diag_valid] = est_np
+    est_np = tmp
 
     if output == None:
-        return approx_np
+        return est_np
 
     if os.path.dirname(output):
         os.makedirs(os.path.dirname(output), exist_ok=True)
@@ -144,26 +142,26 @@ def create_approx(pearson_np: np.ndarray, output: str | None = None, method: str
     with open(output, 'w') as f:
         tmp_str = ''
 
-        for i in approx_np:
+        for i in est_np:
             tmp_str += f"{str(i)}\n"
 
         tmp_str = tmp_str[:-1]
         f.write(tmp_str)
 
-    return approx_np
+    return est_np
 
 def calc_similarity(track1_np: np.ndarray, track2_np: np.ndarray):
     """
     Compare the similarity information between the given track1 and track2, 
     The ``similar_rate`` is defined as the proportion of the entries in track1 (e.g. ``pc1_np``) 
-    that have a same positive/negative sign as the track2 (e.g. Approximated PC1-pattern) entries compared.
+    that have a same positive/negative sign as the track2 (e.g. Estimated PC1-pattern) entries compared.
 
     Note that the ``NaN`` value entries will be excluded in advance.
 
-    :param track1_np: PC1 or Approximated PC1-pattern in ``numpy.ndarray`` format. 
+    :param track1_np: PC1 or Estimated PC1-pattern in ``numpy.ndarray`` format. 
     :type track1_np: ``numpy.ndarray``
 
-    :param track2_np: PC1 or Approximated PC1-pattern in ``numpy.ndarray`` format. 
+    :param track2_np: PC1 or Estimated PC1-pattern in ``numpy.ndarray`` format. 
     :type track2_np: ``numpy.ndarray``
 
     :return:
@@ -210,19 +208,19 @@ def calc_similarity(track1_np: np.ndarray, track2_np: np.ndarray):
     }
 
 ### If there's no `NaN` value, then the legend will have some mistakes. 
-def plot_comparison(pc1_np: np.ndarray, approx_np: np.ndarray, figsize: int=20, scatter: str | None = None, relative_magnitude: str | None = None, xticks: int=50):
+def plot_comparison(pc1_np: np.ndarray, est_np: np.ndarray, figsize: int=20, scatter: str | None = None, relative_magnitude: str | None = None, xticks: int=50):
     """
-    Plot the scatter or relative-magnitude comparison figure between the PC1 and Approximated PC1-pattern. 
+    Plot the scatter or relative-magnitude comparison figure between the PC1 and Estimated PC1-pattern. 
     Please specified at least one of the figure storing path among the scatter plot or the relative_magnitude plot.
 
     Note that for the plot of relative_magnitude, all the ``NaN`` value entries will be replaced with ``0`` in advance, 
-    and both the PC1 and Approximated PC1-pattern will be Z-score normalized.
+    and both the PC1 and Estimated PC1-pattern will be Z-score normalized.
 
     :param pc1_np: PC1 in ``numpy.ndarray`` format. 
     :type pc1_np: ``numpy.ndarray``
 
-    :param approx_np: Approximated PC1-pattern in ``numpy.ndarray`` format. 
-    :type approx_np: ``numpy.ndarray``
+    :param est_np: Estimated PC1-pattern in ``numpy.ndarray`` format. 
+    :type est_np: ``numpy.ndarray``
 
     :param figsize: Scaling the figure size. 
     :type figsize: ``int``
@@ -235,7 +233,7 @@ def plot_comparison(pc1_np: np.ndarray, approx_np: np.ndarray, figsize: int=20, 
     """
 
     pc1_np = deepcopy(pc1_np)
-    approx_np = deepcopy(approx_np)
+    est_np = deepcopy(est_np)
 
     if os.path.dirname(scatter):
         os.makedirs(os.path.dirname(scatter), exist_ok=True)
@@ -243,7 +241,7 @@ def plot_comparison(pc1_np: np.ndarray, approx_np: np.ndarray, figsize: int=20, 
     if os.path.dirname(relative_magnitude):
         os.makedirs(os.path.dirname(relative_magnitude), exist_ok=True)
 
-    similarity_info = calc_similarity(track1_np=pc1_np, track2_np=approx_np)
+    similarity_info = calc_similarity(track1_np=pc1_np, track2_np=est_np)
     total_entry_num = similarity_info["total_entry_num"]
     valid_entry_num = similarity_info["valid_entry_num"]
     similar_num = similarity_info["similar_num"]
@@ -251,17 +249,17 @@ def plot_comparison(pc1_np: np.ndarray, approx_np: np.ndarray, figsize: int=20, 
 
     if scatter != None:
         plot_x_axis = [i + 1 for i in range(total_entry_num)]
-        approx_dots = [1 if i > 0 else -1 if i < 0 else 0 for i in approx_np]
+        est_dots = [1 if i > 0 else -1 if i < 0 else 0 for i in est_np]
         pc1_colors_values = ['b' if i > 0 else 'r' if i < 0 else 'g' for i in pc1_np]
 
         # https://matplotlib.org/stable/users/explain/axes/legend_guide.html
-        red_patch = mpatches.Patch(color='r', label='PC1 < 0 ')
-        green_patch = mpatches.Patch(color='g', label='PC1 == 0 ')
+        red_patch = mpatches.Patch(color='r', label='PC1 < 0')
+        green_patch = mpatches.Patch(color='g', label='PC1 == NaN')
         blue_patch = mpatches.Patch(color='b', label='PC1 > 0')
 
         plt.figure(figsize=(figsize, 6))
         plt.xticks(np.arange(0, total_entry_num, xticks)) 
-        plt.scatter(plot_x_axis, approx_dots, c=pc1_colors_values)
+        plt.scatter(plot_x_axis, est_dots, c=pc1_colors_values)
         plt.legend(handles=[red_patch, green_patch, blue_patch], fontsize="20", loc="center left")
         plt.title(f"total_entry_num: {total_entry_num}, valid_entry_num: {valid_entry_num}, similar_num = {similar_num}, similar_rate={np.round(similar_rate, 2)}", fontsize=20, loc="left")
         plt.savefig(scatter)
@@ -270,17 +268,17 @@ def plot_comparison(pc1_np: np.ndarray, approx_np: np.ndarray, figsize: int=20, 
     if relative_magnitude != None:
         # Fill NaN with 0 for plotting
         pc1_np[np.isnan(pc1_np)] = float(0) 
-        approx_np[np.isnan(approx_np)] = float(0)
+        est_np[np.isnan(est_np)] = float(0)
 
         # Z-score Normalization
-        approx_np_norm = (approx_np - np.mean(approx_np)) / np.std(approx_np)
+        est_np_norm = (est_np - np.mean(est_np)) / np.std(est_np)
         pc1_np_norm = (pc1_np - np.mean(pc1_np)) / np.std(pc1_np)
         
         plt.figure(figsize=(figsize, 6))
         plt.xticks(np.arange(0, total_entry_num, xticks)) 
         plt.plot(pc1_np_norm, c='r')
-        plt.plot(approx_np_norm, c='b')
-        plt.legend(["PC1", "approximated PC1-pattern"], fontsize="20", loc ="upper left")
+        plt.plot(est_np_norm, c='b')
+        plt.legend(["PC1", "Estimated PC1-pattern"], fontsize="20", loc ="upper left")
         plt.title(f"total_entry_num: {total_entry_num}, valid_entry_num: {valid_entry_num}", fontsize=20, loc="left")
         plt.savefig(relative_magnitude)        
         plt.clf()

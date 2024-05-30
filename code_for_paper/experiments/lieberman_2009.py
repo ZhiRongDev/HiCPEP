@@ -6,9 +6,8 @@ import os
 import datetime
 import numpy as np
 import pandas as pd
-from hicpap.paptools import create_approx, calc_similarity, plot_comparison
+from hicpep.peptools import create_est, calc_similarity, plot_comparison
 from experiments.utils import read_pearson, flip_tracks, pca_on_pearson
-
 import logging
 logging.basicConfig(format='%(message)s', level=logging.INFO)
 
@@ -16,7 +15,7 @@ def data_prepare(data_store):
     logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 data_prepare start")
 
     data_path = f"{data_store}/data/lieberman_2009"
-    output_path=f"{data_store}/outputs/approx_pc1_pattern/lieberman_2009"
+    output_path=f"{data_store}/outputs/est_pc1_pattern/lieberman_2009"
     resolutions = [1000000, 100000]
     cell_lines = ["gm06690", "k562"]
     methods = ["cxmax", "cxmin"]
@@ -35,9 +34,9 @@ def data_prepare(data_store):
                 
                 for chrom in chroms:
                     pearson=f"{data_path}/heatmaps/HIC_{cell_line}_chr{chrom}_chr{chrom}_{resolution}_pearson.txt"
-                    output=f"{output_path}/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chr{chrom}.txt"
+                    output=f"{output_path}/{cell_line}/{resolution}/{method}/est_PC1_pattern_chr{chrom}.txt"
                     pearson_np = read_pearson(pearson=pearson, format="aiden_2009")
-                    create_approx(pearson_np=pearson_np, output=output, method=method)
+                    create_est(pearson_np=pearson_np, output=output, method=method)
 
     logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 data_prepare end")
     return
@@ -65,7 +64,7 @@ def summary_similarity(data_store):
         "similar_rate": []
     })
     pc1_path = f"{data_store}/data/lieberman_2009/eigenvectors"
-    approx_path = f"{data_store}/outputs/approx_pc1_pattern/lieberman_2009"
+    est_path = f"{data_store}/outputs/est_pc1_pattern/lieberman_2009"
 
     cell_lines = ["gm06690", "k562"]
     methods = ["cxmax", "cxmin"]
@@ -98,17 +97,17 @@ def summary_similarity(data_store):
                     if cell_line == "gm06690":
                         if chrom == "23":
                             pc1 = f"{pc1_path}/GM-combined.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
-                            approx = f"{approx_path}/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chrX.txt"
+                            est = f"{est_path}/{cell_line}/{resolution}/{method}/est_PC1_pattern_chrX.txt"
                         else:
                             pc1 = f"{pc1_path}/GM-combined.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
-                            approx = f"{approx_path}/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chr{chrom}.txt"
+                            est = f"{est_path}/{cell_line}/{resolution}/{method}/est_PC1_pattern_chr{chrom}.txt"
                     elif cell_line == "k562":
                         if chrom == "23":
                             pc1 = f"{pc1_path}/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
-                            approx = f"{approx_path}/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chrX.txt"
+                            est = f"{est_path}/{cell_line}/{resolution}/{method}/est_PC1_pattern_chrX.txt"
                         else:
                             pc1 = f"{pc1_path}/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
-                            approx = f"{approx_path}/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chr{chrom}.txt"
+                            est = f"{est_path}/{cell_line}/{resolution}/{method}/est_PC1_pattern_chr{chrom}.txt"
                     
                     pc1_df = pd.read_table(pc1, header=None, sep="\s+")
                     pc1_df = pc1_df.iloc[:, [2]]
@@ -118,16 +117,16 @@ def summary_similarity(data_store):
                     tmp[pc1_np != 0] = pc1_np[pc1_np != 0]
                     pc1_np = tmp
 
-                    approx_df = pd.read_table(approx, header=None)
-                    approx_np = approx_df.values # Turn into numpy format
-                    approx_np = approx_np.flatten() # Turn into 1D vector
+                    est_df = pd.read_table(est, header=None)
+                    est_np = est_df.values # Turn into numpy format
+                    est_np = est_np.flatten() # Turn into 1D vector
                     
-                    del pc1_df, approx_df
+                    del pc1_df, est_df
 
                     ### Flip tracks according to the similarity between track1 and track2
-                    pc1_np, approx_np  = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
+                    pc1_np, est_np  = flip_tracks(track1_np=pc1_np, track2_np=est_np)
 
-                    similarity_info = calc_similarity(track1_np=pc1_np, track2_np=approx_np)
+                    similarity_info = calc_similarity(track1_np=pc1_np, track2_np=est_np)
 
                     if method == "cxmax":
                         cxmax_df.loc[len(cxmax_df)] = [cell_line, resolution, f"chr{chrom}", method, similarity_info["total_entry_num"], similarity_info["valid_entry_num"], similarity_info["similar_num"], similarity_info["similar_rate"]] 
@@ -174,17 +173,17 @@ def plot_all_comparisons(data_store):
                     if cell_line == "gm06690":
                         if chrom == "23":
                             pc1 = f"{data_path}/lieberman_2009/eigenvectors/GM-combined.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
-                            approx = f"{data_store}/outputs/approx_pc1_pattern/lieberman_2009/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chrX.txt"
+                            est = f"{data_store}/outputs/est_pc1_pattern/lieberman_2009/{cell_line}/{resolution}/{method}/est_PC1_pattern_chrX.txt"
                         else:
                             pc1 = f"{data_path}/lieberman_2009/eigenvectors/GM-combined.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
-                            approx = f"{data_store}/outputs/approx_pc1_pattern/lieberman_2009/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chr{chrom}.txt"
+                            est = f"{data_store}/outputs/est_pc1_pattern/lieberman_2009/{cell_line}/{resolution}/{method}/est_PC1_pattern_chr{chrom}.txt"
                     elif cell_line == "k562":
                         if chrom == "23":
                             pc1 = f"{data_path}/lieberman_2009/eigenvectors/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
-                            approx = f"{data_store}/outputs/approx_pc1_pattern/lieberman_2009/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chrX.txt"
+                            est = f"{data_store}/outputs/est_pc1_pattern/lieberman_2009/{cell_line}/{resolution}/{method}/est_PC1_pattern_chrX.txt"
                         else:
                             pc1 = f"{data_path}/lieberman_2009/eigenvectors/K562-HindIII.ctg{chrom}.ctg{chrom}.{resolution}bp.hm.eigenvector.tab"
-                            approx = f"{data_store}/outputs/approx_pc1_pattern/lieberman_2009/{cell_line}/{resolution}/{method}/approx_PC1_pattern_chr{chrom}.txt"
+                            est = f"{data_store}/outputs/est_pc1_pattern/lieberman_2009/{cell_line}/{resolution}/{method}/est_PC1_pattern_chr{chrom}.txt"
 
                     output_path = f"{data_store}/outputs/plots/lieberman_2009/{cell_line}/{resolution}/{method}"
                     os.makedirs(f"{output_path}/scatter", exist_ok=True)
@@ -198,23 +197,23 @@ def plot_all_comparisons(data_store):
                     tmp[pc1_np != 0] = pc1_np[pc1_np != 0]
                     pc1_np = tmp
 
-                    approx_df = pd.read_table(approx, header=None)
-                    approx_np = approx_df.values # Turn into numpy format
-                    approx_np = approx_np.flatten() # Turn into 1D vector
-                    del pc1_df, approx_df
+                    est_df = pd.read_table(est, header=None)
+                    est_np = est_df.values # Turn into numpy format
+                    est_np = est_np.flatten() # Turn into 1D vector
+                    del pc1_df, est_df
                     relative_magnitude = f"{output_path}/relative_magnitude/relative_magnitude_chr{chrom}.png"
                     scatter=f"{output_path}/scatter/scatter_chr{chrom}.png"
 
                     ### Flip tracks according to the similarity between track1 and track2
-                    pc1_np, approx_np  = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
+                    pc1_np, est_np  = flip_tracks(track1_np=pc1_np, track2_np=est_np)
 
-                    plot_comparison(pc1_np=pc1_np, approx_np=approx_np, figsize=figsize, scatter=scatter, relative_magnitude=relative_magnitude)
+                    plot_comparison(pc1_np=pc1_np, est_np=est_np, figsize=figsize, scatter=scatter, relative_magnitude=relative_magnitude)
 
     logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 plot_comparison end")
     return
 
-def summary_self_pca(data_store):
-    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_self_pca start")
+def summary_pca(data_store):
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_pca start")
     output_df = pd.DataFrame(columns = {
         "cell_line": [],
         "resolution": [],
@@ -240,7 +239,7 @@ def summary_self_pca(data_store):
             chroms = [str(i) for i in range(1, 23)]
             chroms.extend(["X"])
 
-            logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_self_pca_2009 {resolution} {cell_line}")
+            logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_pca {resolution} {cell_line}")
             for chrom in chroms:
                 pearson = f"{data_store}/data/lieberman_2009/heatmaps/HIC_{cell_line}_chr{chrom}_chr{chrom}_{resolution}_pearson.txt"
                 pearson_np = read_pearson(pearson=pearson, format="aiden_2009")
@@ -248,22 +247,22 @@ def summary_self_pca(data_store):
 
                 ## Compute similar_rate for cxmax
                 pc1_np = Vh[0].copy()
-                approx_np = create_approx(pearson_np=pearson_np, method="cxmax")
+                est_np = create_est(pearson_np=pearson_np, method="cxmax")
 
                 ### Flip tracks according to the similarity between track1 and track2
-                pc1_np, approx_np  = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
+                pc1_np, est_np  = flip_tracks(track1_np=pc1_np, track2_np=est_np)
 
-                similarity_info_cxmax = calc_similarity(track1_np=pc1_np, track2_np=approx_np)
+                similarity_info_cxmax = calc_similarity(track1_np=pc1_np, track2_np=est_np)
                 similar_rate_cxmax = similarity_info_cxmax["similar_rate"]
 
                 ## Compute similar_rate for cxmin
                 pc1_np = Vh[0].copy()
-                approx_np = create_approx(pearson_np=pearson_np, method="cxmin")
+                est_np = create_est(pearson_np=pearson_np, method="cxmin")
 
                 ### Flip tracks according to the similarity between track1 and track2
-                pc1_np, approx_np  = flip_tracks(track1_np=pc1_np, track2_np=approx_np)
+                pc1_np, est_np  = flip_tracks(track1_np=pc1_np, track2_np=est_np)
 
-                similarity_info_cxmin = calc_similarity(track1_np=pc1_np, track2_np=approx_np)
+                similarity_info_cxmin = calc_similarity(track1_np=pc1_np, track2_np=est_np)
                 similar_rate_cxmin = similarity_info_cxmin["similar_rate"]
                 
                 output_df.loc[len(output_df)] = [
@@ -279,20 +278,20 @@ def summary_self_pca(data_store):
                     similar_rate_cxmin
                 ] 
 
-    filename = f"{data_store}/outputs/summary/summary_self_pca_2009.xlsx"
+    filename = f"{data_store}/outputs/summary/summary_pca_2009.xlsx"
 
     if os.path.dirname(filename):
         os.makedirs(os.path.dirname(filename), exist_ok=True)
 
     with pd.ExcelWriter(filename, mode="w") as writer:
-        output_df.to_excel(writer, sheet_name="summary_self_pca_2009")
+        output_df.to_excel(writer, sheet_name="summary_pca_2009")
 
-    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_self_pca end")
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 summary_pca end")
     return
 
 def run_all(data_store):
-    # data_prepare(data_store) # Create the Approximated PC1-pattern .txt files.
-    summary_similarity(data_store) # Compare the similarity difference with the PC1 and the Approximated PC1-pattern.
+    # data_prepare(data_store) # Create the Estimated PC1-pattern .txt files.
+    # summary_similarity(data_store) # Compare the similarity difference with the PC1 and the Estimated PC1-pattern.
     plot_all_comparisons(data_store) # Plot the scatter and relative-magnitude chart.
-    summary_self_pca(data_store) # Performing the PCA by self and get the information of the explained variances.
+    # summary_pca(data_store) # Performing the PCA by self and get the information of the explained variances.
     return

@@ -6,7 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'HiCPAP'
+project = 'HiCPEP'
 copyright = '2024, Zhi-Rong Cheng'
 author = 'Zhi-Rong Cheng'
 

@@ -1,5 +1,5 @@
 Python API reference
 ====================
 
-.. automodule:: hicpap.paptools
+.. automodule:: hicpep.peptools
     :members:

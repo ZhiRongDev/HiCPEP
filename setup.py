@@ -1,13 +1,13 @@
 from setuptools import setup
 
 setup(
-    name='hicpap',
+    name='hicpep',
     version='0.0.1',
-    description="Hi-C Pearson matrix's Approximated-Pc1-pattern is a toolkit \
-                used for Hi-C AB compartment analysis, which is much more faster than PCA.",
+    description="Hi-C Pearson matrix's Estimated-Pc1-pattern is a toolkit \
+                used for Hi-C AB compartment analysis.",
     author='Zhi-Rong Cheng',
     license='MIT',
-    packages = ['hicpap'],
+    packages = ['hicpep'],
     install_requires=[
         'hic-straw>=1.3.1',
         'matplotlib>=3.8.1',

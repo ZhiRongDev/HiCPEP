@@ -1,10 +1,10 @@
 .. 
-    HiCPAP documentation master file, created by
+    HiCPEP documentation master file, created by
     sphinx-quickstart on Tue Mar 26 23:09:02 2024.
     You can adapt this file completely to your liking, but it should at least
     contain the root `toctree` directive.
 
-Welcome to the HiCPAP's documentation!
+Welcome to the HiCPEP's documentation!
 ======================================
 
 .. toctree::
@@ -33,5 +33,5 @@ All the HTML pages will be placed in the ``build`` directory.
 
 .. code:: bash
 
-    cd HiCPAP/docs
+    cd HiCPEP/docs
     make html
