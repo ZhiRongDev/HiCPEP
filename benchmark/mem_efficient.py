@@ -5,7 +5,6 @@ import pandas as pd
 import math
 from random import sample
 from hicpep import peptools
-from sklearn.decomposition import PCA
 from scipy import sparse
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -14,14 +13,14 @@ def flip_tracks(track1_np: np.ndarray, track2_np: np.ndarray):
         track2_np = -track2_np
     return track1_np, track2_np
 
+### `store_oe_sparse` is not included in memusage benchmark.
 def store_oe_sparse(oe_path):
     oe_df = pd.read_table(oe_path, index_col=0, header=1, sep="\s+")
     oe_np = oe_df.values
     del oe_df
     oe_np = oe_np.astype('float64')
-    diag = np.diag(oe_np)
-    diag_valid = diag != 0 
-    ixgrid = np.ix_(diag_valid, diag_valid) # Record the position of the valid sub-matrix.
+    valid = oe_np.any(axis=1)
+    ixgrid = np.ix_(valid, valid) # Record the position of the valid sub-matrix.
     oe_np = oe_np[ixgrid]
     x = sparse.csr_matrix(oe_np)
     sparse.save_npz('/tmp/oe_sparse.npz', x)
@@ -32,20 +31,9 @@ def load_oe_sparse():
     print(x)
     return
 
-def sum_zero_percent(oe_path):
-    oe_df = pd.read_table(oe_path, index_col=0, header=1, sep="\s+")
-    oe_np = oe_df.values 
-    size = len(oe_np) * len(oe_np)
-    zero = size - np.count_nonzero(oe_np)
-    print(zero)
-    print(size)
-    print(zero / size)
-    return
-
-@profile
 def mem_efficient_sampling(proportion=0.1):
-    start = time.time()
     x = sparse.load_npz('/tmp/oe_sparse.npz')
+    start = time.time()
     index_s = 0
     std = []
     c = []
@@ -95,23 +83,24 @@ def mem_efficient_sampling(proportion=0.1):
     end = time.time()
     print(f"Time spent for creating the Estimated PC1-pattern by sampling and new algo (seconds): {end - start}")
     print(f"mem_efficient cov: {est_np[:5]}")
+
     return est_np
 
 if __name__ == '__main__':
-    oe_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/lieberman_2009/heatmaps/HIC_gm06690_chr2_chr2_1000000_obsexp.txt"
-    store_oe_sparse(oe_path)
+    # oe_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/lieberman_2009/heatmaps/HIC_gm06690_chr2_chr2_100000_obsexp.txt"
+    # store_oe_sparse(oe_path)
     est_np = mem_efficient_sampling(proportion=0.1)
 
-    pc1_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/lieberman_2009/eigenvectors/GM-combined.ctg2.ctg2.1000000bp.hm.eigenvector.tab" # Ground Truth.
-    pc1_df = pd.read_table(pc1_path, header=None, sep="\s+")
-    pc1_df = pc1_df.iloc[:, [2]]
-    pc1_np = pc1_df.values # Turn into numpy format
-    pc1_np = pc1_np.flatten() # Turn into 1D vector
+    # pc1_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/lieberman_2009/eigenvectors/GM-combined.ctg2.ctg2.1000000bp.hm.eigenvector.tab"
+    # pc1_df = pd.read_table(pc1_path, header=None, sep="\s+")
+    # pc1_df = pc1_df.iloc[:, [2]]
+    # pc1_np = pc1_df.values # Turn into numpy format
+    # pc1_np = pc1_np.flatten() # Turn into 1D vector
+    # pc1_np = pc1_np[pc1_np != 0]
 
-    pc1_np = pc1_np[pc1_np != 0]
-    print(len(est_np))
-    print(len(pc1_np))
+    # print(len(est_np))
+    # print(len(pc1_np))
 
-    pc1_np, est_np  = flip_tracks(track1_np=pc1_np, track2_np=est_np)
-    similarity_info = peptools.calc_similarity(track1_np=pc1_np, track2_np=est_np)
-    print(similarity_info)
+    # pc1_np, est_np  = flip_tracks(track1_np=pc1_np, track2_np=est_np)
+    # similarity_info = peptools.calc_similarity(track1_np=pc1_np, track2_np=est_np)
+    # print(similarity_info)

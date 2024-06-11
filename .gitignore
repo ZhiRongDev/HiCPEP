@@ -3,6 +3,8 @@ archive/
 code_for_paper/notebooks/data/gm12878_pc1_25000_chr2.txt
 code_for_paper/notebooks/data/gm12878_pearson_25000_chr2.txt
 examples/data/ucsc/
+benchmark/EigenVector
+benchmark/juicer/output
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -164,3 +166,5 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+code_for_paper/notebooks/data/gm12878_pc1_25000_chr5.txt
+code_for_paper/notebooks/data/gm12878_pearson_25000_chr5.txt

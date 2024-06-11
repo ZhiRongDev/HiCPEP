@@ -1,8 +1,6 @@
 import time
 import numpy as np
 import pandas as pd
-from random import sample
-from sklearn.decomposition import PCA
 from hicpep import peptools
 
 def flip_tracks(track1_np: np.ndarray, track2_np: np.ndarray):
@@ -28,7 +26,6 @@ def read_file(pearson_path):
 
     return pearson_np, diag_valid
 
-@profile
 def hicpep_est_all(pearson_path):
     pearson_np, diag_valid = read_file(pearson_path) 
     start = time.time()
@@ -41,22 +38,23 @@ def hicpep_est_all(pearson_path):
     est_np[diag_valid] = cov_np[sorted_cov_abs_sum[0][0]]
     end = time.time()
     print(f"Time spent for creating the Estimated PC1-pattern by finding the CxMax in the full-covariance matrix (seconds): {end - start}")
+
     return est_np
 
 if __name__ == "__main__":
-    pearson_path = "/home/jordan990301/Projects/HiCPEP/code_for_paper/notebooks/data/gm12878_pearson_25000_chr2.txt"
-    juicer_pc1_path = "/home/jordan990301/Projects/HiCPEP/code_for_paper/notebooks/data/gm12878_pc1_25000_chr2.txt" # Ground Truth.
+    # pearson_path = "/home/jordan990301/Projects/HiCPEP/code_for_paper/notebooks/data/gm12878_pearson_25000_chr2.txt"
+    # juicer_pc1_path = "/home/jordan990301/Projects/HiCPEP/code_for_paper/notebooks/data/gm12878_pc1_25000_chr2.txt" # Ground Truth.
+
+    pearson_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/rao_2014/juicer_outputs/gm12878/100000/pearsons/pearson_chr2.txt"
+    juicer_pc1_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/rao_2014/juicer_outputs/gm12878/100000/eigenvector/pc1_chr2.txt"
 
     # pearson_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/rao_2014/juicer_outputs/gm12878/1000000/pearsons/pearson_chr2.txt"
     # juicer_pc1_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/rao_2014/juicer_outputs/gm12878/1000000/eigenvector/pc1_chr2.txt"
 
-    # pearson_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/rao_2014/juicer_outputs/gm12878/100000/pearsons/pearson_chr2.txt"
-    # juicer_pc1_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/rao_2014/juicer_outputs/gm12878/100000/eigenvector/pc1_chr2.txt"
+    est_np_1 = hicpep_est_all(pearson_path)
 
     juicer_pc1_df = pd.read_table(juicer_pc1_path, header=None)
     juicer_pc1_np = juicer_pc1_df.values.flatten()
-
-    est_np_1 = hicpep_est_all(pearson_path)
     juicer_pc1_np, est_np_1  = flip_tracks(track1_np=juicer_pc1_np, track2_np=est_np_1)
     similarity_info = peptools.calc_similarity(track1_np=juicer_pc1_np, track2_np=est_np_1)
 

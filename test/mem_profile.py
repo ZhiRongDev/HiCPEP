@@ -1,7 +1,8 @@
 import sys
 import numpy as np
 import pandas as pd
-import hicstraw
+import math
+from random import sample
 from hicpep import peptools
 from sklearn.decomposition import PCA
 from scipy import sparse
@@ -35,8 +36,9 @@ def sum_zero_percent(oe_path):
     print(zero / size)
     return
 
-# @profile
+@profile
 def test(oe_path):
+    index_s = 10
     oe_df = pd.read_table(oe_path, index_col=0, header=1, sep="\s+")
     oe_np = oe_df.values
     del oe_df
@@ -47,14 +49,16 @@ def test(oe_path):
     oe_np = oe_np[ixgrid]
     corr = np.corrcoef(oe_np)
     cov = np.cov(corr, bias=True)
-    print(f"test corr: {corr[0][:5]}")
-    print(f"test cov: {cov[0][:5]}")
+    corr[index_s] -= corr[index_s].mean()
+
+    print(f"test corr: {corr[index_s][:5]}")
+    print(f"test cov: {cov[index_s][:5]}")
     return
 
-# @profile
+@profile
 def mem_efficient_random1():
+    index_s = 10
     x = sparse.load_npz('/tmp/oe_sparse.npz')
-    index_s = 0
     std = []
     c = []
     n = x.get_shape()[0]
@@ -130,8 +134,10 @@ def mem_efficient_find_best():
 
     max = 0
     est_np = np.array([]) 
+    proportion = 0.1
+    sample_indexes = sample(list(range(n)), math.floor(n * proportion))
 
-    for k in range(n):
+    for k in sample_indexes:
         index_s = k # The target column (or row) in the Pearson's covariance matrix.
         x_s = x[index_s].toarray()[0]
         x_s -= x_s.mean()
@@ -164,11 +170,10 @@ if __name__ == '__main__':
     # load_oe_sparse()
     # sum_zero_percent(oe_path)
 
+    store_oe_sparse(oe_path)
     ####
     # test(oe_path)
     # mem_efficient_random1()
     ####
-
-    store_oe_sparse(oe_path)
     normal(oe_path)
     mem_efficient_find_best()

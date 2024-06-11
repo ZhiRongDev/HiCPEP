@@ -1,12 +1,10 @@
 #!/bin/bash
 
-echo "benchmark_scikit"
-python -m memory_profiler benchmark_scikit.py
-echo "benchmark_est_all"
-python -m memory_profiler benchmark_est_all.py
-echo "benchmark_est_sample"
-python -m memory_profiler benchmark_est_sample.py
+LOG="20240609.log"
 
-###
-# echo "mem_efficient"
-# python -m memory_profiler ./new_algo/mem_efficient.py
+start_time=$(date +%s.%N)
+echo "$(date '+%Y-%m-%d %H:%M:%S') 1Mb Chr2 start" 2>&1 | tee -a "${LOG}"
+memusage python benchmark_scikit.py
+end_time=$(date +%s.%N)
+elapsed_time=$(awk -v start="$start_time" -v end="$end_time" 'BEGIN{print (end - start)}')
+echo "Elapsed time in seconds: $elapsed_time" 2>&1 | tee -a "${LOG}"
