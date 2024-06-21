@@ -9,13 +9,22 @@ Here we summarize the main usage of HiCPEP:
 .. code::
 
     from hicpep import peptools
+    import hicstraw
 
-    pearson_np = peptools.straw_to_pearson(
-        hic_path="https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic", # Path to the Juicer's `.hic` file.
-        chrom="1", 
-        resolution=1000000,
-        normalization="KR",
-    )
+    hic_path="https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic", # Path to the Juicer's `.hic` file.
+    chrom = "1"
+    resolution = 1000000
+    normalization = "KR"
+
+    hic = hicstraw.HiCFile(hic_path)
+
+    for chromosome in hic.getChromosomes():
+        if chromosome.name == chrom:
+            chrom_size = int(chromosome.length)
+
+    matrix = hic.getMatrixZoomData(chrom, chrom, "oe", normalization, "BP", resolution)
+    matrix_np = matrix.getRecordsAsMatrix(0, chrom_size, 0, chrom_size)
+    pearson_np = np.corrcoef(matrix_np)
 
     est_np = peptools.create_est(pearson_np=pearson_np)
     print(f"est_np: {est_np}")

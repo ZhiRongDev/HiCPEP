@@ -13,7 +13,7 @@ def flip_tracks(track1_np: np.ndarray, track2_np: np.ndarray):
         track2_np = -track2_np
     return track1_np, track2_np
 
-### `store_oe_sparse` is not included in memusage benchmark.
+### `store_oe_sparse` is not included in benchmark.
 def store_oe_sparse(oe_path):
     oe_df = pd.read_table(oe_path, index_col=0, header=1, sep="\s+")
     oe_np = oe_df.values
@@ -87,20 +87,20 @@ def mem_efficient_sampling(proportion=0.1):
     return est_np
 
 if __name__ == '__main__':
-    # oe_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/lieberman_2009/heatmaps/HIC_gm06690_chr2_chr2_100000_obsexp.txt"
-    # store_oe_sparse(oe_path)
+    oe_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/lieberman_2009/heatmaps/HIC_gm06690_chr2_chr2_100000_obsexp.txt"
+    # store_oe_sparse(oe_path) # Not include in benchmarking 
     est_np = mem_efficient_sampling(proportion=0.1)
 
-    # pc1_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/lieberman_2009/eigenvectors/GM-combined.ctg2.ctg2.1000000bp.hm.eigenvector.tab"
-    # pc1_df = pd.read_table(pc1_path, header=None, sep="\s+")
-    # pc1_df = pc1_df.iloc[:, [2]]
-    # pc1_np = pc1_df.values # Turn into numpy format
-    # pc1_np = pc1_np.flatten() # Turn into 1D vector
-    # pc1_np = pc1_np[pc1_np != 0]
+    pc1_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/lieberman_2009/eigenvectors/GM-combined.ctg2.ctg2.1000000bp.hm.eigenvector.tab"
+    pc1_df = pd.read_table(pc1_path, header=None, sep="\s+")
+    pc1_df = pc1_df.iloc[:, [2]]
+    pc1_np = pc1_df.values # Turn into numpy format
+    pc1_np = pc1_np.flatten() # Turn into 1D vector
+    pc1_np = pc1_np[pc1_np != 0]
 
-    # print(len(est_np))
-    # print(len(pc1_np))
+    print(len(est_np))
+    print(len(pc1_np))
 
-    # pc1_np, est_np  = flip_tracks(track1_np=pc1_np, track2_np=est_np)
-    # similarity_info = peptools.calc_similarity(track1_np=pc1_np, track2_np=est_np)
-    # print(similarity_info)
+    pc1_np, est_np  = flip_tracks(track1_np=pc1_np, track2_np=est_np)
+    similarity_info = peptools.calc_similarity(track1_np=pc1_np, track2_np=est_np)
+    print(similarity_info)

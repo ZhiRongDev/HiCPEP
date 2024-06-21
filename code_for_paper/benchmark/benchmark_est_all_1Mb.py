@@ -28,6 +28,7 @@ def read_file(pearson_path):
 
 def hicpep_est_all(pearson_path):
     pearson_np, diag_valid = read_file(pearson_path) 
+    pearson_np -= pearson_np.mean(axis=1, keepdims=True)
     start = time.time()
     pearson_np -= pearson_np.mean(axis=1, keepdims=True)
     n = len(pearson_np[0])
@@ -42,14 +43,8 @@ def hicpep_est_all(pearson_path):
     return est_np
 
 if __name__ == "__main__":
-    # pearson_path = "/home/jordan990301/Projects/HiCPEP/code_for_paper/notebooks/data/gm12878_pearson_25000_chr2.txt"
-    # juicer_pc1_path = "/home/jordan990301/Projects/HiCPEP/code_for_paper/notebooks/data/gm12878_pc1_25000_chr2.txt" # Ground Truth.
-
-    pearson_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/rao_2014/juicer_outputs/gm12878/100000/pearsons/pearson_chr2.txt"
-    juicer_pc1_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/rao_2014/juicer_outputs/gm12878/100000/eigenvector/pc1_chr2.txt"
-
-    # pearson_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/rao_2014/juicer_outputs/gm12878/1000000/pearsons/pearson_chr2.txt"
-    # juicer_pc1_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/rao_2014/juicer_outputs/gm12878/1000000/eigenvector/pc1_chr2.txt"
+    pearson_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/rao_2014/juicer_outputs/gm12878/1000000/pearsons/pearson_chr2.txt"
+    juicer_pc1_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/rao_2014/juicer_outputs/gm12878/1000000/eigenvector/pc1_chr2.txt"
 
     est_np_1 = hicpep_est_all(pearson_path)
 

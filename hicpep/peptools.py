@@ -27,49 +27,19 @@ def read_pearson(pearson: str) -> np.ndarray:
     pearson_np = pearson_np.astype('float64')
     return pearson_np
 
-def straw_to_pearson(hic_path: str, chrom: str, resolution: int, normalization: str="KR") -> np.ndarray:
+def create_est(pearson_np: np.ndarray, output: str | None = None, method: str="cxmax", sampling_proportion: float=1.0) -> np.ndarray:
     """
-    Read a ``.hic`` file created by `Juicer <https://github.com/aidenlab/juicer>`_ and return the Pearson matrix in NumPy format. 
-    This function is just a use case adjusted from the `Straw API reference <https://pypi.org/project/hic-straw/>`_, which we use it for creating the intra-chromosomal Hi-C Pearson matrix from the O/E matrix.
-
-    :param hic_path: Path of the Juicer created ``.hic`` file.
-    :type hic_path: ``str``
-
-    :param chrom: Chromosome name in string (e.g. ``'1'``, ``'22'``, ``'X'`` or ``'chr1'``, ``'chr22'``, ``'chrX'`` etc. according to the cell line).
-    :type chrom: ``str``
-
-    :param resolution: Typically ``2500000``, ``1000000``, ``500000``, ``100000``, ``50000``, ``25000``, ``10000``, ``5000``, etc. 
-    :type resolution: ``int``
-
-    :param normalization: ``'NONE'``, ``'VC'``, ``'VC_SQRT'``, ``'KR'``, ``'SCALE'``, etc.
-    :type normalization: ``str``
-
-    :return: Intra-chromosomal Pearson matrix in NumPy format.
-    :rtype: ``numpy.ndarray``
-    """
-
-    hic = hicstraw.HiCFile(hic_path)
-
-    for chromosome in hic.getChromosomes():
-        if chromosome.name == chrom:
-            chrom_size = int(chromosome.length)
-
-    matrix = hic.getMatrixZoomData(chrom, chrom, "oe", normalization, "BP", resolution)
-    matrix_np = matrix.getRecordsAsMatrix(0, chrom_size, 0, chrom_size)
-    pearson_np = np.corrcoef(matrix_np)
-    return pearson_np
-
-def create_est(pearson_np: np.ndarray, output: str | None = None, method: str="cxmax", sampling_proportion: float | None = None) -> np.ndarray:
-    """
-    Create the Estimated PC1-pattern of the given Hi-C Pearson matrix.
-    The calculation is only performed on the valid sub-matrix. (rows and columns with all ``NaN`` will be excluded, however these all ``NaN`` rows/columns will not be removed in the Estimated PC1-pattern returned)
+    Create the Estimated PC1-pattern of the given Hi-C Pearson matrix. 
+    The calculation is only performed on the valid sub-matrix. 
+    (We exclude the rows and columns which the corresponding diagonal value is ``NaN``, implies that these rows and columns are all ``NaN``.    
+    However these all ``NaN`` rows or columns will not be removed in the Estimated PC1-pattern returned)
 
     :param pearson_np: Hi-C Pearson matrix in NumPy format.
     :type pearson_np: ``numpy.ndarray``
-    
+
     :param output: (Optional) If the file path is specified, the Estimated PC1-pattern will be stored (e.g. ``output="./test/est_pc1.txt"``).
     :type output: ``str``
-    
+
     :param method: ``cxmax`` or ``cxmin``.
     :type method: ``str``
 
@@ -101,20 +71,7 @@ def create_est(pearson_np: np.ndarray, output: str | None = None, method: str="c
     pearson_np -= pearson_np.mean(axis=1, keepdims=True)
 
     # Core idea, note that the covariance matrix is symmetric.
-    if sampling_proportion is None:
-        n = len(pearson_np)
-        cov_np = pearson_np @ pearson_np.T / n # covariance matrix
-        cov_abs_sum = [(index, np.sum(np.abs(row))) for index, row in enumerate(cov_np)] 
-        sorted_cov_abs_sum = sorted(cov_abs_sum, key=lambda x: x[1], reverse=True) # Sorted from the maximum to the minimum 
-
-        if method == "cxmax":
-            sorted_index = 0
-            est_np = cov_np[sorted_cov_abs_sum[sorted_index][0]]
-        elif method == "cxmin":
-            sorted_index = -1
-            est_np = cov_np[sorted_cov_abs_sum[sorted_index][0]]
-
-    elif isinstance(sampling_proportion, float) and sampling_proportion > 0 and sampling_proportion <= 1:
+    if isinstance(sampling_proportion, float) and sampling_proportion > 0 and sampling_proportion <= 1.0:
         n = len(pearson_np)
         sample_indexes = random.sample(list(range(n)), math.floor(n * float(sampling_proportion)))
         partial_cov_np = pearson_np @ pearson_np[sample_indexes].T / n
@@ -186,8 +143,8 @@ def calc_similarity(track1_np: np.ndarray, track2_np: np.ndarray):
         logging.info("track1_np and track2_np has a different total_entry_num")
         return
     
-    track1_np = track1_np[~np.isnan(track1_np)]    
-    track2_np = track2_np[~np.isnan(track2_np)]    
+    track1_np = track1_np[~np.isnan(track1_np)]
+    track2_np = track2_np[~np.isnan(track2_np)]
     valid_entry_num = len(track1_np)
     
     if valid_entry_num != len(track2_np): 

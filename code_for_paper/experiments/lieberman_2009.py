@@ -35,7 +35,7 @@ def data_prepare(data_store):
                 for chrom in chroms:
                     pearson=f"{data_path}/heatmaps/HIC_{cell_line}_chr{chrom}_chr{chrom}_{resolution}_pearson.txt"
                     output=f"{output_path}/{cell_line}/{resolution}/{method}/est_PC1_pattern_chr{chrom}.txt"
-                    pearson_np = read_pearson(pearson=pearson, format="aiden_2009")
+                    pearson_np = read_pearson(pearson=pearson, format="aiden_2009") # Already fill 0 with NaN.
                     create_est(pearson_np=pearson_np, output=output, method=method)
 
     logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} lieberman_2009 data_prepare end")

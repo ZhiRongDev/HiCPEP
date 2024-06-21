@@ -1,3 +1,4 @@
+# This Python script is used for calculating the sparsity of a matrix (i.e., The percentage of zero accounts for the matrix).
 import numpy as np
 import pandas as pd
 import hicstraw
