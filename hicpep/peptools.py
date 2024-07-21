@@ -1,7 +1,6 @@
 import os
 import random
 import math
-import hicstraw
 import numpy as np
 import pandas as pd
 from copy import deepcopy

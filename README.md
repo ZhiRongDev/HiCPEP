@@ -4,7 +4,7 @@ HiCPEP is a Python package for creating the Estimated PC1-pattern of the Hi-C Pe
 
 ## Requirements and Installation
 
-All the programs were tested in Ubuntu 22.04.4 LTS, HiCPEP requires `python3`, `pip` and `libcurl4-openssl-dev` installed on your system. 
+All the programs were tested in Ubuntu 22.04.4 LTS, HiCPEP requires `python3`, `pip` and `libcurl4-openssl-dev` installed on your system.
 
 For example (Paste these commands in Bash or Zsh):
 
@@ -34,7 +34,7 @@ from hicpep import peptools
 
 pearson_np = peptools.straw_to_pearson(
     hic_path="https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic", # Path to the Juicer's `.hic` file.
-    chrom="1", 
+    chrom="1",
     resolution=1000000,
     normalization="KR",
 )

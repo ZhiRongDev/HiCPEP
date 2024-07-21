@@ -1,3 +1,4 @@
+# This Python script is used for calculating the RAM usage of the NumPy matrix. 
 import numpy as np
 import pandas as pd
 import gc
@@ -15,7 +16,7 @@ def read_file():
     del pearson_df, valid, ixgrid, pearson_path, pearson_np
     gc.collect()
 
-    pearson_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/rao_2014/juicer_outputs/gm12878/100000/pearsons/pearson_chr2.txt"
+    pearson_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpep/data_store/data/rao_2014/juicer_outputs/gm12878/100000/pearsons/pearson_chr2.txt"
     pearson_df = pd.read_table(pearson_path, header=None, sep="\s+").fillna(0)
     pearson_np = pearson_df.values # Turn into numpy.ndarray.
     pearson_np = pearson_np.astype('float64')
@@ -26,7 +27,7 @@ def read_file():
     del pearson_df, valid, ixgrid, pearson_path, pearson_np
     gc.collect()
 
-    pearson_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/rao_2014/juicer_outputs/gm12878/1000000/pearsons/pearson_chr2.txt"
+    pearson_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpep/data_store/data/rao_2014/juicer_outputs/gm12878/1000000/pearsons/pearson_chr2.txt"
     pearson_df = pd.read_table(pearson_path, header=None, sep="\s+").fillna(0)
     pearson_np = pearson_df.values # Turn into numpy.ndarray.
     pearson_np = pearson_np.astype('float64')
@@ -37,7 +38,7 @@ def read_file():
     del pearson_df, valid, ixgrid, pearson_path, pearson_np
     gc.collect()
 
-    oe_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/lieberman_2009/heatmaps/HIC_gm06690_chr2_chr2_100000_obsexp.txt"
+    oe_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpep/data_store/data/lieberman_2009/heatmaps/HIC_gm06690_chr2_chr2_100000_obsexp.txt"
     oe_df = pd.read_table(oe_path, index_col=0, header=1, sep="\s+")
     oe_np = oe_df.values
     oe_np = oe_np.astype('float64')
@@ -48,7 +49,7 @@ def read_file():
     del oe_df, valid, ixgrid, oe_path, oe_np
     gc.collect()
 
-    oe_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/lieberman_2009/heatmaps/HIC_gm06690_chr2_chr2_1000000_obsexp.txt"
+    oe_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpep/data_store/data/lieberman_2009/heatmaps/HIC_gm06690_chr2_chr2_1000000_obsexp.txt"
     oe_df = pd.read_table(oe_path, index_col=0, header=1, sep="\s+")
     oe_np = oe_df.values
     oe_np = oe_np.astype('float64')

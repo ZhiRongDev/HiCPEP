@@ -1,5 +1,5 @@
 """
-The dataset used for this package can be downloaded from:
+The dataset used for this package (experiment) can be downloaded from:
 https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE63525
 """
 import os
@@ -342,9 +342,9 @@ def summary_pca(data_store):
     return
 
 def run_all(data_store):
-    # data_prepare(data_store) # Create the Estimated PC1-pattern .txt files.
-    # summary_similarity(data_store) # Compare the similarity difference with the PC1 and the Estimated PC1-pattern.
+    data_prepare(data_store) # Create the Estimated PC1-pattern .txt files.
+    summary_similarity(data_store) # Compare the similarity difference with the PC1 and the Estimated PC1-pattern.
     plot_all_comparisons(data_store) # Plot the scatter and relative-magnitude chart.
-    # summary_pca(data_store) # Performing the PCA by self and get the information of the explained variance ratios.
-    # summary_similar_rate_percentage(data_store) # Summarize the percentage of columns in the covariance matrix that has a similar_rate over 90%, 95% or 99%. 
+    summary_pca(data_store) # Performing the PCA by self and get the information of the explained variance ratios.
+    summary_similar_rate_percentage(data_store) # Summarize the percentage of columns in the covariance matrix that has a similar_rate over 90%, 95% or 99%. 
     return

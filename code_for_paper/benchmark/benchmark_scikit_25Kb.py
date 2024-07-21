@@ -1,11 +1,16 @@
 import time
 import numpy as np
+from numpy import dot
+from numpy.linalg import norm
 import pandas as pd
 from sklearn.decomposition import PCA
 from hicpep import peptools
 
 def flip_tracks(track1_np: np.ndarray, track2_np: np.ndarray):
-    if np.corrcoef(track1_np[~np.isnan(track1_np)], track2_np[~np.isnan(track2_np)])[0][1] < 0:
+    a = track1_np[~np.isnan(track1_np)]
+    b = track2_np[~np.isnan(track2_np)]
+    cos_sim = dot(a, b) / (norm(a) * norm(b))
+    if cos_sim < 0:
         track2_np = -track2_np
     return track1_np, track2_np
 
@@ -27,6 +32,7 @@ def read_file(pearson_path):
 
     return pearson_np, diag_valid
 
+# Core Function
 def scikit_pc1(pearson_path):
     pearson_np, diag_valid = read_file(pearson_path) 
     start = time.time()

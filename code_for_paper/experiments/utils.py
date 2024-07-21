@@ -1,4 +1,6 @@
 import numpy as np
+from numpy import dot
+from numpy.linalg import norm
 import pandas as pd
 import logging
 logging.basicConfig(format='%(message)s', level=logging.INFO)
@@ -36,7 +38,11 @@ def flip_tracks(track1_np: np.ndarray, track2_np: np.ndarray):
         logging.info(f"Length of track1_np: {len(track1_np)}")
         logging.info(f"Length of track2_np: {len(track2_np)}")
 
-    if np.corrcoef(track1_np[~np.isnan(track1_np)], track2_np[~np.isnan(track2_np)])[0][1] < 0:
+    a = track1_np[~np.isnan(track1_np)]
+    b = track2_np[~np.isnan(track2_np)]
+    cos_sim = dot(a, b) / (norm(a) * norm(b))
+
+    if cos_sim < 0:
         track2_np = -track2_np
 
     return track1_np, track2_np

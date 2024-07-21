@@ -166,7 +166,7 @@ def mem_efficient_find_best():
     return
 
 if __name__ == '__main__':
-    oe_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/lieberman_2009/heatmaps/HIC_gm06690_chr1_chr1_1000000_obsexp.txt"
+    oe_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpep/data_store/data/lieberman_2009/heatmaps/HIC_gm06690_chr1_chr1_1000000_obsexp.txt"
     # load_oe_sparse()
     # sum_zero_percent(oe_path)
 

@@ -9,7 +9,6 @@ setup(
     license='MIT',
     packages = ['hicpep'],
     install_requires=[
-        'hic-straw>=1.3.1',
         'matplotlib>=3.8.1',
         'numpy>=1.26.1',
         'pandas>=1.5.3'

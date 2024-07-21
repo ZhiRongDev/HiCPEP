@@ -1,6 +1,9 @@
+# This is the implementation of the PC1-pattern Estimation using sparse O/E matrix. The algorithm is written in `mem_efficient_sampling` function.
 import time
 import sys
 import numpy as np
+from numpy import dot
+from numpy.linalg import norm
 import pandas as pd
 import math
 from random import sample
@@ -9,11 +12,14 @@ from scipy import sparse
 np.set_printoptions(threshold=sys.maxsize)
 
 def flip_tracks(track1_np: np.ndarray, track2_np: np.ndarray):
-    if np.corrcoef(track1_np[~np.isnan(track1_np)], track2_np[~np.isnan(track2_np)])[0][1] < 0:
+    a = track1_np[~np.isnan(track1_np)]
+    b = track2_np[~np.isnan(track2_np)]
+    cos_sim = dot(a, b) / (norm(a) * norm(b))
+    if cos_sim < 0:
         track2_np = -track2_np
     return track1_np, track2_np
 
-### `store_oe_sparse` is not included in benchmark.
+### `store_oe_sparse` is not included in the benchmark calculation. We only used this function for storing the O/E matrix as the .npz file. 
 def store_oe_sparse(oe_path):
     oe_df = pd.read_table(oe_path, index_col=0, header=1, sep="\s+")
     oe_np = oe_df.values
@@ -31,6 +37,7 @@ def load_oe_sparse():
     print(x)
     return
 
+# Core Function
 def mem_efficient_sampling(proportion=0.1):
     x = sparse.load_npz('/tmp/oe_sparse.npz')
     start = time.time()
@@ -87,11 +94,11 @@ def mem_efficient_sampling(proportion=0.1):
     return est_np
 
 if __name__ == '__main__':
-    oe_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/lieberman_2009/heatmaps/HIC_gm06690_chr2_chr2_100000_obsexp.txt"
-    # store_oe_sparse(oe_path) # Not include in benchmarking 
+    oe_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpep/data_store/data/lieberman_2009/heatmaps/HIC_gm06690_chr2_chr2_100000_obsexp.txt"
+    store_oe_sparse(oe_path) # Not include in benchmarking 
     est_np = mem_efficient_sampling(proportion=0.1)
 
-    pc1_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/lieberman_2009/eigenvectors/GM-combined.ctg2.ctg2.1000000bp.hm.eigenvector.tab"
+    pc1_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpep/data_store/data/lieberman_2009/eigenvectors/GM-combined.ctg2.ctg2.100000bp.hm.eigenvector.tab"
     pc1_df = pd.read_table(pc1_path, header=None, sep="\s+")
     pc1_df = pc1_df.iloc[:, [2]]
     pc1_np = pc1_df.values # Turn into numpy format

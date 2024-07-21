@@ -5,7 +5,7 @@ import hicstraw
 
 if __name__ == '__main__':
     print("GM06690")
-    oe_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/lieberman_2009/heatmaps/HIC_gm06690_chr2_chr2_100000_obsexp.txt"
+    oe_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpep/data_store/data/lieberman_2009/heatmaps/HIC_gm06690_chr2_chr2_100000_obsexp.txt"
     oe_df = pd.read_table(oe_path, index_col=0, header=1, sep="\s+")
     oe_np = oe_df.values 
     size = len(oe_np) * len(oe_np)
@@ -15,7 +15,7 @@ if __name__ == '__main__':
     print(zero / size)
 
     print("\nGM12878")
-    hic_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpap/data_store/data/rao_2014/hic/GSE63525_GM12878_insitu_primary_replicate_combined_30.hic"
+    hic_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpep/data_store/data/rao_2014/hic/GSE63525_GM12878_insitu_primary_replicate_combined_30.hic"
     hic = hicstraw.HiCFile(hic_path)
     chrom = "2"
     normalization = "KR"
