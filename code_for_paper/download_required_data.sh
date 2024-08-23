@@ -43,4 +43,4 @@ gzip -d "${DATA_PATH}/lieberman_2009/zip/GSE18199_eigenvector_files.zip.gz"
 unzip "${DATA_PATH}/lieberman_2009/zip/GSE18199_eigenvector_files.zip" -d "${DATA_PATH}/lieberman_2009/eigenvectors"
 
 ### Optional
-# rm -rf "${DATA_PATH}/lieberman_2009/zip" 
+rm -rf "${DATA_PATH}/lieberman_2009/zip" 
