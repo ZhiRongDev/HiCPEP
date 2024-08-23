@@ -11,7 +11,8 @@ setup(
     install_requires=[
         'matplotlib>=3.8.1',
         'numpy>=1.26.1',
-        'pandas>=1.5.3'
+        'pandas>=1.5.3',
+        'openpyxl'
     ],
     python_requires='>=3.11.5',
 )

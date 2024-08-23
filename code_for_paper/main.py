@@ -1,6 +1,6 @@
 import argparse
-from code_for_paper.experiments import rao_2014
-from code_for_paper.experiments import lieberman_2009 
+from experiments import rao_2014
+from experiments import lieberman_2009 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

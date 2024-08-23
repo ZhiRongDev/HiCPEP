@@ -73,6 +73,10 @@ def create_est(pearson_np: np.ndarray, output: str | None = None, method: str="c
     if isinstance(sampling_proportion, float) and sampling_proportion > 0 and sampling_proportion <= 1.0:
         n = len(pearson_np)
         sample_indexes = random.sample(list(range(n)), math.floor(n * float(sampling_proportion)))
+
+        if len(sample_indexes) < 1:
+            sample_indexes = [i for i in range(n)]
+
         partial_cov_np = pearson_np @ pearson_np[sample_indexes].T / n
         partial_cov_abs_sum = [(index, np.sum(np.abs(row))) for index, row in enumerate(partial_cov_np.T)] 
         sorted_partial_cov_abs_sum = sorted(partial_cov_abs_sum, key=lambda x: x[1], reverse=True) # Sorted from the maximum to the minimum 

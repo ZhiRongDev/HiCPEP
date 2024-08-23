@@ -41,6 +41,13 @@ def data_prepare(data_store):
                     pearson_np = read_pearson(pearson=pearson, format="juicer")
                     create_est(pearson_np=pearson_np, output=output, method=method)
 
+                    # Sample 10%
+                    output_path=f"{data_store}/outputs/est_pc1_pattern/rao_2014_sample10"
+                    pearson=f"{data_path}/{cell_line}/{resolution}/pearsons/pearson_chr{chrom}.txt"
+                    output=f"{output_path}/{cell_line}/{resolution}/{method}/est_pc1_pattern_chr{chrom}.txt"
+                    pearson_np = read_pearson(pearson=pearson, format="juicer")
+                    create_est(pearson_np=pearson_np, output=output, method=method, sampling_proportion=0.1)
+
     logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 data_prepare end")
     return
 
@@ -118,6 +125,82 @@ def summary_similarity(data_store):
         output_df.to_excel(writer, sheet_name="summary_similarity_2014")
 
     logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_similarity end")
+    return
+
+def summary_similarity_sample10(data_store):
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_similarity_sample10 start")
+    cxmax_df = pd.DataFrame(columns = {
+        'cell_line': [], 
+        'resolution': [], 
+        'chrom':[], 
+        "method":[], 
+        "total_entry_num":[], 
+        "valid_entry_num":[], 
+        "similar_num":[], 
+        "similar_rate": []
+    })
+    cxmin_df = pd.DataFrame(columns = {
+        'cell_line': [], 
+        'resolution': [], 
+        'chrom':[], 
+        "method":[], 
+        "total_entry_num":[], 
+        "valid_entry_num":[], 
+        "similar_num":[], 
+        "similar_rate": []
+    })
+    juicer_outputs_path = f"{data_store}/data/rao_2014/juicer_outputs"
+    est_path = f"{data_store}/outputs/est_pc1_pattern/rao_2014_sample10"
+
+    for species in ["human", "mouse"]:
+        if species == "human":
+            cell_lines = ["gm12878", "imr90", "hmec", "nhek", "k562", "kbm7", "huvec"]
+            chroms = [str(i) for i in range(1, 23)]
+        elif species == "mouse":
+            cell_lines = ["ch12-lx"]
+            chroms = [str(i) for i in range(1, 20)]
+    
+        chroms.extend(["X", "Y"])
+        resolutions = [1000000, 100000]
+        methods = ["cxmax", "cxmin"]
+
+        for resolution in resolutions:
+            for cell_line in cell_lines:
+                for chrom in chroms:
+                    for method in methods:
+                        pc1 = f"{juicer_outputs_path}/{cell_line}/{resolution}/eigenvector/pc1_chr{chrom}.txt"
+                        est = f"{est_path}/{cell_line}/{resolution}/{method}/est_pc1_pattern_chr{chrom}.txt"
+
+                        pc1_df = pd.read_table(pc1, header=None)
+                        pc1_np = pc1_df.values # Turn into numpy format
+                        pc1_np = pc1_np.flatten() # Turn into 1D vector
+                        est_df = pd.read_table(est, header=None)
+                        est_np = est_df.values # Turn into numpy format
+                        est_np = est_np.flatten() # Turn into 1D vector
+
+                        del pc1_df, est_df
+
+                        ### Flip tracks according to the similarity between track1 and track2
+                        pc1_np, est_np  = flip_tracks(track1_np=pc1_np, track2_np=est_np)
+
+                        similarity_info = calc_similarity(track1_np=pc1_np, track2_np=est_np)
+
+                        if method == "cxmax":
+                            cxmax_df.loc[len(cxmax_df)] = [cell_line, resolution, f"chr{chrom}", method, similarity_info["total_entry_num"], similarity_info["valid_entry_num"], similarity_info["similar_num"], similarity_info["similar_rate"]] 
+                        elif method == "cxmin":
+                            cxmin_df.loc[len(cxmin_df)] = [cell_line, resolution, f"chr{chrom}", method, similarity_info["total_entry_num"], similarity_info["valid_entry_num"], similarity_info["similar_num"], similarity_info["similar_rate"]] 
+
+    output_df = pd.concat([cxmax_df, cxmin_df], ignore_index=True)
+
+    filename = f"{data_store}/outputs/summary/summary_similarity_2014_sample10.xlsx"
+
+    if os.path.dirname(filename):
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+
+    with pd.ExcelWriter(filename, mode="w") as writer:
+        output_df.to_excel(writer, sheet_name="summary_similarity_2014_sample10")
+
+    logging.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} rao_2014 summary_similarity_sample10 end")
     return
 
 def summary_similar_rate_percentage(data_store):
@@ -343,6 +426,7 @@ def summary_pca(data_store):
 
 def run_all(data_store):
     data_prepare(data_store) # Create the Estimated PC1-pattern .txt files.
+    summary_similarity_sample10(data_store)
     summary_similarity(data_store) # Compare the similarity difference with the PC1 and the Estimated PC1-pattern.
     plot_all_comparisons(data_store) # Plot the scatter and relative-magnitude chart.
     summary_pca(data_store) # Performing the PCA by self and get the information of the explained variance ratios.
