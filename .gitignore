@@ -5,6 +5,7 @@ code_for_paper/notebooks/data/gm12878_pearson_25000_chr2.txt
 examples/data/ucsc/
 code_for_paper/benchmark/EigenVector/
 code_for_paper/benchmark/juicer/output/
+test/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
