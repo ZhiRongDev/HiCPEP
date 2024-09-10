@@ -1,0 +1,153 @@
+WARN [2024-06-10T19:35:20,082]  [Globals.java:138] [main]  Development mode is enabled
+Reading file: /media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpep/data_store/data/rao_2014/hic/GSE63525_GM12878_insitu_primary_replicate_combined_30.hic
+	Command being timed: "bash run_1Mb_pearson.sh -p"
+	User time (seconds): 1.86
+	System time (seconds): 0.13
+	Percent of CPU this job got: 200%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.99
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 241296
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 58838
+	Voluntary context switches: 2193
+	Involuntary context switches: 15
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 1360
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+1Mb pearson end ======================= -p
+WARN [2024-06-10T19:35:21,109]  [Globals.java:138] [main]  Development mode is enabled
+	Command being timed: "bash run_1Mb_pc1.sh -p"
+	User time (seconds): 2.28
+	System time (seconds): 0.12
+	Percent of CPU this job got: 175%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:01.37
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 238948
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 58212
+	Voluntary context switches: 2351
+	Involuntary context switches: 22
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 80
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+1Mb pc1 end ======================= -p
+WARN [2024-06-10T19:35:22,490]  [Globals.java:138] [main]  Development mode is enabled
+Reading file: /media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpep/data_store/data/rao_2014/hic/GSE63525_GM12878_insitu_primary_replicate_combined_30.hic
+	Command being timed: "bash run_100Kb_pearson.sh -p"
+	User time (seconds): 102.78
+	System time (seconds): 0.69
+	Percent of CPU this job got: 101%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:42.00
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 1252896
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 311763
+	Voluntary context switches: 4761
+	Involuntary context switches: 1306
+	Swaps: 0
+	File system inputs: 8
+	File system outputs: 127064
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+100Kb pearson end ======================= -p
+WARN [2024-06-10T19:37:04,539]  [Globals.java:138] [main]  Development mode is enabled
+	Command being timed: "bash run_100Kb_pc1.sh -p"
+	User time (seconds): 273.45
+	System time (seconds): 0.48
+	Percent of CPU this job got: 100%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 4:32.32
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 831012
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 206348
+	Voluntary context switches: 8683
+	Involuntary context switches: 4364
+	Swaps: 0
+	File system inputs: 8
+	File system outputs: 384
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+100Kb pc1 end ======================= -p
+WARN [2024-06-10T19:41:36,955]  [Globals.java:138] [main]  Development mode is enabled
+Reading file: /media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpep/data_store/data/rao_2014/hic/GSE63525_GM12878_insitu_primary_replicate_combined_30.hic
+	Command being timed: "bash run_25Kb_pearson.sh -p"
+	User time (seconds): 5078.86
+	System time (seconds): 4.40
+	Percent of CPU this job got: 96%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:28:03
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 5140988
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 1284150
+	Voluntary context switches: 118507
+	Involuntary context switches: 46438
+	Swaps: 0
+	File system inputs: 80
+	File system outputs: 2130064
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+25Kb pearson end ======================= -p
+WARN [2024-06-10T21:09:40,129]  [Globals.java:138] [main]  Development mode is enabled
+	Command being timed: "bash run_25Kb_pc1.sh -p"
+	User time (seconds): 15806.66
+	System time (seconds): 9.68
+	Percent of CPU this job got: 100%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 4:23:20
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 8369760
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 22
+	Minor (reclaiming a frame) page faults: 2093739
+	Voluntary context switches: 348876
+	Involuntary context switches: 103536
+	Swaps: 0
+	File system inputs: 4328
+	File system outputs: 9040
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+25Kb pc1 end ======================= -p

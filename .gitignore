@@ -4,7 +4,7 @@ code_for_paper/notebooks/data/gm12878_pc1_25000_chr2.txt
 code_for_paper/notebooks/data/gm12878_pearson_25000_chr2.txt
 examples/data/ucsc/
 code_for_paper/benchmark/EigenVector/
-code_for_paper/benchmark/juicer/output/
+code_for_paper/benchmark/juicer/output/*.txt
 test/
 
 # Byte-compiled / optimized / DLL files
@@ -65,7 +65,7 @@ cover/
 *.pot
 
 # Django stuff:
-*.log
+# *.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal

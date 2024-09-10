@@ -19,7 +19,10 @@ def flip_tracks(track1_np: np.ndarray, track2_np: np.ndarray):
         track2_np = -track2_np
     return track1_np, track2_np
 
-### `store_oe_sparse` is not included in the benchmark calculation. We only used this function for storing the O/E matrix as the .npz file. 
+'''
+`store_oe_sparse` is not included in the benchmark calculation, otherwise the RAM usage of the dense O/E matrix will be recorded. 
+We only used this function for storing the O/E matrix as the .npz file. 
+'''
 def store_oe_sparse(oe_path):
     oe_df = pd.read_table(oe_path, index_col=0, header=1, sep="\s+")
     oe_np = oe_df.values
@@ -95,7 +98,7 @@ def mem_efficient_sampling(proportion=0.1):
 
 if __name__ == '__main__':
     oe_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpep/data_store/data/lieberman_2009/heatmaps/HIC_gm06690_chr2_chr2_100000_obsexp.txt"
-    store_oe_sparse(oe_path) # Not include in benchmarking 
+    store_oe_sparse(oe_path) # Not include in benchmark.
     est_np = mem_efficient_sampling(proportion=0.1)
 
     pc1_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpep/data_store/data/lieberman_2009/eigenvectors/GM-combined.ctg2.ctg2.100000bp.hm.eigenvector.tab"
