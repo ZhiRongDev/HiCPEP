@@ -3,8 +3,7 @@ archive/
 code_for_paper/notebooks/data/gm12878_pc1_25000_chr2.txt
 code_for_paper/notebooks/data/gm12878_pearson_25000_chr2.txt
 examples/data/ucsc/
-code_for_paper/benchmark/EigenVector/C++
-code_for_paper/benchmark/EigenVector/R/*.txt*
+code_for_paper/benchmark/POSSUMM/R/*.txt*
 code_for_paper/benchmark/juicer/output/*.txt
 test/
 
