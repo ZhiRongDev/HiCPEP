@@ -30,6 +30,6 @@ The ``est_pc1_pattern`` directory contains the text files of the Estimated PC1-p
 The ``plots`` directories including the scatter and the relative_magnitude plots. 
 In the ``summary`` directory there are (2009 means using the data from GSE18199; 2014 means using the data from GSE63525):
 
-1. ``summary_similarity_2009.xlsx`` and ``summary_similarity_2014.xlsx``, which is for comparing the ``similar_rate`` between the juicer_tools calculated PC1 and the Estimated PC1-pattern.  
+1. ``summary_similarity_2009.xlsx`` and ``summary_similarity_2014.xlsx``, `summary_similarity_2014_sample10.xlsx`, which is for comparing the ``similar_rate`` between the juicer_tools calculated PC1 and the Estimated PC1-pattern, with and  without using sampling method.
 2. ``summary_self_pca_2009.xlsx`` and ``summary_self_pca_2014.xlsx``, which is for recording the explained variance ratio of the first 3 Principal components of the Pearson matrix, and for recording the ``similar_rate`` between the self calaulated PC1 (NOT the juicer_tools calculated PC1) and the Estimated PC1-pattern.
 3. ``summary_similar_rate_percentage_2014.xlsx``, which is used for summarizing the percentage of columns in the covariance matrix that has a similar_rate over 90%, 95% or 99%.  
