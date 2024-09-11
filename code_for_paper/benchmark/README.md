@@ -1,5 +1,10 @@
 # Benchmark the time and RAM requirement
 
+* `1_calc_matrix_size.py` is for calculating the matrix size of GM12878 chromosome 2 and GM06690 chromosome 2 mentioned in thesis page 31, which is not calcuated from GNU time tool
+* `2_sum_zero_percent.py` is for calculating the sparsity of matrices mentioned in thesis page 40.
+
+---
+
 > We manually tested the Python script and record the Elapsed (wall clock) time, Maximum resident set size and similar_rate.
 
 For benchmarking the time and RAM requirement of the hicpep PC1-pattern estimation start from dense Pearson matrix without random sampling techniques at 1Mb 100Kb or 25Kb resolution, use the following command (The only different in these scripts is the parameter setting):
@@ -29,7 +34,7 @@ For benchmarking the time and RAM requirement of the Power iteration PC1 approxi
 For benchmarking the time and RAM requirement of the hicpep PC1-pattern estimation start from sparse O/E matrix with random sampling techniques at 1Mb or 100Kb resolution, use the following command:
 
 ```shell
-python store_oe_sparse.py # Store the sparse O/E matrix as the .npz file, which is not included in benchmark.
+python 3_store_oe_sparse.py # Store the sparse O/E matrix as the .npz file, which is not included in benchmark.
 /usr/bin/time -v python benchmark_est_mem_efficient_1Mb.py
 /usr/bin/time -v python benchmark_est_mem_efficient_100Kb.py
 ```
@@ -42,7 +47,7 @@ cd juicer
 /usr/bin/time -v run_all.sh
 ```
 
-For benchmarking the time and RAM requirement of POSSUMM to create the PC1 txt files at 1Mb 100Kb or 25Kb resolution. The code in the `code_for_paper/benchmark/EigenVector/R` folder are downloaded from https://github.com/aidenlab/EigenVector.
+For benchmarking the time and RAM requirement of POSSUMM to create the PC1 txt files at 1Mb 100Kb or 25Kb resolution. The code in the `code_for_paper/benchmark/POSSUMM/R` folder are downloaded from https://github.com/aidenlab/EigenVector.
 
 **References**  
 * Fine-mapping of nuclear compartments using ultra-deep Hi-C shows that active promoter and enhancer elements localize in the active A compartment even when adjacent sequences do not (https://www.biorxiv.org/content/10.1101/2021.10.03.462599v2)
@@ -55,12 +60,12 @@ After all the requirements installed, use the following command:
  /usr/bin/time -v Rscript eigFromHicRscript.R -v TRUE -n KR GSE63525_GM12878_insitu_primary_replicate_combined_30.hic 2 possumm_pc1.txt 100000
  /usr/bin/time -v Rscript eigFromHicRscript.R -v TRUE -n KR GSE63525_GM12878_insitu_primary_replicate_combined_30.hic 2 possumm_pc1.txt 25000
 ```
-It will shows the time and RAM usage of POSSUMM. The similar_rate with Juicer's PC1 will be calculated using `code_for_paper/benchmark/EigenVector/R/benchmark_similarity_POSSUMM.ipynb`
+It will shows the time and RAM usage of POSSUMM. The `similar_rate` compared with Juicer's PC1 will be calculated using `code_for_paper/benchmark/POSSUMM/R/benchmark_similarity_POSSUMM.ipynb`.
 
 ---
 **Importent**
-Note that the 'time' we mentioned in our thesis is the wall clock time calculated by `/usr/bin/time`, but not the Python time package imported in the Python script. 
-For the example showing below, "Elapsed (wall clock) time (h:mm:ss or m:ss): 0:27.54" is recorded.
+* Note that the 'time' we mentioned in our thesis is the wall clock time calculated by `/usr/bin/time`, but not the Python time package imported in the Python script. 
+For the example showing below, "Elapsed (wall clock) time (h:mm:ss or m:ss): 0:27.54" will be recorded (And the "Maximum resident set size (kbytes): 2528488").
 
 ```code
 (env) (base) ➜  benchmark git:(main) ✗ /usr/bin/time -v python benchmark_est_all_25Kb.py
@@ -75,7 +80,7 @@ Time spent for creating the Estimated PC1-pattern by finding the CxMax in the fu
         Average unshared data size (kbytes): 0
         Average stack size (kbytes): 0
         Average total size (kbytes): 0
-        Maximum resident set size (kbytes): 2528488
+        y: 2528488
         Average resident set size (kbytes): 0
         Major (requiring I/O) page faults: 0
         Minor (reclaiming a frame) page faults: 339242
@@ -88,3 +93,5 @@ Time spent for creating the Estimated PC1-pattern by finding the CxMax in the fu
         Socket messages received: 0
         Signals delivered: 0
 ```
+
+* Besides, we mention that the time and RAM usage for calculating `similar_rate` can be ignored since they are both too small.

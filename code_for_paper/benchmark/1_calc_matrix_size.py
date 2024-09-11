@@ -1,4 +1,4 @@
-# This Python script is used for calculating the RAM usage of the NumPy matrix. 
+# This Python script is used for calculating the RAM usage fo GM12878, chromosome 2 at 1Mb, 100Kb, 25Kb resolution using the NumPy matrix format.
 import numpy as np
 import pandas as pd
 import gc
