@@ -68,8 +68,8 @@ est_np = peptools.create_est(pearson_np=pearson_np)
 print(f"est_np: {est_np}")
 ```
 
-For more details, please check the [examples](https://github.com/ZhiRongDev/HiCPEP/blob/main/examples/). If you are interested in the programs we used for the paper, please check the [code_for_paper](https://github.com/ZhiRongDev/HiCPEP/blob/main/code_for_paper/).
+For more details, please check the [examples](https://github.com/ZhiRongDev/HiCPEP/blob/main/examples/). If you are interested in the programs we used for the paper, please check the [code_for_paper](https://github.com/ZhiRongDev/HiCPEP/blob/main/code_for_paper/). The HiCPEP Python library depends on [NumPy](https://numpy.org/doc/stable/index.html), [pandas](https://pandas.pydata.org/), [SciPy](https://scipy.org/) and [Matplotlib](https://matplotlib.org/).
 
 ## References
 
-* Zhi-Rong Cheng, Jia-Ming Chang. Decoding the Power of PC1: A Fast and Accurate Covariance-Based Method for A/B Compartment Identification in Hi-C Data.
+Zhi-Rong Cheng, Jia-Ming Chang. Decoding the Power of PC1: A Fast and Accurate Covariance-Based Method for A/B Compartment Identification in Hi-C Data.
