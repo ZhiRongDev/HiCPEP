@@ -1,6 +1,6 @@
 # Hi-C Pearson matrix's Estimated PC1-pattern (HiCPEP)
 
-HiCPEP is a Python package for creating the Estimated PC1-pattern of the Hi-C Pearson matrix, which can be used for identifying the A/B compartments.
+HiCPEP is a Python package for creating the Estimated PC1-pattern of the Hi-C Pearson matrix, which can be used for identifying the A/B compartments.A detailed document is avaiable in [the Sphinx documentation of HiCPEP](https://zhirongdev.github.io/HiCPEP_documentation/).
 
 ## Requirements and Installation
 

@@ -33,72 +33,72 @@ The following is the content of the ``code_for_paper`` directory:
 .. code:: bash
 
     code_for_paper
-├── benchmark
-│   ├── 1_calc_matrix_size.py
-│   ├── 2_sum_zero_percent.py
-│   ├── 3_store_oe_sparse.py
-│   ├── benchmark_est_all_100kb.py
-│   ├── benchmark_est_all_1Mb.py
-│   ├── benchmark_est_all_25Kb.py
-│   ├── benchmark_est_mem_efficient_100Kb.py
-│   ├── benchmark_est_mem_efficient_1Mb.py
-│   ├── benchmark_est_sample_100kb.py
-│   ├── benchmark_est_sample_1Mb.py
-│   ├── benchmark_est_sample_25kb.py
-│   ├── benchmark_scikit_100Kb.py
-│   ├── benchmark_scikit_1Mb.py
-│   ├── benchmark_scikit_25Kb.py
-│   ├── juicer
-│   │   ├── output
-│   │   │   └── run_all.log
-│   │   ├── run_100Kb_pc1.sh
-│   │   ├── run_100Kb_pearson.sh
-│   │   ├── run_1Mb_pc1.sh
-│   │   ├── run_1Mb_pearson.sh
-│   │   ├── run_25Kb_pc1.sh
-│   │   ├── run_25Kb_pearson.sh
-│   │   └── run_all.sh
-│   ├── POSSUMM
-│   │   ├── R
-│   │   │   ├── benchmark_similarity_POSSUMM.ipynb
-│   │   │   ├── bestEigen3.R
-│   │   │   ├── eigenVectorRscript.R
-│   │   │   ├── eigFromHicRscript.R
-│   │   └── README.md
-│   └── README.md
-├── build_pearsons_pc1_2014.sh
-├── create_ref_gc.sh
-├── download_required_data.sh
-├── experiments
-│   ├── __init__.py
-│   ├── lieberman_2009.py
-│   ├── __pycache__
-│   │   ├── calc_correctness.cpython-311.pyc
-│   │   ├── __init__.cpython-311.pyc
-│   │   ├── lieberman_2009.cpython-311.pyc
-│   │   ├── process.cpython-311.pyc
-│   │   ├── rao_2014.cpython-311.pyc
-│   │   └── utils.cpython-311.pyc
-│   ├── rao_2014.py
-│   └── utils.py
-├── main.py
-├── notebooks
-│   ├── compare_explained_variance_ratio.ipynb
-│   ├── data
-│   │   ├── gm12878_pc1_25000_chr2.txt
-│   │   ├── gm12878_pc1_25000_chr5.txt
-│   │   ├── gm12878_pearson_25000_chr2.txt
-│   │   ├── gm12878_pearson_25000_chr5.txt
-│   │   └── hg19_gc25000_chr2.txt
-│   ├── GC_content_effect.ipynb
-│   ├── heatmaps.ipynb
-│   ├── low_similar_rate_percentage_IMR90_NHEK_chrY_reason.ipynb
-│   └── plots_for_explaining_formula.ipynb
-├── reference_gc
-│   ├── hg18
-│   ├── hg19
-│   └── mm9
-└── run.sh
+    ├── benchmark
+    │   ├── 1_calc_matrix_size.py
+    │   ├── 2_sum_zero_percent.py
+    │   ├── 3_store_oe_sparse.py
+    │   ├── benchmark_est_all_100kb.py
+    │   ├── benchmark_est_all_1Mb.py
+    │   ├── benchmark_est_all_25Kb.py
+    │   ├── benchmark_est_mem_efficient_100Kb.py
+    │   ├── benchmark_est_mem_efficient_1Mb.py
+    │   ├── benchmark_est_sample_100kb.py
+    │   ├── benchmark_est_sample_1Mb.py
+    │   ├── benchmark_est_sample_25kb.py
+    │   ├── benchmark_scikit_100Kb.py
+    │   ├── benchmark_scikit_1Mb.py
+    │   ├── benchmark_scikit_25Kb.py
+    │   ├── juicer
+    │   │   ├── output
+    │   │   │   └── run_all.log
+    │   │   ├── run_100Kb_pc1.sh
+    │   │   ├── run_100Kb_pearson.sh
+    │   │   ├── run_1Mb_pc1.sh
+    │   │   ├── run_1Mb_pearson.sh
+    │   │   ├── run_25Kb_pc1.sh
+    │   │   ├── run_25Kb_pearson.sh
+    │   │   └── run_all.sh
+    │   ├── POSSUMM
+    │   │   ├── R
+    │   │   │   ├── benchmark_similarity_POSSUMM.ipynb
+    │   │   │   ├── bestEigen3.R
+    │   │   │   ├── eigenVectorRscript.R
+    │   │   │   ├── eigFromHicRscript.R
+    │   │   └── README.md
+    │   └── README.md
+    ├── build_pearsons_pc1_2014.sh
+    ├── create_ref_gc.sh
+    ├── download_required_data.sh
+    ├── experiments
+    │   ├── __init__.py
+    │   ├── lieberman_2009.py
+    │   ├── __pycache__
+    │   │   ├── calc_correctness.cpython-311.pyc
+    │   │   ├── __init__.cpython-311.pyc
+    │   │   ├── lieberman_2009.cpython-311.pyc
+    │   │   ├── process.cpython-311.pyc
+    │   │   ├── rao_2014.cpython-311.pyc
+    │   │   └── utils.cpython-311.pyc
+    │   ├── rao_2014.py
+    │   └── utils.py
+    ├── main.py
+    ├── notebooks
+    │   ├── compare_explained_variance_ratio.ipynb
+    │   ├── data
+    │   │   ├── gm12878_pc1_25000_chr2.txt
+    │   │   ├── gm12878_pc1_25000_chr5.txt
+    │   │   ├── gm12878_pearson_25000_chr2.txt
+    │   │   ├── gm12878_pearson_25000_chr5.txt
+    │   │   └── hg19_gc25000_chr2.txt
+    │   ├── GC_content_effect.ipynb
+    │   ├── heatmaps.ipynb
+    │   ├── low_similar_rate_percentage_IMR90_NHEK_chrY_reason.ipynb
+    │   └── plots_for_explaining_formula.ipynb
+    ├── reference_gc
+    │   ├── hg18
+    │   ├── hg19
+    │   └── mm9
+    └── run.sh
 
 * The ``run.sh`` is the entry point to carry out all the experiments except for ``benchmark``, please start the code tracing from this script if you're interested in how the entire programs work. 
 * The ``benchmark`` directory contains Python script we used for benchmarking the time and RAM requirement for our estimation algorithm, Juicer and POSSUMM. Please check `README.md <https://github.com/ZhiRongDev/HiCPEP/blob/main/code_for_paper/benchmark/README.md>`_ for more information.
