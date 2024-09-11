@@ -99,7 +99,7 @@ def mem_efficient_sampling(proportion=0.1):
 if __name__ == '__main__':
     oe_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpep/data_store/data/lieberman_2009/heatmaps/HIC_gm06690_chr2_chr2_100000_obsexp.txt"
     # store_oe_sparse(oe_path) # Not included in benchmark, we comment this line after storing the O/E matrix to .npz file.
-    est_np = mem_efficient_sampling(proportion=0.001)
+    est_np = mem_efficient_sampling(proportion=0.1)
 
     pc1_path = "/media/jordan990301/Samsung_T5/HiC_Datasets/data_for_hicpep/data_store/data/lieberman_2009/eigenvectors/GM-combined.ctg2.ctg2.100000bp.hm.eigenvector.tab"
     pc1_df = pd.read_table(pc1_path, header=None, sep="\s+")

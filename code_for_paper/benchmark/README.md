@@ -26,7 +26,7 @@ For benchmarking the time and RAM requirement of the Power iteration PC1 approxi
 /usr/bin/time -v python benchmark_scikit_25Kb.py 
 ```
 
-For benchmarking the time and RAM requirement of the hicpep PC1-pattern estimation start from sparse O/E matrix with random sampling techniques at 1Mb or 100Kb resolution, use the following command (Note that ):
+For benchmarking the time and RAM requirement of the hicpep PC1-pattern estimation start from sparse O/E matrix with random sampling techniques at 1Mb or 100Kb resolution, use the following command:
 
 ```shell
 python store_oe_sparse.py # Store the sparse O/E matrix as the .npz file, which is not included in benchmark.
