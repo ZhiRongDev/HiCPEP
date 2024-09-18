@@ -21,6 +21,7 @@ def read_pearson(pearson: str) -> np.ndarray:
     :rtype: ``numpy.ndarray``
     """
 
+    # We don't use `numpy.genfromtxt` directly since it takes more time and memory.
     pearson_df = pd.read_table(pearson, header=None, sep="\s+")
     pearson_np = pearson_df.values # Turn into numpy.ndarray.
     pearson_np = pearson_np.astype('float64')
